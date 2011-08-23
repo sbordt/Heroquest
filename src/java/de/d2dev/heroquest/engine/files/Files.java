@@ -19,6 +19,7 @@ public class Files {
 		 TArchiveDetector detector = config.getArchiveDetector();
 		 
 		 detector = new TArchiveDetector( detector, HqMapFile.EXTENSION, new JarDriver(IOPoolLocator.SINGLETON) );
+		 detector = new TArchiveDetector( detector, HqMapFile.EXTENSION, new JarDriver(IOPoolLocator.SINGLETON) );
 		 
 		 config.setArchiveDetector(detector);
 	}

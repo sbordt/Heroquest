@@ -2,11 +2,14 @@ package de.d2dev.heroquest.engine.files;
 
 import java.io.IOException;
 
+import nu.xom.Document;
 import nu.xom.ParsingException;
 
-import de.d2dev.fourseasons.MagicStringException;
 import de.d2dev.fourseasons.VersionNumber;
 import de.d2dev.fourseasons.files.AbstractContainerFile;
+import de.d2dev.fourseasons.files.FileUtil;
+import de.d2dev.fourseasons.files.MagicStringException;
+import de.schlichtherle.truezip.file.TFile;
 
 public class HqMapFile extends AbstractContainerFile {
 	
@@ -14,6 +17,8 @@ public class HqMapFile extends AbstractContainerFile {
 	public static final String MAGIC_STRING = "HEROQUEST_MAP";
 	
 	public static final VersionNumber VERSION = new VersionNumber(1, 0); 
+	
+	public static final String MAP_FILE_NAME = "map.xml";
 	
 	/**
 	 * Create a new map file.
@@ -28,6 +33,8 @@ public class HqMapFile extends AbstractContainerFile {
 		return new HqMapFile( path );
 	}
 	
+	public Document map;
+	
 	/**
 	 * Load an existing map.
 	 * @param path
@@ -37,6 +44,9 @@ public class HqMapFile extends AbstractContainerFile {
 	 */
 	public HqMapFile(String path) throws IOException, MagicStringException, ParsingException {
 		super( path );
+		
+		// parse the map
+		this.map = FileUtil.readXMLFromFile( new TFile( this.file.getAbsolutePath() + "/" + MAP_FILE_NAME ) );
 	}
 	
 
