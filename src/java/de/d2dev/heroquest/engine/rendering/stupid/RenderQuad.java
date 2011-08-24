@@ -15,25 +15,26 @@ public class RenderQuad {
 		
 		@Override
 		public int compare(RenderQuad arg0, RenderQuad arg1) {
-			return arg0.z < arg1.z ? -1 : (arg0.z == arg1.z ? 0 : 1);
+			return arg0.zLayer < arg1.zLayer ? -1 : (arg0.zLayer == arg1.zLayer ? 0 : 1);
 		}
 	}
 	
 	private float x;
 	private float y;
-	int z;
+	int zLayer;
 	
 	private float widht;
 	private float height;
 	
 	String texture;
 	
-	public RenderQuad(float x, float y, float width, float height, int z, String texture) {
+	
+	public RenderQuad(float x, float y, float width, float height, int zLayer, String texture) {
 		this.x = x;
 		this.y = y;
 		this.widht = width;
 		this.height = height;
-		this.z = z;
+		this.zLayer = zLayer;
 		this.texture = texture;
 	}
 	
@@ -45,8 +46,8 @@ public class RenderQuad {
 		return this.y;
 	}
 	
-	public int getZ() {
-		return this.z;
+	public int getZLayer() {
+		return this.zLayer;
 	}
 	
 	public float getWidth() {
