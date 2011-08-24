@@ -15,7 +15,7 @@ public class RenderQuad {
 		
 		@Override
 		public int compare(RenderQuad arg0, RenderQuad arg1) {
-			return arg0.z < arg1.z ? -1 : (arg0.z == arg1.z ? 0 : 1);
+			return arg0.zLayer < arg1.zLayer ? -1 : (arg0.zLayer == arg1.zLayer ? 0 : 1);
 		}
 	}
 	

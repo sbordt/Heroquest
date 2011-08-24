@@ -18,21 +18,20 @@ import java.util.List;
  *
  * @author Justus
  */
-public class StupidRenderer extends SimpleApplication {
+public class jmeRenderer extends SimpleApplication implements StupidRenderer {
    
     // Variablen die die Cameraeinstellungen bestimmen
     private float cameraSpeed = 0.01f;
     private float zoomLevel = 5.0f;
     private float zoomSpeed = 0.01f;
     
+    StupidRenderModel map;
     
-    public StupidRenderer (StupidRenderModel map){
+    public jmeRenderer (StupidRenderModel map){
         super();
-        this.start();
-        this.initialize();
-        initKeys();
-        setCamToParallelProjektion (); 
-        createMap(map);
+        //this.initialize();
+        //initKeys();
+        this.map = map;
     }
     /** 
      * zeichnet den übergebenen Spielfeldstatus(StupidRenderModel) als 3D Szene.
@@ -54,7 +53,8 @@ public class StupidRenderer extends SimpleApplication {
                 System.out.println ("null");
             Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
             System.out.println ("danach");
-            Texture texture = assetManager.loadTexture(map.getQuads().get(i).getTexture());
+            // Texture texture = assetManager.loadTexture(map.getQuads().get(i).getTexture());
+            Texture texture = assetManager.loadTexture("Textures/Terrain/Rocky/RockyTexture.jpg");
             System.out.println ("nach textur");
             mat.setTexture("ColorMap", texture);
             geom.setMaterial(mat);
@@ -124,5 +124,18 @@ public class StupidRenderer extends SimpleApplication {
      */
     @Override
     public void simpleInitApp() {
+        setCamToParallelProjektion (); 
+        createMap(map);
     }
+    
+	@Override
+	public void setRenderModel(StupidRenderModel m) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public StupidRenderModel getRenderModel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
