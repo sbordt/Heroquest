@@ -1,4 +1,4 @@
-package de.d2dev.heroquest.engine.rendering.stupid;
+﻿package de.d2dev.heroquest.engine.rendering.stupid;
 
 public interface StupidRenderer {
 	

@@ -21,19 +21,20 @@ public class RenderQuad {
 	
 	private float x;
 	private float y;
-	int z;
+	int zLayer;
 	
 	private float widht;
 	private float height;
 	
 	String texture;
 	
-	public RenderQuad(float x, float y, float width, float height, int z, String texture) {
+	
+	public RenderQuad(float x, float y, float width, float height, int zLayer, String texture) {
 		this.x = x;
 		this.y = y;
 		this.widht = width;
 		this.height = height;
-		this.z = z;
+		this.zLayer = zLayer;
 		this.texture = texture;
 	}
 	
@@ -45,8 +46,8 @@ public class RenderQuad {
 		return this.y;
 	}
 	
-	public int getZ() {
-		return this.z;
+	public int getZLayer() {
+		return this.zLayer;
 	}
 	
 	public float getWidth() {
