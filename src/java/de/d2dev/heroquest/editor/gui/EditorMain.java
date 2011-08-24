@@ -57,7 +57,7 @@ public class EditorMain extends javax.swing.JFrame {
 
         renderWindowsMenu.setText("Render Windows");
 
-        java2DRenderWindowMenuItem.setText("Java 2D Render Windwo");
+        java2DRenderWindowMenuItem.setText("Java 2D Render Window");
         java2DRenderWindowMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 java2DRenderWindowMenuItemActionPerformed(evt);

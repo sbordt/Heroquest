@@ -21,7 +21,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="java2DRenderWindowMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Java 2D Render Windwo"/>
+                <Property name="text" type="java.lang.String" value="Java 2D Render Window"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="java2DRenderWindowMenuItemActionPerformed"/>

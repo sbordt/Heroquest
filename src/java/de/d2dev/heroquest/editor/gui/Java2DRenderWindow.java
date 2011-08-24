@@ -16,7 +16,7 @@ import de.d2dev.heroquest.engine.rendering.stupid.*;
 
 /**
  *
- * @author Batti
+ * @author Sebastian Bordt
  */
 public class Java2DRenderWindow extends javax.swing.JFrame {
 	
