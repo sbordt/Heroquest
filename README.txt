@@ -1,1 +1,1 @@
-Hier entstehe HeroQuest!
+Hier entsteht HeroQuest!
