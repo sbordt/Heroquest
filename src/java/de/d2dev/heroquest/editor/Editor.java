@@ -6,8 +6,8 @@ import de.d2dev.fourseasons.Application;
 import de.d2dev.heroquest.editor.gui.*;
 import de.d2dev.heroquest.engine.files.Files;
 import de.d2dev.heroquest.engine.files.HqRessourceFile;
-import de.d2dev.heroquest.engine.rendering.stupid.RenderQuad;
-import de.d2dev.heroquest.engine.rendering.stupid.StupidRenderModel;
+import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
+import de.d2dev.heroquest.engine.rendering.quads.RenderQuad;
 
 public class Editor {
 	
@@ -16,11 +16,11 @@ public class Editor {
 	public HqRessourceFile globalRessources;
 	public EditorRessourceLocator resourceProvider;
 	
-	public StupidRenderModel renderModel;
+	public QuadRenderModel renderModel;
 	
 	
 	public Editor() {
-		this.renderModel = new StupidRenderModel(500, 500);
+		this.renderModel = new QuadRenderModel(500, 500);
 		this.renderModel.addQuad( new RenderQuad( 10.0f, 10.0f, 100.0f, 100.0f, 0, "fields/yellow/yellow.bmp" ) );
 	}
 	

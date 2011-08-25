@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.d2dev.heroquest.engine.rendering.stupid;
+package de.d2dev.heroquest.engine.rendering.quads;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
@@ -18,16 +18,16 @@ import java.util.List;
  *
  * @author Justus
  */
-public class jmeRenderer extends SimpleApplication implements StupidRenderer {
+public class JmeRenderer extends SimpleApplication implements QuadRenderer {
    
     // Variablen die die Cameraeinstellungen bestimmen
     private float cameraSpeed = 0.01f;
     private float zoomLevel = 5.0f;
     private float zoomSpeed = 0.01f;
     
-    StupidRenderModel map;
+    QuadRenderModel map;
     
-    public jmeRenderer (StupidRenderModel map){
+    public JmeRenderer (QuadRenderModel map){
         super();
         //this.initialize();
         //initKeys();
@@ -38,7 +38,7 @@ public class jmeRenderer extends SimpleApplication implements StupidRenderer {
      * 
      */
      
-    private void createMap (StupidRenderModel map){
+    private void createMap (QuadRenderModel map){
        
         for (int i = 0; i < map.getQuads().size(); i++){
             System.out.println(map.getQuads().size());
@@ -129,12 +129,12 @@ public class jmeRenderer extends SimpleApplication implements StupidRenderer {
     }
     
 	@Override
-	public void setRenderModel(StupidRenderModel m) {
+	public void setRenderModel(QuadRenderModel m) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public StupidRenderModel getRenderModel() {
+	public QuadRenderModel getRenderModel() {
 		// TODO Auto-generated method stub
 		return null;
 	}

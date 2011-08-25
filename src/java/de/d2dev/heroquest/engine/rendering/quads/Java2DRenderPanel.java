@@ -1,4 +1,4 @@
-package de.d2dev.heroquest.engine.rendering.stupid;
+package de.d2dev.heroquest.engine.rendering.quads;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -21,7 +21,7 @@ public class Java2DRenderPanel extends JPanel {
 	
 	private Java2DRenderer renderer;
 	
-	public Java2DRenderPanel(StupidRenderModel m, ResourceLocator p) {
+	public Java2DRenderPanel(QuadRenderModel m, ResourceLocator p) {
 		this.renderer = new Java2DRenderer(m, p);
 		
 		this.setPreferredSize( new Dimension( m.getWidth(), m.getHeight() ) );

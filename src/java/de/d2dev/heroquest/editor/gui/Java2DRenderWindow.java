@@ -12,7 +12,7 @@
 package de.d2dev.heroquest.editor.gui;
 
 import de.d2dev.fourseasons.resource.ResourceLocator;
-import de.d2dev.heroquest.engine.rendering.stupid.*;
+import de.d2dev.heroquest.engine.rendering.quads.*;
 
 /**
  *
@@ -28,7 +28,7 @@ public class Java2DRenderWindow extends javax.swing.JFrame {
 	private Java2DRenderPanel renderPanel;
 
     /** Creates new form Java2DRenderWindow */
-    public Java2DRenderWindow(StupidRenderModel m, ResourceLocator p) {
+    public Java2DRenderWindow(QuadRenderModel m, ResourceLocator p) {
         initComponents();
         
         this.renderPanel = new Java2DRenderPanel(m, p);

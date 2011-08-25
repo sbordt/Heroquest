@@ -1,10 +1,10 @@
-package de.d2dev.heroquest.engine.rendering.stupid;
+package de.d2dev.heroquest.engine.rendering.quads;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class StupidRenderModel {
+public class QuadRenderModel {
 	
 	private int width;
 	private int height;
@@ -19,7 +19,7 @@ public class StupidRenderModel {
 	 */
 	private List<RenderQuad> unmodifiable_quads = Collections.unmodifiableList( quads );
 	
-	public StupidRenderModel(int width, int height) {
+	public QuadRenderModel(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}

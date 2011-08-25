@@ -2,19 +2,19 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.d2dev.heroquest.engine.rendering.stupid.tests;
+package de.d2dev.heroquest.engine.rendering.quads.tests;
 
 import java.util.List;
 import java.util.ArrayList;
 
-import de.d2dev.heroquest.engine.rendering.stupid.RenderQuad;
-import de.d2dev.heroquest.engine.rendering.stupid.StupidRenderModel;
+import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
+import de.d2dev.heroquest.engine.rendering.quads.RenderQuad;
 
 /**
  *
  * @author Justus
  */
-public class TestMap extends StupidRenderModel {
+public class TestMap extends QuadRenderModel {
 
     public TestMap() {
 		super(20, 30);

@@ -1,4 +1,4 @@
-package de.d2dev.heroquest.engine.rendering.stupid;
+package de.d2dev.heroquest.engine.rendering.quads;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -15,11 +15,11 @@ import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.resource.types.TextureResource;
 
-public class Java2DRenderer extends AbstractRenderer {
+public class Java2DRenderer extends AbstractQuadRenderer {
 	
 	private HashMap< String, BufferedImage > textures = new HashMap< String, BufferedImage >();
 
-	protected Java2DRenderer(StupidRenderModel m, ResourceLocator p) {
+	protected Java2DRenderer(QuadRenderModel m, ResourceLocator p) {
 		super(m, p);
 	}
 	
