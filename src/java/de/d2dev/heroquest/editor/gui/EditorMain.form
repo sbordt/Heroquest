@@ -31,6 +31,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="jMonkey Render Window"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMonkeyRenderWindowMenuItemActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>

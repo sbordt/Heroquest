@@ -52,13 +52,13 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 		return target;
 	}
 	
-	BufferedImage provideTexture(String texture) {
+	BufferedImage provideTexture(Resource texture) {
 		BufferedImage img;
 		
-		if ( (img = this.textures.get( texture )) == null ) {
+		if ( (img = this.textures.get( texture.getName() )) == null ) {
 			try {
-				img = TextureResource.load( this.resourceProvider.getAbsoluteLocation( new Resource( texture, new TextureResource() ) ) );
-				this.textures.put( texture, img );
+				img = TextureResource.load( this.resourceProvider.getAbsoluteLocation( texture ) );
+				this.textures.put( texture.getName(), img );
 			} catch (Exception e) {
 				e.printStackTrace();
 				

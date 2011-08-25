@@ -2,6 +2,8 @@ package de.d2dev.heroquest.engine.rendering.quads;
 
 import java.util.Comparator;
 
+import de.d2dev.fourseasons.resource.Resource;
+
 /**
  * A rectangle to be rendered by our stupid Renderer.
  * Has x,y,width,height (floating point valus), a texture and
@@ -26,10 +28,10 @@ public class RenderQuad {
 	private float widht;
 	private float height;
 	
-	String texture;
+	Resource texture;
 	
 	
-	public RenderQuad(float x, float y, float width, float height, int zLayer, String texture) {
+	public RenderQuad(float x, float y, float width, float height, int zLayer, Resource texture) {
 		this.x = x;
 		this.y = y;
 		this.widht = width;
@@ -58,7 +60,7 @@ public class RenderQuad {
 		return this.height;
 	}
 	
-	public String getTexture() {
+	public Resource getTexture() {
 		return this.texture;
 	}
 }

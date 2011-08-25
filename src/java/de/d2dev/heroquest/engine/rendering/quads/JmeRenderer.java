@@ -12,6 +12,10 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Texture;
 import com.jme3.math.Vector3f;
+
+import de.d2dev.fourseasons.resource.JmeAssetLocatorAdapter;
+import de.d2dev.fourseasons.resource.ResourceLocator;
+
 import java.util.List;
 
 /**
@@ -25,13 +29,14 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer {
     private float zoomLevel = 5.0f;
     private float zoomSpeed = 0.01f;
     
-    QuadRenderModel map;
+    QuadRenderModel model;
+    ResourceLocator resourceLocator;
     
-    public JmeRenderer (QuadRenderModel map){
+    public JmeRenderer (QuadRenderModel model, ResourceLocator locator) {
         super();
-        //this.initialize();
-        //initKeys();
-        this.map = map;
+        
+        this.model = model;
+        this.resourceLocator = locator;
     }
     /** 
      * zeichnet den übergebenen Spielfeldstatus(StupidRenderModel) als 3D Szene.
@@ -53,8 +58,9 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer {
                 System.out.println ("null");
             Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
             System.out.println ("danach");
-            // Texture texture = assetManager.loadTexture(map.getQuads().get(i).getTexture());
-            Texture texture = assetManager.loadTexture("Textures/Terrain/Rocky/RockyTexture.jpg");
+            
+            Texture texture = assetManager.loadTexture( map.getQuads().get(i).getTexture().getName() );
+            
             System.out.println ("nach textur");
             mat.setTexture("ColorMap", texture);
             geom.setMaterial(mat);
@@ -124,8 +130,12 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer {
      */
     @Override
     public void simpleInitApp() {
+    	JmeAssetLocatorAdapter.locators.put("argh", this.resourceLocator );	// ugly hack
+    	this.assetManager.registerLocator( "argh", new JmeAssetLocatorAdapter().getClass() );
+    	
+    	initKeys();
         setCamToParallelProjektion (); 
-        createMap(map);
+        createMap(model);
     }
     
 	@Override

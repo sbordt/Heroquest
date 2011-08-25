@@ -4,6 +4,9 @@
  */
 package de.d2dev.heroquest.engine.rendering.quads.tests;
 
+import de.d2dev.fourseasons.resource.DummyResourceLocator;
+import de.d2dev.fourseasons.resource.Resource;
+import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.heroquest.engine.rendering.quads.JmeRenderer;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 
@@ -12,9 +15,10 @@ import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
  * @author Justus
  */
 public class Main {
+	
     public static void main(String[] args) {
         QuadRenderModel map = new TestMap ();
-        JmeRenderer stupidRenderer = new JmeRenderer(map);
+        JmeRenderer stupidRenderer = new JmeRenderer(map, new DummyResourceLocator() );
         stupidRenderer.start();
     }
 }

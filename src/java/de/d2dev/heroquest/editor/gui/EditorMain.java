@@ -12,6 +12,7 @@
 package de.d2dev.heroquest.editor.gui;
 
 import de.d2dev.heroquest.editor.Editor;
+import de.d2dev.heroquest.engine.rendering.quads.JmeRenderer;
 
 /**
  *
@@ -20,7 +21,9 @@ import de.d2dev.heroquest.editor.Editor;
 public class EditorMain extends javax.swing.JFrame {
 	
 	private Editor editor;
+	
 	private Java2DRenderWindow java2DRenderWindow = null;
+	private JmeRenderer jmeRenderWindow = null;
 	
     /** Creates new form EditorMain */
     public EditorMain(Editor editor) {
@@ -66,6 +69,11 @@ public class EditorMain extends javax.swing.JFrame {
         renderWindowsMenu.add(java2DRenderWindowMenuItem);
 
         jMonkeyRenderWindowMenuItem.setText("jMonkey Render Window");
+        jMonkeyRenderWindowMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMonkeyRenderWindowMenuItemActionPerformed(evt);
+            }
+        });
         renderWindowsMenu.add(jMonkeyRenderWindowMenuItem);
 
         jMenuBar1.add(renderWindowsMenu);
@@ -93,6 +101,9 @@ public class EditorMain extends javax.swing.JFrame {
     	
     	this.java2DRenderWindow.setVisible(true);
     }//GEN-LAST:event_java2DRenderWindowMenuItemActionPerformed
+
+    private void jMonkeyRenderWindowMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMonkeyRenderWindowMenuItemActionPerformed
+    }//GEN-LAST:event_jMonkeyRenderWindowMenuItemActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
