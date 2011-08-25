@@ -4,9 +4,6 @@
  */
 package de.d2dev.heroquest.engine.rendering.quads.tests;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import de.d2dev.fourseasons.resource.types.TextureResource;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.rendering.quads.RenderQuad;

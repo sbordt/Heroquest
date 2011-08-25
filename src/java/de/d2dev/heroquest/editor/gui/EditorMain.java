@@ -12,6 +12,7 @@
 package de.d2dev.heroquest.editor.gui;
 
 import de.d2dev.heroquest.editor.Editor;
+import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderWindow;
 import de.d2dev.heroquest.engine.rendering.quads.JmeRenderer;
 
 /**

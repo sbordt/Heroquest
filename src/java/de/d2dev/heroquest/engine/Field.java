@@ -1,7 +1,6 @@
 package de.d2dev.heroquest.engine;
 
 import nu.xom.Attribute;
-import nu.xom.Document;
 import nu.xom.Element;
 import de.d2dev.fourseasons.files.FileUtil;
 import de.d2dev.fourseasons.game.GameObjectAdapter;
@@ -47,7 +46,7 @@ public class Field extends GameObjectAdapter {
 	private int y;
 	
 	/**
-	 * Whether the field has been revealed. This value is initially usually
+	 * Whether the field has been revealed. In game this value is initially usually
 	 * false, then changes to true and can't be changed from thereon.
 	 */
 	private boolean revealed;
@@ -65,6 +64,8 @@ public class Field extends GameObjectAdapter {
 		
 		this.isWall = false;
 		this.isDoor = false;
+		
+		this.texture = TextureResource.createTextureResource( "fields/default.jpg" );
 	}
 	
 	/**
@@ -80,7 +81,7 @@ public class Field extends GameObjectAdapter {
 		this.revealed = FileUtil.readBoleanAttribute( xml, REVEALED );
 		this.isWall = FileUtil.readBoleanAttribute( xml, IS_WALL);
 		this.isDoor = FileUtil.readBoleanAttribute( xml, IS_DOOR);
-		this.texture = new Resource( FileUtil.readStringAttribute( xml, TEXTURE ), new TextureResource() );
+		this.texture = TextureResource.createTextureResource( FileUtil.readStringAttribute( xml, TEXTURE ) );
 	}
 	
 	public int getX() {

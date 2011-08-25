@@ -16,8 +16,6 @@ import com.jme3.math.Vector3f;
 import de.d2dev.fourseasons.resource.JmeAssetLocatorAdapter;
 import de.d2dev.fourseasons.resource.ResourceLocator;
 
-import java.util.List;
-
 /**
  *
  * @author Justus

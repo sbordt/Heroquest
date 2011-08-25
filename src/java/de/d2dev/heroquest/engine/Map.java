@@ -11,6 +11,8 @@ import de.d2dev.heroquest.engine.files.HqMapFile;
  */
 public class Map {
 	
+	
+	
 	private int width;
 	private int height;
 	
@@ -29,6 +31,12 @@ public class Map {
 		this.height = height;
 		
 		this.fields = new Field[width][height];
+		
+		for (int x=0; x<this.width; x++) {
+			for (int y=0; y<this.height; y++) {
+				this.fields[x][y] = new Field( x, y );
+			}
+		}
 	}
 	
 	/**
@@ -37,6 +45,22 @@ public class Map {
 	 */
 	public Map(HqMapFile file) {
 		
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public Field getField(int x, int y) {
+		return this.fields[x][y];
+	}
+	
+	public Field[][] getFields() {
+		return fields;
 	}
 	
 	/**
