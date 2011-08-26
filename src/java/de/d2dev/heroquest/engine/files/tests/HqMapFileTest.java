@@ -1,7 +1,5 @@
 package de.d2dev.heroquest.engine.files.tests;
 
-import static org.junit.Assert.*;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,6 +15,6 @@ public class HqMapFileTest {
 
 	@Test
 	public void create() throws Exception {
-		HqMapFile map = HqMapFile.createHqMapFile( "C:/Users/Batti/Desktop/tests/mymap.hqmap" );
+		HqMapFile.createHqMapFile( "C:/Users/Batti/Desktop/tests/mymap.hqmap" );
 	}
 }
