@@ -16,7 +16,7 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 	
 	private HashMap< String, BufferedImage > textures = new HashMap< String, BufferedImage >();
 	
-	private int ppUnit = 40;
+	private int ppUnit = 100;
 
 	public Java2DRenderer(QuadRenderModel m, ResourceLocator p) {
 		super(m, p);

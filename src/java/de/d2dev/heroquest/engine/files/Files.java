@@ -18,7 +18,7 @@ public class Files {
 		 TConfig config = TConfig.get();
 		 TArchiveDetector detector = config.getArchiveDetector();
 		 
-		 detector = new TArchiveDetector( detector, HqMapFile.EXTENSION, new JarDriver(IOPoolLocator.SINGLETON) );
+		 detector = new TArchiveDetector( detector, HqRessourceFile.EXTENSION, new JarDriver(IOPoolLocator.SINGLETON) );
 		 detector = new TArchiveDetector( detector, HqMapFile.EXTENSION, new JarDriver(IOPoolLocator.SINGLETON) );
 		 
 		 config.setArchiveDetector(detector);

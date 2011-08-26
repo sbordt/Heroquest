@@ -11,9 +11,14 @@
 
 package de.d2dev.heroquest.editor.gui;
 
+import javax.swing.JFrame;
+
+import com.jme3.app.SimpleApplication;
+
 import de.d2dev.heroquest.editor.Editor;
 import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderWindow;
 import de.d2dev.heroquest.engine.rendering.quads.JmeRenderer;
+import de.d2dev.heroquest.engine.rendering.quads.RunJmeCanvasInSwing;
 
 /**
  *
@@ -24,7 +29,8 @@ public class EditorMain extends javax.swing.JFrame {
 	private Editor editor;
 	
 	private Java2DRenderWindow java2DRenderWindow = null;
-	private JmeRenderer jmeRenderWindow = null;
+	private JFrame jmeRenderWindow = null;
+	private JmeRenderer jmeRenderer = null;
 	
     /** Creates new form EditorMain */
     public EditorMain(Editor editor) {
@@ -104,6 +110,16 @@ public class EditorMain extends javax.swing.JFrame {
     }//GEN-LAST:event_java2DRenderWindowMenuItemActionPerformed
 
     private void jMonkeyRenderWindowMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMonkeyRenderWindowMenuItemActionPerformed
+    	if ( (this.jmeRenderWindow == null) && (this.jmeRenderer == null)){
+    		
+    		this.jmeRenderWindow = new JFrame ("JME-Renderer");
+    		this.jmeRenderWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    		
+    		this.jmeRenderer = new JmeRenderer (this.editor.renderModel, this.editor.resourceProvider);
+    		
+    		SimpleApplication jmeRenderer = this.jmeRenderer;
+    		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing (this.jmeRenderWindow, jmeRenderer));
+    	}
     }//GEN-LAST:event_jMonkeyRenderWindowMenuItemActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

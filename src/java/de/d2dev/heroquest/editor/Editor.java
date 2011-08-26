@@ -3,6 +3,7 @@ package de.d2dev.heroquest.editor;
 import javax.swing.UIManager;
 
 import de.d2dev.fourseasons.Application;
+import de.d2dev.fourseasons.resource.types.TextureResource;
 import de.d2dev.heroquest.editor.gui.*;
 import de.d2dev.heroquest.engine.Map;
 import de.d2dev.heroquest.engine.files.Files;
@@ -23,7 +24,8 @@ public class Editor {
 	public QuadRenderModel renderModel;
 	
 	public Editor() {
-		this.map = new Map( 10, 10 );
+		this.map = new Map( 20, 10 );
+		this.map.getField(5, 5).setTexture( TextureResource.createTextureResource( "fields/yellow/yellow.jpg" ) );
 		
 		this.renderer = new Renderer( this.map );
 		this.renderer.render();
@@ -47,7 +49,7 @@ public class Editor {
     	Editor editor = new Editor();
     	editor.publicDataStoragePath = Application.getPublicStoragePath("HeroQuest Editor");
     	
-    	editor.globalRessources = new HqRessourceFile( editor.publicDataStoragePath + "/" + "globalRessources.zip" );
+    	editor.globalRessources = new HqRessourceFile( editor.publicDataStoragePath + "/" + "globalRessources.hqres" );
     	
     	editor.resourceProvider = new EditorRessourceLocator( editor );
  
