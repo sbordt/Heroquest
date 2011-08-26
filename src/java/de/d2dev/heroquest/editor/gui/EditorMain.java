@@ -161,7 +161,7 @@ public class EditorMain extends javax.swing.JFrame {
     		this.jmeRenderWindow = new JFrame ("JME-Renderer");
     		this.jmeRenderWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     		
-    		this.jmeRenderer = new JmeRenderer (this.editor.renderModel, this.editor.resourceProvider);
+    		this.jmeRenderer = new JmeRenderer (this.editor.renderer.getRederTarget(), this.editor.resourceProvider);
     		
     		SimpleApplication jmeRenderer = this.jmeRenderer;
     		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing (this.jmeRenderWindow, jmeRenderer));
