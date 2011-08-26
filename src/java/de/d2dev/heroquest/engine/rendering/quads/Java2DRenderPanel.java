@@ -20,14 +20,26 @@ public class Java2DRenderPanel extends JPanel {
 	private Java2DRenderer renderer;
 	
 	public Java2DRenderPanel(QuadRenderModel m, ResourceLocator p) {
-		this.renderer = new Java2DRenderer(m, p);
+		this.renderer = new Java2DRenderer( m, p, 40 );
 		
-		this.setPreferredSize( new Dimension( m.getWidth(), m.getHeight() ) );
-		this.setMaximumSize( new Dimension( m.getWidth(), m.getHeight() ) );
+		this.setPreferredSize( new Dimension( this.renderer.getTargetWidth(), this.renderer.getTargetHeight() ) );
+		this.setMaximumSize( new Dimension( this.renderer.getTargetWidth(), this.renderer.getTargetHeight() ) );
 	}
 	
 	public Java2DRenderer getRenderer() {
 		return this.renderer;
+	}
+	
+	public void setRenderModel(QuadRenderModel m) {
+		// set the new render model
+		this.renderer = new Java2DRenderer( m, this.renderer.getResourceLocator(), 40 );
+		
+		// adapt the size
+		this.setPreferredSize( new Dimension( this.renderer.getTargetWidth(), this.renderer.getTargetHeight() ) );
+		this.setMaximumSize( new Dimension( this.renderer.getTargetWidth(), this.renderer.getTargetHeight() ) );
+		
+		// repaint the panel
+		this.repaint();
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -36,14 +48,22 @@ public class Java2DRenderPanel extends JPanel {
 		Graphics2D graphics = (Graphics2D) g;
 
         // Black background fill
-		graphics.setColor( Color.BLACK );
+		graphics.setColor( new Color(0f, 0f, 0.75f) );
 		graphics.fillRect( 0, 0, this.getWidth(), this.getHeight() );
 		
 		// ask the renderer to render!
 		BufferedImage img = renderer.render();
 		
-		// display the rendered image
-		graphics.drawImage( img, 0, 0, null );
+		// display the rendered image (put it in the center if we are bigger than it)
+		int x = 0, y = 0;
+		
+		if ( this.getWidth()  > img.getWidth() )
+			x = ( this.getWidth() - img.getWidth() ) / 2;
+		
+		if ( this.getHeight()  > img.getHeight() )
+			y = ( this.getHeight()  - img.getHeight() ) / 2;
+		
+		graphics.drawImage( img, x, y, null );
     }
 
 }

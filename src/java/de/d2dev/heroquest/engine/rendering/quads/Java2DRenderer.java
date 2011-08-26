@@ -7,29 +7,46 @@ import java.awt.image.*;
 import java.util.HashMap;
 import java.util.List;
 
-
 import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.resource.types.TextureResource;
 
+/**
+ * This class renders a {@link QuadRenderModel} into a {@link java.awt.BufferedImage} (using {@code BufferedImage.TYPE_INT_ARGB}). 
+ * {@code ppUnit} determines the number of pixels per render model unit. 
+ * @author Sebastian Bordt
+ *
+ */
 public class Java2DRenderer extends AbstractQuadRenderer {
 	
 	private HashMap< String, BufferedImage > textures = new HashMap< String, BufferedImage >();
 	
-	private int ppUnit = 40;
-
-	public Java2DRenderer(QuadRenderModel m, ResourceLocator p) {
+	private int ppUnit;
+	
+	private BufferedImage target;
+	
+	public Java2DRenderer(QuadRenderModel m, ResourceLocator p, int ppUnit) {
 		super(m, p);
+		
+		if ( ppUnit <= 0 )	// verify
+			throw new IllegalArgumentException();
+		
+		this.ppUnit = ppUnit;
+		
+		// create the render target
+		this.target = new BufferedImage( this.model.getWidth() * this.ppUnit, this.model.getHeight() * this.ppUnit,  BufferedImage.TYPE_INT_ARGB );
 	}
 	
+	/**
+	 * Render!
+	 * @return The render target.
+	 */
 	public BufferedImage render() {
-		// create a render target
-		BufferedImage target = new BufferedImage( this.model.getWidth() * this.ppUnit, this.model.getHeight() * this.ppUnit,  BufferedImage.TYPE_INT_ARGB );
 		Graphics2D graphics = target.createGraphics();
 		
 		// fill the background (black)
 		graphics.setColor( Color.BLACK );
-		graphics.fillRect( 0, 0, model.getWidth() * this.ppUnit, model.getHeight() * this.ppUnit );
+		graphics.fillRect( 0, 0, this.target.getWidth(), this.target.getHeight() );
 		
 		// render the quads
 		List<RenderQuad> quads = this.model.getQuads();
@@ -51,7 +68,35 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 		return target;
 	}
 	
-	BufferedImage provideTexture(Resource texture) {
+	@Override
+	public void setRenderModel(QuadRenderModel m) {
+		// clear loaded texture
+		this.textures.clear();
+		
+		// change the underlying model
+		this.model = m;
+		
+		// create the render target
+		this.target = new BufferedImage( this.model.getWidth() * this.ppUnit, this.model.getHeight() * this.ppUnit,  BufferedImage.TYPE_INT_ARGB );
+	}
+	
+	public int getTargetWidth() {
+		return this.target.getWidth();
+	}
+	
+	public int getTargetHeight() {
+		return this.target.getHeight();
+	}
+	
+	public BufferedImage getRenderTarget() {
+		return this.target;
+	}
+	
+	public ResourceLocator getResourceLocator() {
+		return this.resourceProvider;
+	}
+	
+	private BufferedImage provideTexture(Resource texture) {
 		BufferedImage img;
 		
 		if ( (img = this.textures.get( texture.getName() )) == null ) {
@@ -72,5 +117,4 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 		
 		return img;
 	}
-
 }
