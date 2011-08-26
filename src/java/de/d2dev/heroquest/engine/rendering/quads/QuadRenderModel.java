@@ -3,8 +3,11 @@ package de.d2dev.heroquest.engine.rendering.quads;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 public class QuadRenderModel {
+
+	public Vector<QuadRenderModelListener> listeners = new Vector<QuadRenderModelListener>();
 	
 	private int width;
 	private int height;
@@ -22,6 +25,28 @@ public class QuadRenderModel {
 	public QuadRenderModel(int width, int height) {
 		this.width = width;
 		this.height = height;
+	}
+	
+	public void addListener(QuadRenderModelListener l) {
+		if ( !this.listeners.contains( l ) ) {
+			this.listeners.add( l );
+		}
+	}
+	
+	public void removeListener(QuadRenderModelListener l) {
+		this.listeners.remove( l );
+	}
+	
+	private void fireOnAddQuad(RenderQuad quad) {
+		for ( QuadRenderModelListener l : this.listeners ) {
+			l.onAddQuad( quad );
+		}
+	}
+	
+	private void fireOnRemoveQuad(RenderQuad quad) {
+		for ( QuadRenderModelListener l : this.listeners ) {
+			l.onRemoveQuad( quad );
+		}
 	}
 	
 	public int getWidth() {
@@ -43,11 +68,17 @@ public class QuadRenderModel {
 	public void addQuad(RenderQuad quad) {
 		if ( !quads.contains( quad) ) {
 			quads.add( quad );
-			Collections.sort( quads, quad.new ZOrderComparator() );				
+			Collections.sort( quads, quad.new ZOrderComparator() );	
+			
+			this.fireOnAddQuad( quad );
 		}
 	}
 	
 	public void removeQuad(RenderQuad quad) {
-		quads.remove( quad );
+		if ( this.quads.contains( quad ) ) {
+			this.fireOnRemoveQuad( quad );	// notify listeners before
+			
+			quads.remove( quad );
+		}
 	}
 }

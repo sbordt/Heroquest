@@ -11,8 +11,6 @@ import de.d2dev.heroquest.engine.files.HqMapFile;
  */
 public class Map {
 	
-	
-	
 	private int width;
 	private int height;
 	
