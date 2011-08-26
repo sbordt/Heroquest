@@ -178,8 +178,12 @@ public class EditorMain extends javax.swing.JFrame {
     	this.editor.renderer = new Renderer( this.editor.map );
     	this.editor.renderer.render();
     	
+    	// update render windows
     	if ( this.java2DRenderWindow != null )
     		this.java2DRenderWindow.setRenderModel( this.editor.renderer.getRederTarget() );
+    	
+    	if ( this.jmeRenderer != null )
+    		this.jmeRenderer.setRenderModel( this.editor.renderer.getRederTarget() );
     	
     }//GEN-LAST:event_newEmptyMapMenuItemActionPerformed
 
