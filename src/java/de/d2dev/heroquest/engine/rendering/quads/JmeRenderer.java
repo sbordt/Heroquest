@@ -4,6 +4,8 @@
  */
 package de.d2dev.heroquest.engine.rendering.quads;
 
+import java.util.HashMap;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.*;
@@ -23,17 +25,21 @@ import de.d2dev.fourseasons.resource.ResourceLocator;
 public class JmeRenderer extends SimpleApplication implements QuadRenderer {
    
     // Variablen die die Cameraeinstellungen bestimmen
-    private float cameraSpeed = 0.01f;
+	private float cameraSpeed = 0.01f;
     private float zoomLevel = 5.0f;
     private float zoomSpeed = 0.01f;
     
-    QuadRenderModel model;
+    // Spielfeldvariablen
+    QuadRenderModel quadRenderModel = null;
+    HashMap<RenderQuad, Geometry> geometrics = new HashMap<RenderQuad, Geometry>();
+    
+    
     ResourceLocator resourceLocator;
     
     public JmeRenderer (QuadRenderModel model, ResourceLocator locator) {
         super();
         
-        this.model = model;
+        this.quadRenderModel = model;
         this.resourceLocator = locator;
     }
     /** 
@@ -43,26 +49,25 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer {
      
     private void createMap (QuadRenderModel map){
        
+    	// Für jedes Quad des QuadRenderModels wird ein Quad erstellt mit der Textur versehen
+    	// und zum rootNode hinzugefügt
         for (int i = 0; i < map.getQuads().size(); i++){
-            System.out.println(map.getQuads().size());
-            System.out.println (map.getQuads().get(i).getTexture());
-            Quad quad = new Quad(map.getQuads().get(i).getWidth(),map.getQuads().get(i).getHeight());
+            
+        	// Das Quad wird in seiner Größe erstellt
+        	Quad quad = new Quad(map.getQuads().get(i).getWidth(),map.getQuads().get(i).getHeight());
             Geometry geom = new Geometry("Quad", quad);
+            // Das Quad wird im Geometry bewegt
             geom.move(map.getQuads().get(i).getX(), map.getQuads().get(i).getY(), map.getQuads().get(i).getZLayer());
-            System.out.println ("Vor dem Mat erstellen");
-            if (assetManager != null)
-                System.out.println ("null nicht");
-            else
-                System.out.println ("null");
+            // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
             Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            System.out.println ("danach");
-            
             Texture texture = assetManager.loadTexture( map.getQuads().get(i).getTexture().getName() );
-            
-            System.out.println ("nach textur");
             mat.setTexture("ColorMap", texture);
             geom.setMaterial(mat);
-            rootNode.attachChild(geom); 
+            // Das Geometrie Object wird dem rootnode hinzugefügt
+            this.rootNode.attachChild(geom);
+            // Damit später auf die Quads zugefriffen werden kann werden diese mit dem zugehörigen
+            // RenderQuad als Schlüssel gespeichert 
+            geometrics.put(map.getQuads().get(i), geom);
         }
     }
     
@@ -133,17 +138,18 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer {
     	
     	initKeys();
         setCamToParallelProjektion (); 
-        createMap(model);
+        createMap(this.quadRenderModel);
     }
     
 	@Override
 	public void setRenderModel(QuadRenderModel m) {
-		// TODO Auto-generated method stub
-		
+		this.quadRenderModel = m;
+		rootNode.detachAllChildren();
+		this.createMap(m);
 	}
 	@Override
 	public QuadRenderModel getRenderModel() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.quadRenderModel;
 	}
 }

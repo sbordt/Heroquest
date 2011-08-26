@@ -11,8 +11,9 @@ import com.jme3.system.JmeCanvasContext;
 
 public class RunJmeCanvasInSwing implements Runnable {
 	
-	JFrame frame;
-	SimpleApplication jmeApp;
+	private JFrame frame = null;
+	private JPanel panel = null;
+	private SimpleApplication jmeApp = null;
 
 	public RunJmeCanvasInSwing (JFrame frame, SimpleApplication jmeApp){
 		this.frame = frame;
@@ -31,11 +32,16 @@ public class RunJmeCanvasInSwing implements Runnable {
 		Dimension dim = new Dimension(640, 480);
 		canvasContext.getCanvas().setPreferredSize(dim);
 		
-		JPanel panel = new JPanel();
-		panel.add(canvasContext.getCanvas());
-		frame.add(panel);
-		frame.pack();
-		frame.setVisible(true);
+		if ((panel == null) && (frame != null)){
+			JPanel panel = new JPanel();
+			panel.add(canvasContext.getCanvas());
+			frame.add(panel);
+			frame.pack();
+			frame.setVisible(true);
+		}
+		else if (panel != null){
+			panel.add(canvasContext.getCanvas());
+		}
 		
 		jmeApp.startCanvas();
 	}
