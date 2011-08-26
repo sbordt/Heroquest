@@ -22,7 +22,7 @@ import de.d2dev.fourseasons.resource.ResourceLocator;
  *
  * @author Justus
  */
-public class JmeRenderer extends SimpleApplication implements QuadRenderer {
+public class JmeRenderer extends SimpleApplication implements QuadRenderer, QuadRenderModelListener {
    
     // Variablen die die Cameraeinstellungen bestimmen
 	private float cameraSpeed = 0.01f;
@@ -149,7 +149,39 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer {
 	}
 	@Override
 	public QuadRenderModel getRenderModel() {
-		// TODO Auto-generated method stub
 		return this.quadRenderModel;
+	}
+	@Override
+	public void onAddQuad(RenderQuad quad) {
+		this.quadRenderModel.addQuad(quad);
+		// Das Quad wird in seiner Größe erstellt
+    	Quad jmeQuad = new Quad(quad.getWidth(),quad.getHeight());
+        Geometry geom = new Geometry("Quad", jmeQuad);
+        // Das Quad wird im Geometry bewegt
+        geom.move(quad.getX(), quad.getY(), quad.getZLayer());
+        // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
+        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        Texture texture = assetManager.loadTexture( quad.getTexture().getName() );
+        mat.setTexture("ColorMap", texture);
+        geom.setMaterial(mat);
+        // Das Geometrie Object wird dem rootnode hinzugefügt
+        this.rootNode.attachChild(geom);
+        // Damit später auf die Quads zugefriffen werden kann werden diese mit dem zugehörigen
+        // RenderQuad als Schlüssel gespeichert 
+        geometrics.put(quad, geom);
+	}
+	@Override
+	public void onRemoveQuad(RenderQuad quad) {
+		rootNode.detachChild(geometrics.get(quad));
+		geometrics.remove(quad);
+	}
+	@Override
+	public void onQuadMoved(RenderQuad quad) {
+		geometrics.get(quad).move(quad.getX(), quad.getY(), quad.getZLayer());
+	}
+	@Override
+	public void onQuadTextureChanged(RenderQuad quad) {
+		Texture texture = assetManager.loadTexture( quad.getTexture().getName() );
+		geometrics.get(quad).getMaterial().setTexture("ColorMap", texture);
 	}
 }
