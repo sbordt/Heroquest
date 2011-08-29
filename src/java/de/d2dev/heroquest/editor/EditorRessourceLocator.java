@@ -18,6 +18,11 @@ public class EditorRessourceLocator implements ResourceLocator {
 	public String getAbsoluteLocation(Resource r) {
 		TFile resource;
 		
+		// absolute path - general
+		if ( ( resource = new TFile( r.getName() ) ).exists() ) {
+			return resource.getAbsolutePath();
+		}
+		
 		// textures
 		if ( r.getType().isType( TextureResource.TYPENAME ) ) {
 			if ( ( resource = new TFile( this.editor.globalRessources.textures.getAbsolutePath() + "/" + r.getName() ) ).exists() ) {

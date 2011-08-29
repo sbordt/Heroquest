@@ -184,4 +184,9 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 		Texture texture = assetManager.loadTexture( quad.getTexture().getName() );
 		geometrics.get(quad).getMaterial().setTexture("ColorMap", texture);
 	}
+	@Override
+	public void onResize(int width, int height) {
+		// TODO Auto-generated method stub
+		
+	}
 }

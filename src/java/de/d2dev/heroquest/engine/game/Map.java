@@ -1,9 +1,9 @@
-package de.d2dev.heroquest.engine.gamestate;
+package de.d2dev.heroquest.engine.game;
 
+import de.d2dev.fourseasons.files.FileUtil;
 import nu.xom.Attribute;
-import nu.xom.Document;
 import nu.xom.Element;
-import de.d2dev.heroquest.engine.files.HqMapFile;
+import nu.xom.Elements;
 
 /**
  * Class for a heroquest map that holds all the objects associated with a map,
@@ -54,11 +54,39 @@ public final class Map {
 	}
 	
 	/**
-	 * Load a map from file.
+	 * Read from xml.
 	 * @param file
 	 */
-	public Map(HqMapFile file) {
+	public Map(Element element) {
+		if ( element.getLocalName() != HERO_QUEST_MAP )	// verify parameter
+			throw new IllegalArgumentException();
 		
+		this.width = FileUtil.readIntAttribute( element, WIDTH );
+		this.height = FileUtil.readIntAttribute( element, HEIGHT );
+		
+		// parse the fields
+		this.fields = new Field[this.width][this.height];
+		
+		Elements field_elements = element.getChildElements( FIELDS ).get(0).getChildElements();
+		
+		for (int i=0; i<field_elements.size(); i++) {
+			Field field = new Field( field_elements.get(i) );
+			
+			if ( this.fields[field.getX()][field.getY()] == null ) {
+				this.fields[field.getX()][field.getY()] = field;
+			} else {
+				throw new IllegalArgumentException("Field appears twice in xml");
+			}	
+		}
+		
+		// all fields parsed?
+		for (Field[] fields : this.fields) {
+			for(Field field : fields) {
+				if ( field == null ) {
+					throw new IllegalArgumentException("A field does not appear in xml");
+				}
+			}
+		}
 	}
 	
 	public int getWidth() {
@@ -82,14 +110,14 @@ public final class Map {
 	}
 	
 	/**
-	 * Save a map to file.
+	 * Save to xml.
 	 * (No game data will be saved, just the map as-is).
 	 * @param file
 	 */
-	public void save(HqMapFile file) {
-		Element map = new Element( HERO_QUEST_MAP );
-		map.addAttribute( new Attribute( WIDTH, Integer.toString( this.width ) ) );
-		map.addAttribute( new Attribute( HEIGHT, Integer.toString( this.height ) ) );
+	public Element toXML() {
+		Element xml = new Element( HERO_QUEST_MAP );
+		xml.addAttribute( new Attribute( WIDTH, Integer.toString( this.width ) ) );
+		xml.addAttribute( new Attribute( HEIGHT, Integer.toString( this.height ) ) );
 		
 		// save the fields
 		Element xml_fields = new Element( FIELDS );
@@ -100,9 +128,8 @@ public final class Map {
 			}
 		}
 		
-		map.appendChild( xml_fields );
+		xml.appendChild( xml_fields );
 		
-		// save the generated xml to the map - file
-		file.map = new Document( map );
+		return xml;
 	}
 }

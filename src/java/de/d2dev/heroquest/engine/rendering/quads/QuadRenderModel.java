@@ -49,12 +49,40 @@ public class QuadRenderModel {
 		}
 	}
 	
+	private void fireOnResize() {
+		for ( QuadRenderModelListener l : this.listeners ) {
+			l.onResize( this.width, this.height );
+		}
+	}
+	
 	public int getWidth() {
 		return this.width;
 	}
 	
 	public int getHeight() {
 		return this.height;
+	}
+	
+	/**
+	 * Resize the rendering area.
+	 * @param width > 0
+	 * @param height > 0
+	 */
+	public void resize(int width, int height) {
+		if ( width <= 0 || height <= 0 )	// verify parameters
+			throw new IllegalArgumentException( "QuadRenderModel width and height must be greater than 0" );
+		
+		if ( this.width == width && this.height == height )	// no resize operation needed - it might be expensive for the renderer
+			return;
+
+		this.width = width;
+		this.height = height;
+		
+		this.fireOnResize();	// notify listeners		
+	}
+	
+	public void setHeight(int height) {
+
 	}
 	
 	/**
@@ -79,6 +107,15 @@ public class QuadRenderModel {
 			this.fireOnRemoveQuad( quad );	// notify listeners before
 			
 			quads.remove( quad );
+		}
+	}
+	
+	/**
+	 * Clear the render model, i.e. remove all quads.
+	 */
+	public void clear() {
+		while ( !this.quads.isEmpty() ) {
+			this.removeQuad( this.quads.get(0) );
 		}
 	}
 }
