@@ -56,16 +56,20 @@ public class AStar {
 
         }
     }
-
+    
     /**
-     * Astar core Algorithm
-     * @return Stack with all optimal solutions
+     * Core Algorithm
+     * @param start Start Point
+     * @param solutionCount Number of solutions you want to get
+     * @return Stack with optimal solutions
      */
     public Stack<Path> search(Knot start, int solutionCount) {
+        
         
         Stack<Path> result = new Stack<Path>();
         Path next = new Path(start);
         agenda.add(next);
+        
         while (!agenda.isEmpty()) {
             Knot top = next.getTop();
             if (isGoal(top)) {
@@ -81,8 +85,7 @@ public class AStar {
             }
             expand(next);
         }
-       
-//        System.out.println(result.size());
+      
         return result;
     }
 }

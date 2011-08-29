@@ -86,7 +86,7 @@ public class Path implements Comparable {
         return totalCosts;
     }
 
-    public Stack getTrace() {
+    public Stack<Knot> getTrace() {
         return trace;
     }
 
@@ -116,39 +116,6 @@ public class Path implements Comparable {
         throw new RuntimeException("Not Comparable");
     }
 
-    @Override
-    public String toString() {
 
-        int[][] field = {
-            { 0, 0, 0, 0, 0, 0,-1},
-            { 0, 0, 0,-1, 0,-1,-1},
-            { 0,-1,-1,-1, 0,-1},
-            { 0, 0,-1, 0, 0, 0, 0, 0},
-            { 0, 0,-1,-1,-1, 0},
-            { 0, 0,-1, 0,-1, 0, 0, 0},
-            { 0, 0, 0, 0,-1, 0,-1,-1},
-            { 0,-1,-1, 0,-1, 0, 0, 0},
-            { 0, 0,-1, 0, 0, 0, 0, 0},
-            { 0, 0,-1, 0, 0,-1,-1, 0}};
 
-        for (Knot knot : trace) {
-            field[((SearchKnot) knot).getX()][((SearchKnot) knot).getY()] = 4;
-        }
-        String result = trace.size() + "\n";
-        for (int i = 0; i < field.length; i++) {
-            for (int j = 0; j < field[i].length; j++) {
-                if (field[i][j] == -1) {
-                    result += "# ";
-                } else if (field[i][j] == 0) {
-                    result += 0 + " ";
-                } else {
-                    result += (char) 186 + " ";
-//                    result += field[i][j] + ((field[i][j] < 10) ? " " : "");
-                }
-            }
-            result += "\n";
-        }
-        result += "\n";
-        return result;
-    }
 }
