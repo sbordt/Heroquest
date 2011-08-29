@@ -2,8 +2,8 @@ package de.d2dev.heroquest.engine.rendering;
 
 import java.util.HashMap;
 
-import de.d2dev.heroquest.engine.Field;
-import de.d2dev.heroquest.engine.Map;
+import de.d2dev.heroquest.engine.gamestate.Field;
+import de.d2dev.heroquest.engine.gamestate.Map;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.rendering.quads.RenderQuad;
 
