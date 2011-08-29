@@ -11,12 +11,15 @@
 
 package de.d2dev.heroquest.editor.gui;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 import com.jme3.app.SimpleApplication;
 
 import de.d2dev.heroquest.editor.Editor;
-import de.d2dev.heroquest.engine.Map;
+import de.d2dev.heroquest.engine.files.Files;
+import de.d2dev.heroquest.engine.files.HqMapFile;
+import de.d2dev.heroquest.engine.gamestate.Map;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderWindow;
 import de.d2dev.heroquest.engine.rendering.quads.JmeRenderer;
@@ -60,6 +63,10 @@ public class EditorMain extends javax.swing.JFrame {
         jMenu4 = new javax.swing.JMenu();
         newEmptyMapMenuItem = new javax.swing.JMenuItem();
         newTemplateMapMenuItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        saveMapMenuItem = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         renderWindowsMenu = new javax.swing.JMenu();
         java2DRenderWindowMenuItem = new javax.swing.JMenuItem();
@@ -78,7 +85,7 @@ public class EditorMain extends javax.swing.JFrame {
 
         jMenu3.setText("New");
 
-        jMenu4.setText("HeroQuest map");
+        jMenu4.setText("Map");
 
         newEmptyMapMenuItem.setText("Emtpy map");
         newEmptyMapMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -99,6 +106,19 @@ public class EditorMain extends javax.swing.JFrame {
         jMenu3.add(jMenu4);
 
         jMenu1.add(jMenu3);
+        jMenu1.add(jSeparator1);
+
+        jMenuItem1.setText("Open Map");
+        jMenu1.add(jMenuItem1);
+        jMenu1.add(jSeparator2);
+
+        saveMapMenuItem.setText("Save Map");
+        saveMapMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveMapMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(saveMapMenuItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -201,17 +221,37 @@ public class EditorMain extends javax.swing.JFrame {
 		}
     }//GEN-LAST:event_formWindowClosing
 
+    private void saveMapMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMapMenuItemActionPerformed
+    	JFileChooser chooser = Files.createHqMapFileChooser();
+    	int action = chooser.showSaveDialog( this );
+    	
+    	if ( action == JFileChooser.APPROVE_OPTION ) {
+    		try {
+				HqMapFile.createHqMapFile( chooser.getSelectedFile().getAbsolutePath() );
+			} catch (Exception e) {
+				e.printStackTrace();	// TODO
+				return;
+			}
+    		
+    		// TODO save
+    	}
+    }//GEN-LAST:event_saveMapMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMonkeyRenderWindowMenuItem;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JMenuItem java2DRenderWindowMenuItem;
     private javax.swing.JMenuItem newEmptyMapMenuItem;
     private javax.swing.JMenuItem newTemplateMapMenuItem;
     private javax.swing.JMenu renderWindowsMenu;
+    private javax.swing.JMenuItem saveMapMenuItem;
     // End of variables declaration//GEN-END:variables
 
 }

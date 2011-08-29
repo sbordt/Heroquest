@@ -29,7 +29,7 @@ public class HqMapFile extends AbstractContainerFile {
 	 * @throws ParsingException
 	 */
 	public static HqMapFile createHqMapFile(String path) throws IOException, MagicStringException, ParsingException {
-		AbstractContainerFile.createEmptyContainer( path, MAGIC_STRING, VERSION );
+		AbstractContainerFile.createEmptyContainer( path, MAGIC_STRING, VERSION );	
 		return new HqMapFile( path );
 	}
 	
@@ -49,7 +49,15 @@ public class HqMapFile extends AbstractContainerFile {
 		this.map = FileUtil.readXMLFromFile( new TFile( this.file.getAbsolutePath() + "/" + MAP_FILE_NAME ) );
 	}
 	
-
+	/**
+	 * Save the contents of the file to disk.
+	 * @throws IOException 
+	 */
+	public void save() throws IOException {
+		// save the map
+		FileUtil.writeXMLToFile( new TFile( this.file.getAbsolutePath() + "/" + MAP_FILE_NAME), this.map );
+	}
+	
 	@Override
 	public String getMagicString() {
 		return MAGIC_STRING;
