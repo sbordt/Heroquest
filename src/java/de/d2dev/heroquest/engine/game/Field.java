@@ -1,9 +1,9 @@
-package de.d2dev.heroquest.engine;
+package de.d2dev.heroquest.engine.game;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
 import de.d2dev.fourseasons.files.FileUtil;
-import de.d2dev.fourseasons.game.GameObjectAdapter;
+import de.d2dev.fourseasons.gamestate.GameStateException;
 import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.types.TextureResource;
 
@@ -13,19 +13,22 @@ import de.d2dev.fourseasons.resource.types.TextureResource;
  * <br><br>
  * <table border="1">
  *  <tr>
- *   <th>Field Type</th><th>isWall</th><th>isDoor</th>
+ *   <th>Field Type</th><th>isWall</th><th>isDoor</th><th>isBlocked</th>
+ *  </tr>
+  *  <tr>
+ *   <th>free field</th><th>false</th><th>false</th><th>false</th>
  *  </tr>
  *  <tr>
- *   <th>plain wall</th><th>true</th><th>false</th>
+ *   <th>plain wall</th><th>true</th><th>false</th><th>true</th>
  *  </tr>
  *  <tr>
- *   <th>door</th><th>true</th><th>true</th>
+ *   <th>door</th><th>true</th><th>true</th><th>true</th>
  *  </tr>
  * </table>
  * @author Sebastian Bordt
  *
  */
-public class Field extends GameObjectAdapter {
+public final class Field {
 	
 	private static final String FIELD = "field";
 	private static final String X = "x";
@@ -51,9 +54,26 @@ public class Field extends GameObjectAdapter {
 	 */
 	private boolean revealed;
 	
+	/**
+	 * Whether this field is a wall.
+	 */
 	private boolean isWall;
+	
+	/**
+	 * Whether this field is a door. A door is required to be a wall.
+	 */
 	private boolean isDoor;
 	
+	/**
+	 * A unit that might be standing on the field. Visible to the package because 
+	 * the unit has the {@code setField} method.
+	 */
+	Unit unit;
+	
+	/**
+	 * The fields texture. Simply the texture to be rendered when there is nothing on
+	 * the field.
+	 */
 	private Resource texture;
 	
 	public Field(int x, int y) {
@@ -64,6 +84,8 @@ public class Field extends GameObjectAdapter {
 		
 		this.isWall = false;
 		this.isDoor = false;
+		
+		this.unit = null;
 		
 		this.texture = TextureResource.createTextureResource( "fields/default.jpg" );
 	}
@@ -84,34 +106,93 @@ public class Field extends GameObjectAdapter {
 		this.texture = TextureResource.createTextureResource( FileUtil.readStringAttribute( xml, TEXTURE ) );
 	}
 	
+	/**
+	 * Getter for the fields x-coord.
+	 * @return
+	 */
 	public int getX() {
 		return x;
 	}
 	
+	/**
+	 * Getter for the fields y-coord.
+	 * @return
+	 */
 	public int getY() {
 		return y;
 	}
 	
+	/**
+	 * Is the field revealed?
+	 * @return
+	 */
 	public boolean isRevealed() {
 		return revealed;
 	}
 	
+	/**
+	 * Is this field a wall?
+	 * @return
+	 */
 	public boolean isWall() {
 		return isWall;
 	}
 	
-	public void setWall(boolean w) {
-		this.isWall = w;
+	public void setWall(boolean wall) throws GameStateException {
+		if ( this.isDoor && !wall )	// validity
+			throw new GameStateException( "Attempt to make a door-field a non-wall field." );
+		
+		this.isWall = wall;
 	}
 	
+	/**
+	 * Is this field a door?
+	 * @return
+	 */
 	public boolean isDoor() {
 		return isDoor;
 	}
 	
-	public void setDoor() {
-		// TODO
+	public void setDoor(boolean door) throws GameStateException {
+		if ( !this.isWall && door )	// validity
+			throw new GameStateException( "Attempt to set a door on a non-wall field." );
+		
+		this.isDoor = door;
 	}
 	
+	public boolean isBlocked() {
+		if ( this.unit != null )	// actors block the field
+			return false;
+		
+		//TODO doors
+		if ( this.isWall )
+			return false;
+		
+		return true;
+	}
+	
+	/**
+	 * Is some unit standing on the field? Maximum of one unit
+	 * standing on a field. 
+	 * @return
+	 */
+	public boolean hasUnit() {
+		return this.unit != null;
+	}
+	
+	/**
+	 * Getter for the unit standing on the field.
+	 * @return {@code null} in case there is no unit standing on the field.
+	 */
+	public Unit getUnit() {
+		return this.unit;
+	}
+	
+	/**
+	 * Getter for 'the' fields texture. Each field must have at least one
+	 * texture. (How should it otherwise be rendered with no objects on it?)
+	 * @return
+	 */
 	public Resource getTexture() {
 		return texture;
 	}

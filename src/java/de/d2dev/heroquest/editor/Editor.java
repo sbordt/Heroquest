@@ -7,18 +7,21 @@ import java.util.Properties;
 
 import javax.swing.UIManager;
 
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import de.d2dev.fourseasons.Application;
+import de.d2dev.fourseasons.script.lua.LuaResourceFinder;
 import de.d2dev.fourseasons.script.lua.LuaScript;
 import de.d2dev.fourseasons.script.lua.LuaScriptLoader;
 
 import de.d2dev.heroquest.editor.gui.*;
 import de.d2dev.heroquest.editor.script.EditorLuaScriptDecomposer;
 import de.d2dev.heroquest.editor.script.LuaMapCreatorFunction;
-import de.d2dev.heroquest.engine.Map;
 import de.d2dev.heroquest.engine.files.Files;
 import de.d2dev.heroquest.engine.files.HqRessourceFile;
+import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 
@@ -37,18 +40,19 @@ public class Editor {
 	
 	public Properties properties = new Properties();
 	
+	public TFile scriptFolder;
 	public HqRessourceFile globalRessources;
+	
 	public EditorRessourceLocator resourceProvider;
 	
 	public Map map;
 	
 	public Renderer renderer;
-	public QuadRenderModel renderModel;
+	public QuadRenderModel renderTarget;
 	
 	public EditorMain mainWindow;
 	
 	public Editor() throws Exception {		
-		this.initialize();
 	}
 	
 	public void initialize() throws Exception {		
@@ -68,13 +72,23 @@ public class Editor {
     	// global resources are in globalRessources.zip
     	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalRessources.zip" );
     	
+    	// script folder 'script'
+    	this.scriptFolder = new TFile( this.publicDataStoragePath + "/script" );
+    	
     	// our resource locator
     	this.resourceProvider = new EditorRessourceLocator( this );
     	
     	// try load map from script
+    	JseBaseLib.FINDER = new LuaResourceFinder( this.resourceProvider );
+    	
     	try {
     		EditorLuaScriptDecomposer decomposer = new EditorLuaScriptDecomposer();
-    		LuaScriptLoader loader = new LuaScriptLoader( JsePlatform.standardGlobals(), decomposer );
+    		LuaValue _G = JsePlatform.standardGlobals();
+    		
+    		LuaScriptLoader loader = new LuaScriptLoader( _G, decomposer );
+    		
+    		loader.load( new TFile( this.publicDataStoragePath + "/script/bindings.lua" ) );
+    		loader.load( new TFile( this.publicDataStoragePath + "/script/map templates/map_creation.lua" ) );
     		
     		LuaScript script = (LuaScript) loader.load( new TFile( this.publicDataStoragePath + "/script/map templates/classical.lua" ) );
     		assert script != null;
@@ -82,7 +96,6 @@ public class Editor {
     		script.getScript().call();
     		
     		LuaMapCreatorFunction function = (LuaMapCreatorFunction) decomposer.decompose( script.getScript() ).get( 0 );
-    		
     		
     		this.map = function.createMap();
     	} catch(Exception e) {
@@ -98,7 +111,9 @@ public class Editor {
     								 Integer.valueOf( this.properties.getProperty( MAIN_WINDOW_Y, "0" ) ) );
     	
     	// init renderer
-		this.renderer = new Renderer( this.map );
+    	this.renderTarget = new QuadRenderModel( this.map.getWidth(), this.map.getHeight() );
+    	
+		this.renderer = new Renderer( this.map, this.renderTarget, this.resourceProvider );
 		this.renderer.render();
 	}
 	
@@ -136,6 +151,7 @@ public class Editor {
     	// start the editor
     	Editor editor = new Editor();
     	editor.publicDataStoragePath = Application.getPublicStoragePath("HeroQuest Editor");
+    	editor.initialize();
     	editor.start();
  
 	}

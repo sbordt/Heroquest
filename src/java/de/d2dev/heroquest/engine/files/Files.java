@@ -1,5 +1,8 @@
 package de.d2dev.heroquest.engine.files;
 
+import javax.swing.JFileChooser;
+
+import de.d2dev.fourseasons.swing.ExtensionFileFilter;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
@@ -22,5 +25,14 @@ public class Files {
 		 detector = new TArchiveDetector( detector, HqMapFile.EXTENSION, new JarDriver(IOPoolLocator.SINGLETON) );
 		 
 		 config.setArchiveDetector(detector);
+	}
+	
+	public static JFileChooser createHqMapFileChooser() {
+		JFileChooser chooser = new JFileChooser();
+		
+		chooser.setAcceptAllFileFilterUsed(false);
+		chooser.setFileFilter( new ExtensionFileFilter( HqMapFile.EXTENSION + "|zip" , "HeroQuest Maps" ) );
+		
+		return chooser;
 	}
 }

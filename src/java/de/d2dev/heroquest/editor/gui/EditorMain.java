@@ -11,12 +11,19 @@
 
 package de.d2dev.heroquest.editor.gui;
 
+import java.io.File;
+
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 import com.jme3.app.SimpleApplication;
 
+import de.d2dev.fourseasons.swing.SwingUtil;
+import de.d2dev.heroquest.client.ClientApplication;
 import de.d2dev.heroquest.editor.Editor;
-import de.d2dev.heroquest.engine.Map;
+import de.d2dev.heroquest.engine.files.Files;
+import de.d2dev.heroquest.engine.files.HqMapFile;
+import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderWindow;
 import de.d2dev.heroquest.engine.rendering.quads.JmeRenderer;
@@ -60,10 +67,16 @@ public class EditorMain extends javax.swing.JFrame {
         jMenu4 = new javax.swing.JMenu();
         newEmptyMapMenuItem = new javax.swing.JMenuItem();
         newTemplateMapMenuItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        saveMapMenuItem = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         renderWindowsMenu = new javax.swing.JMenu();
         java2DRenderWindowMenuItem = new javax.swing.JMenuItem();
         jMonkeyRenderWindowMenuItem = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        playMapMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("HeroQuest Editor");
@@ -78,7 +91,7 @@ public class EditorMain extends javax.swing.JFrame {
 
         jMenu3.setText("New");
 
-        jMenu4.setText("HeroQuest map");
+        jMenu4.setText("Map");
 
         newEmptyMapMenuItem.setText("Emtpy map");
         newEmptyMapMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -99,6 +112,19 @@ public class EditorMain extends javax.swing.JFrame {
         jMenu3.add(jMenu4);
 
         jMenu1.add(jMenu3);
+        jMenu1.add(jSeparator1);
+
+        jMenuItem1.setText("Open Map");
+        jMenu1.add(jMenuItem1);
+        jMenu1.add(jSeparator2);
+
+        saveMapMenuItem.setText("Save Map");
+        saveMapMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveMapMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(saveMapMenuItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -124,6 +150,18 @@ public class EditorMain extends javax.swing.JFrame {
         renderWindowsMenu.add(jMonkeyRenderWindowMenuItem);
 
         jMenuBar1.add(renderWindowsMenu);
+
+        jMenu5.setText("Play");
+
+        playMapMenuItem.setText("Play map");
+        playMapMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                playMapMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu5.add(playMapMenuItem);
+
+        jMenuBar1.add(jMenu5);
 
         setJMenuBar(jMenuBar1);
 
@@ -175,7 +213,7 @@ public class EditorMain extends javax.swing.JFrame {
     	
     	this.editor.map = new Map( dialog.width, dialog.height );
     	
-    	this.editor.renderer = new Renderer( this.editor.map );
+    	this.editor.renderer = new Renderer( this.editor.map, this.editor.renderTarget, this.editor.resourceProvider );
     	this.editor.renderer.render();
     	
     	// update render windows
@@ -201,17 +239,62 @@ public class EditorMain extends javax.swing.JFrame {
 		}
     }//GEN-LAST:event_formWindowClosing
 
+    private void saveMapMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMapMenuItemActionPerformed
+    	JFileChooser chooser = Files.createHqMapFileChooser();
+    	int action = chooser.showSaveDialog( this );
+    	
+    	if ( action == JFileChooser.APPROVE_OPTION ) {
+    		String path = chooser.getSelectedFile().getAbsolutePath();
+    		
+    		if ( !path.endsWith( '.' + HqMapFile.EXTENSION ) ) {	// append extension if not there
+    			path += '.' + HqMapFile.EXTENSION;
+    		}
+    		
+    		if ( !SwingUtil.confirmFileWriting( this, new File( path ) ) ) {	// show warning before we overwrite existing files 
+    			return;
+    		}
+    		
+    		try {
+    			HqMapFile.createHqMapFile( path, this.editor.map );
+			} catch (Exception e) {
+				e.printStackTrace();	// TODO
+				return;
+			}
+    	}
+    }//GEN-LAST:event_saveMapMenuItemActionPerformed
+
+    private void playMapMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playMapMenuItemActionPerformed
+    	try {
+	    	// save the map to a temporary file
+	    	File tmpFile = File.createTempFile( "map", "." + HqMapFile.EXTENSION );
+	    	
+	    	HqMapFile.createHqMapFile( tmpFile.getAbsolutePath(), this.editor.map ) ;
+	    	
+	    	ClientApplication app = new ClientApplication( new HqMapFile( tmpFile.getAbsolutePath() ), this.editor.resourceProvider );
+	    	app.init();
+	    	app.run();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    }//GEN-LAST:event_playMapMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMonkeyRenderWindowMenuItem;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JMenuItem java2DRenderWindowMenuItem;
     private javax.swing.JMenuItem newEmptyMapMenuItem;
     private javax.swing.JMenuItem newTemplateMapMenuItem;
+    private javax.swing.JMenuItem playMapMenuItem;
     private javax.swing.JMenu renderWindowsMenu;
+    private javax.swing.JMenuItem saveMapMenuItem;
     // End of variables declaration//GEN-END:variables
 
 }

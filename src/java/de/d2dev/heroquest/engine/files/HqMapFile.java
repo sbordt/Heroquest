@@ -9,6 +9,7 @@ import de.d2dev.fourseasons.VersionNumber;
 import de.d2dev.fourseasons.files.AbstractContainerFile;
 import de.d2dev.fourseasons.files.FileUtil;
 import de.d2dev.fourseasons.files.MagicStringException;
+import de.d2dev.heroquest.engine.game.Map;
 import de.schlichtherle.truezip.file.TFile;
 
 public class HqMapFile extends AbstractContainerFile {
@@ -28,8 +29,11 @@ public class HqMapFile extends AbstractContainerFile {
 	 * @throws MagicStringException
 	 * @throws ParsingException
 	 */
-	public static HqMapFile createHqMapFile(String path) throws IOException, MagicStringException, ParsingException {
-		AbstractContainerFile.createEmptyContainer( path, MAGIC_STRING, VERSION );
+	public static HqMapFile createHqMapFile(String path, Map map) throws IOException, MagicStringException, ParsingException {
+		AbstractContainerFile.createEmptyContainer( path, MAGIC_STRING, VERSION );	
+		
+		FileUtil.writeXMLToFile( new TFile( path + "/" + MAP_FILE_NAME), new Document( map.toXML() ) );	// the map
+		
 		return new HqMapFile( path );
 	}
 	
@@ -49,7 +53,15 @@ public class HqMapFile extends AbstractContainerFile {
 		this.map = FileUtil.readXMLFromFile( new TFile( this.file.getAbsolutePath() + "/" + MAP_FILE_NAME ) );
 	}
 	
-
+	/**
+	 * Save the contents of the file to disk.
+	 * @throws IOException 
+	 */
+	public void save() throws IOException {
+		// save the map
+		FileUtil.writeXMLToFile( new TFile( this.file.getAbsolutePath() + "/" + MAP_FILE_NAME), this.map );
+	}
+	
 	@Override
 	public String getMagicString() {
 		return MAGIC_STRING;
