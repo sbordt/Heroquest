@@ -1,4 +1,4 @@
-﻿package de.d2dev.heroquest.engine.rendering.quads;
+package de.d2dev.heroquest.engine.rendering.quads;
 
 public interface QuadRenderer {
 	
