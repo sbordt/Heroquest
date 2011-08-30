@@ -1,6 +1,8 @@
 package de.d2dev.heroquest.engine.game;
 
 import de.d2dev.fourseasons.files.FileUtil;
+import de.d2dev.fourseasons.util.Observable;
+import de.d2dev.fourseasons.util.Observers;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -12,12 +14,14 @@ import nu.xom.Elements;
  * @author Sebastian Bordt
  *
  */
-public final class Map {
+public final class Map implements Observable<MapListener> {
 	
 	private static final String HERO_QUEST_MAP = "heroquestmap";
 	private static final String WIDTH = "width";
 	private static final String HEIGHT = "height";
 	private static final String FIELDS = "fields";
+	
+	private Observers<MapListener> listeners;
 	
 	private int width;
 	private int height;
@@ -29,6 +33,8 @@ public final class Map {
 	 * witch the heroes start the game!
 	 */
 	private Field startingField;
+	
+
 
 	/**
 	 * Construct a new empty map.
@@ -46,7 +52,7 @@ public final class Map {
 		
 		for (int x=0; x<this.width; x++) {
 			for (int y=0; y<this.height; y++) {
-				this.fields[x][y] = new Field( x, y );
+				this.fields[x][y] = new Field( this, x, y );
 			}
 		}
 		
@@ -70,7 +76,7 @@ public final class Map {
 		Elements field_elements = element.getChildElements( FIELDS ).get(0).getChildElements();
 		
 		for (int i=0; i<field_elements.size(); i++) {
-			Field field = new Field( field_elements.get(i) );
+			Field field = new Field( this, field_elements.get(i) );
 			
 			if ( this.fields[field.getX()][field.getY()] == null ) {
 				this.fields[field.getX()][field.getY()] = field;
@@ -87,6 +93,16 @@ public final class Map {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void addListener(MapListener l) {
+		this.listeners.addListener(l);
+	}
+
+	@Override
+	public void removeListener(MapListener l) {
+		this.listeners.removeListener(l);
 	}
 	
 	public int getWidth() {

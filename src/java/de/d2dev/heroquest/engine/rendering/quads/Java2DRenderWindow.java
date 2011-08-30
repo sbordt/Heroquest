@@ -41,6 +41,10 @@ public class Java2DRenderWindow extends javax.swing.JFrame {
     	// repaint the whole window
     	this.repaint();
     }
+    
+    public Java2DRenderPanel getRenderPanel() {
+    	return this.renderPanel;
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.

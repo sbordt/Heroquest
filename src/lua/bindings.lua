@@ -1,0 +1,1 @@
+MapClass = "de.d2dev.heroquest.engine.game.Map";
