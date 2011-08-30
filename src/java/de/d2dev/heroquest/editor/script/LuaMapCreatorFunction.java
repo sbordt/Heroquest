@@ -4,7 +4,7 @@ import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 
 import de.d2dev.fourseasons.script.lua.LuaScriptFunction;
-import de.d2dev.heroquest.engine.gamestate.Map;
+import de.d2dev.heroquest.engine.game.Map;
 
 public class LuaMapCreatorFunction extends LuaScriptFunction implements MapCreatorFunction {
 	

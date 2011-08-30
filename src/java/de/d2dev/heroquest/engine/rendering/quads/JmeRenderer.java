@@ -304,4 +304,10 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 		// Die Eigentliche Bewegung der Kamera um den ev. angepassten Vector
 		cam.setLocation(cam.getLocation().add(tempVec));
 	}
+	
+	@Override
+	public void onResize(int width, int height) {
+		// TODO Auto-generated method stub
+		
+	}
 }

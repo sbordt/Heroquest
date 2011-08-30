@@ -31,7 +31,7 @@ public class Files {
 		JFileChooser chooser = new JFileChooser();
 		
 		chooser.setAcceptAllFileFilterUsed(false);
-		chooser.setFileFilter( new ExtensionFileFilter( HqMapFile.EXTENSION, "HeroQuest Maps" ) );
+		chooser.setFileFilter( new ExtensionFileFilter( HqMapFile.EXTENSION + "|zip" , "HeroQuest Maps" ) );
 		
 		return chooser;
 	}

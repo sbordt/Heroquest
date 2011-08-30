@@ -21,7 +21,7 @@ import de.d2dev.heroquest.editor.script.EditorLuaScriptDecomposer;
 import de.d2dev.heroquest.editor.script.LuaMapCreatorFunction;
 import de.d2dev.heroquest.engine.files.Files;
 import de.d2dev.heroquest.engine.files.HqRessourceFile;
-import de.d2dev.heroquest.engine.gamestate.Map;
+import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 
@@ -48,7 +48,7 @@ public class Editor {
 	public Map map;
 	
 	public Renderer renderer;
-	public QuadRenderModel renderModel;
+	public QuadRenderModel renderTarget;
 	
 	public EditorMain mainWindow;
 	
@@ -87,6 +87,7 @@ public class Editor {
     		
     		LuaScriptLoader loader = new LuaScriptLoader( _G, decomposer );
     		
+    		loader.load( new TFile( this.publicDataStoragePath + "/script/bindings.lua" ) );
     		loader.load( new TFile( this.publicDataStoragePath + "/script/map templates/map_creation.lua" ) );
     		
     		LuaScript script = (LuaScript) loader.load( new TFile( this.publicDataStoragePath + "/script/map templates/classical.lua" ) );
@@ -95,7 +96,6 @@ public class Editor {
     		script.getScript().call();
     		
     		LuaMapCreatorFunction function = (LuaMapCreatorFunction) decomposer.decompose( script.getScript() ).get( 0 );
-    		
     		
     		this.map = function.createMap();
     	} catch(Exception e) {
@@ -111,7 +111,9 @@ public class Editor {
     								 Integer.valueOf( this.properties.getProperty( MAIN_WINDOW_Y, "0" ) ) );
     	
     	// init renderer
-		this.renderer = new Renderer( this.map );
+    	this.renderTarget = new QuadRenderModel( this.map.getWidth(), this.map.getHeight() );
+    	
+		this.renderer = new Renderer( this.map, this.renderTarget, this.resourceProvider );
 		this.renderer.render();
 	}
 	

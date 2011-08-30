@@ -86,6 +86,21 @@
             </MenuItem>
           </SubComponents>
         </Menu>
+        <Menu class="javax.swing.JMenu" name="jMenu5">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Play"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="playMapMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Play map"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="playMapMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
       </SubComponents>
     </Menu>
   </NonVisualComponents>

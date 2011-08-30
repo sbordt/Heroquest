@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import de.d2dev.heroquest.engine.files.Files;
 import de.d2dev.heroquest.engine.files.HqMapFile;
+import de.d2dev.heroquest.engine.game.Map;
 
 public class HqMapFileTest {
 	
@@ -15,6 +16,6 @@ public class HqMapFileTest {
 
 	@Test
 	public void create() throws Exception {
-		HqMapFile.createHqMapFile( "C:/Users/Batti/Desktop/tests/mymap.hqmap" );
+		HqMapFile.createHqMapFile( "C:/Users/Batti/Desktop/tests/mymap.zip", new Map( 10, 10 ) );
 	}
 }

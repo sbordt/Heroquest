@@ -1,4 +1,4 @@
-package de.d2dev.heroquest.engine.gamestate;
+package de.d2dev.heroquest.engine.game;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
