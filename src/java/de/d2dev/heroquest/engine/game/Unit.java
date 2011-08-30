@@ -7,7 +7,12 @@ import de.d2dev.fourseasons.gamestate.GameStateException;
  * @author Sebastian Bordt
  *
  */
-public abstract class Unit {
+public class Unit {
+	
+	public enum Type {
+		HERO,
+		MONSTER,
+	}
 	
 	/**
 	 * The direction in witch a unit views. Rather for the rendering
@@ -23,13 +28,16 @@ public abstract class Unit {
 		RIGHT
 	}
 	
+	private Type type;
+	
 	private Field field;
 	
 	private ViewDirection viewDir;
 
-	Unit(Field field) throws GameStateException {
+	public Unit(Field field, Type type) throws GameStateException {
 		this.setField( field );
 		
+		this.type = type;
 		this.viewDir = ViewDirection.UP;
 	}
 	
@@ -48,11 +56,18 @@ public abstract class Unit {
 		if ( field.isBlocked() )	// validity
 			throw new GameStateException( "Attempt to place a unit on a blocked field." );
 		
+		if ( this.field != null )
+			this.field.unit = null;
+		
 		this.field = field;
 		field.unit = this;
 	}
 	
 	public ViewDirection getViewDir() {
 		return viewDir;
+	}
+	
+	public Type getType() {
+		return this.type;
 	}
 }
