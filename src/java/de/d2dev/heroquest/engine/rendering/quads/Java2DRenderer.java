@@ -117,4 +117,34 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 		
 		return img;
 	}
+
+	@Override
+	public void onResize(int width, int height) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAddQuad(RenderQuad quad) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRemoveQuad(RenderQuad quad) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onQuadMoved(RenderQuad quad) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onQuadTextureChanged(RenderQuad quad) {
+		// TODO Auto-generated method stub
+		
+	}
 }

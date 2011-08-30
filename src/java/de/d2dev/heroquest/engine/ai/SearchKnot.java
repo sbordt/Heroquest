@@ -1,5 +1,6 @@
-package de.d2dev.heroquest.engine.ai.astar.tests;
+package de.d2dev.heroquest.engine.ai;
 
+import de.d2dev.heroquest.engine.ai.astar.Communicator;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
 import java.util.Stack;
 
@@ -48,10 +49,10 @@ public class SearchKnot implements Knot {
             return false;
         }
         final SearchKnot other = (SearchKnot) obj;
-        if (this.x != other.x) {
+        if (this.x != other.getX()) {
             return false;
         }
-        if (this.y != other.y) {
+        if (this.y != other.getY()) {
             return false;
         }
         return true;

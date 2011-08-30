@@ -1,5 +1,6 @@
 package de.d2dev.heroquest.engine.ai.astar.tests;
 
+import de.d2dev.heroquest.engine.ai.SearchKnot;
 import de.d2dev.heroquest.engine.ai.astar.AStar;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
 import de.d2dev.heroquest.engine.ai.astar.Path;
@@ -13,7 +14,7 @@ import java.util.Stack;
  *
  * @author Simon + Toni
  */
-public class Communicator {
+public class TestCommunicator {
 
     private int[][] field;
     private final int WALL = -1;
@@ -23,13 +24,13 @@ public class Communicator {
     private int goalX = 99;
     private int goalY = 99;
 
-    public Communicator() {
+    public TestCommunicator() {
         field = new int[100][100];
         field[goalX][goalY] = GOAL;
     }
 
     //****************Public*********************
-    public Stack getSuccessors(int x, int y) {
+    public Stack<Knot> getSuccessors(int x, int y) {
         Stack<Knot> speicher = new Stack<Knot>();
         for (int i = x - 1; i <= x + 1; i++) {
             for (int j = y - 1; j <= y + 1; j++) {
@@ -59,7 +60,9 @@ public class Communicator {
     }
 
 //*************Private********************   
-    private Knot getKnot(int x, int y) {
+    
+    
+    private SearchKnot getKnot(int x, int y) {
         return new SearchKnot(x, y, getHeuristic(x, y), this);
     }
 
@@ -78,11 +81,11 @@ public class Communicator {
 
 //**************** MAIN *************************
     public static void main(String[] args) {
-        Communicator c = new Communicator();
+        TestCommunicator c = new TestCommunicator();
         AStar astar = new AStar();
         long startTime = System.currentTimeMillis();
         for (int i = 0; i <= 1; i++) {
-            Stack<Path> result = astar.search(c.getKnot(0, 0), 100000);
+            Stack<Path<Knot>> result = (Knot)astar.search(c.getKnot(0, 0), 100);
         }
         System.out.println(System.currentTimeMillis() - startTime);
 
@@ -93,3 +96,36 @@ public class Communicator {
 
     }
 }
+
+
+//int[][] field = {
+//            { 0, 0, 0, 0, 0, 0,-1},
+//            { 0, 0, 0,-1, 0,-1,-1},
+//            { 0,-1,-1,-1, 0,-1},
+//            { 0, 0,-1, 0, 0, 0, 0, 0},
+//            { 0, 0,-1,-1,-1, 0},
+//            { 0, 0,-1, 0,-1, 0, 0, 0},
+//            { 0, 0, 0, 0,-1, 0,-1,-1},
+//            { 0,-1,-1, 0,-1, 0, 0, 0},
+//            { 0, 0,-1, 0, 0, 0, 0, 0},
+//            { 0, 0,-1, 0, 0,-1,-1, 0}};
+//
+//        for (Knot knot : trace) {
+//            field[((SearchKnot) knot).getX()][((SearchKnot) knot).getY()] = 4;
+//        }
+//        String result = trace.size() + "\n";
+//        for (int i = 0; i < field.length; i++) {
+//            for (int j = 0; j < field[i].length; j++) {
+//                if (field[i][j] == -1) {
+//                    result += "# ";
+//                } else if (field[i][j] == 0) {
+//                    result += 0 + " ";
+//                } else {
+//                    result += (char) 186 + " ";
+////                    result += field[i][j] + ((field[i][j] < 10) ? " " : "");
+//                }
+//            }
+//            result += "\n";
+//        }
+//        result += "\n";
+//        return result;

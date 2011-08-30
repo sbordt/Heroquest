@@ -1,21 +1,16 @@
 package de.d2dev.heroquest.engine.ai.astar;
 
-import de.d2dev.heroquest.engine.ai.astar.tests.SearchKnot;
 import java.util.Stack;
-
-
 
 /**
  * Path class for Astar search
  * 
  * @author Simon
  */
-public class Path implements Comparable {
+public class Path<T extends Knot> implements Comparable<Path> {
 
-    /**Transition from one to the other Knot*/
-    private final int TRANSITIONCOSTS = 1;
     /** Storage for the path knots */
-    private Stack<Knot> trace;
+    private Stack<T> trace;
     /**real costs from start to end*/
     private int costs;
     /**estimated costs from end to goal*/
@@ -32,7 +27,7 @@ public class Path implements Comparable {
      * @param totalCosts costs + estimated costs
      * 
      */
-    public Path(Stack<Knot> trace, int costs, int estimateCosts, int totalCosts) {
+    public Path(Stack<T> trace, int costs, int estimateCosts, int totalCosts) {
         if (trace == null) {
             throw new NullPointerException("Constructor: Stack is null");
         }
@@ -47,9 +42,9 @@ public class Path implements Comparable {
      * Deep Copy 
      * @param copy 
      */
-    public Path(Path copy) {
+    public Path(Path<T> copy) {
 
-        this(new Stack<Knot>(),
+        this(new Stack<T>(),
                 copy.getCosts(),
                 copy.getEstimateCosts(),
                 copy.getTotalCosts());
@@ -60,9 +55,9 @@ public class Path implements Comparable {
      * Path with initial start knot
      * @param start 
      */
-    public Path(Knot start) {
+    public Path(T start) {
 
-        this(new Stack<Knot>(),
+        this(new Stack<T>(),
                 0,
                 start.getHeuristic(),
                 start.getHeuristic());
@@ -86,36 +81,36 @@ public class Path implements Comparable {
         return totalCosts;
     }
 
-    public Stack<Knot> getTrace() {
+    public Stack<T> getTrace() {
         return trace;
     }
 
-    public Knot getTop() {
+    public T getTop() {
         return trace.peek();
     }
 
 //****************Public Methods************************ 
     /**
      * Adds a knot to the Path 
-     * @param a Knot to add
+     * @param a T to add
      */
-    public void addKnot(Knot a) {
-            costs += a.getTransitionCosts(getTop());
-            estimateCosts = a.getHeuristic();
-            totalCosts = costs + estimateCosts;
-            trace.add(a);
+    public void addKnot(T a) {
+        costs += a.getTransitionCosts(getTop());
+        estimateCosts = a.getHeuristic();
+        totalCosts = costs + estimateCosts;
+        trace.add(a);
 
     }
 
     //*************Override*******************   
     @Override
-    public int compareTo(Object o) {
-        if (o instanceof Path) {
-            return totalCosts - ((Path) o).getTotalCosts();
+    public int compareTo(Path o) {
+        if (o == null) {
+            throw new NullPointerException("CompareTo: Object to Compare is null");
         }
-        throw new RuntimeException("Not Comparable");
+
+        return totalCosts - o.getTotalCosts();
+
+
     }
-
-
-
 }

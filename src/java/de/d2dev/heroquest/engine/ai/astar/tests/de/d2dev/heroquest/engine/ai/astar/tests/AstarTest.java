@@ -1,9 +1,8 @@
-package de.d2dev.heroquest.engine.ai.astar.tests;
-
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+package de.d2dev.heroquest.engine.ai.astar.tests.de.d2dev.heroquest.engine.ai.astar.tests;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -16,9 +15,9 @@ import static org.junit.Assert.*;
  *
  * @author Simon
  */
-public class AStarTest {
+public class AstarTest {
     
-    public AStarTest() {
+    public AstarTest() {
     }
 
     @BeforeClass
@@ -36,9 +35,11 @@ public class AStarTest {
     @After
     public void tearDown() {
     }
-
-    @Test
-    public void hello() {
-    
-    }
+    // TODO add test methods here.
+    // The methods must be annotated with annotation @Test. For example:
+    //
+     @Test
+     public void hello() {
+         assertTrue(false);
+     }
 }

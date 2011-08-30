@@ -39,6 +39,11 @@ public final class Field {
 	private static final String TEXTURE = "texture";
 	
 	/**
+	 * The map the field belongs to.
+	 */
+	private Map map;
+	
+	/**
 	 * The fields x-coordinate.
 	 */
 	private int x;
@@ -76,7 +81,9 @@ public final class Field {
 	 */
 	private Resource texture;
 	
-	public Field(int x, int y) {
+	public Field(Map map, int x, int y) {
+		this.map = map;
+		
 		this.x = x;
 		this.y = y;
 		
@@ -94,9 +101,11 @@ public final class Field {
 	 * Read from xml.
 	 * @param xml
 	 */
-	public Field(Element xml) {
+	public Field(Map map, Element xml) {
 		if ( xml.getLocalName() != FIELD )	// verify parameter
 			throw new IllegalArgumentException();
+		
+		this.map = map;
 		
 		this.x = FileUtil.readIntAttribute( xml, X );
 		this.y = FileUtil.readIntAttribute( xml, Y );
@@ -104,6 +113,14 @@ public final class Field {
 		this.isWall = FileUtil.readBoleanAttribute( xml, IS_WALL);
 		this.isDoor = FileUtil.readBoleanAttribute( xml, IS_DOOR);
 		this.texture = TextureResource.createTextureResource( FileUtil.readStringAttribute( xml, TEXTURE ) );
+	}
+	
+	/**
+	 * Getter for the map the fields belongs to.
+	 * @return
+	 */
+	public Map getMap() {
+		return map;
 	}
 	
 	/**
@@ -162,13 +179,13 @@ public final class Field {
 	
 	public boolean isBlocked() {
 		if ( this.unit != null )	// actors block the field
-			return false;
+			return true;
 		
 		//TODO doors
 		if ( this.isWall )
-			return false;
+			return true;
 		
-		return true;
+		return false;
 	}
 	
 	/**

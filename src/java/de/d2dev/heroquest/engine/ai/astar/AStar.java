@@ -11,45 +11,45 @@ import java.util.Stack;
  *
  * @author Simon
  */
-public class AStar {
+public class AStar<T extends Knot> {
 
-    private PriorityQueue<Path> agenda;
-    private Map<Knot, Integer> closedList;
+    private PriorityQueue<Path<T>> agenda;
+    private Map<T, Integer> closedList;
 
     /**
-     * Constructs the Data with a start Knot
-     * @param start Knot where the Algorithm starts searching
+     * Constructs the Data with a start T
+     * @param start T where the Algorithm starts searching
      */
     public AStar() {
-        this.closedList = new HashMap<Knot, Integer>();
-        this.agenda = new PriorityQueue<Path>();
+        this.closedList = new HashMap<T, Integer>();
+        this.agenda = new PriorityQueue<Path<T>>();
     }
 
     /**
-     * Tries if Knot is a Goal
-     * @param a Knot to be tested
+     * Tries if T is a Goal
+     * @param a T to be tested
      * @return true if goal, else false
      */
-    private boolean isGoal(Knot a) {
+    private boolean isGoal(T a) {
         if (a == null) {
-            throw new NullPointerException("isGoal: Knot is null");
+            throw new NullPointerException("isGoal: T is null");
         }
         return a.getHeuristic() == 0;
     }
 
     /**
-     * Expands the end Knot of a path and puts the new Paths in the agenda
+     * Expands the end T of a path and puts the new Paths in the agenda
      * @param a Path to expand
      */
-    private void expand(Path a) {
+    private void expand(Path<T> a) {
         if (a == null) {
             throw new NullPointerException("Expand: Path is null");
         }
-        Knot top = a.getTop();
+        T top = a.getTop();
         closedList.put(top, a.getCosts());
-        for (Knot successor : top.getSuccessors()) {
+        for (T successor : (Stack<T>)top.getSuccessors()) {
             if (closedList.get(successor) == null || closedList.get(successor) > a.getCosts()) {
-                Path tmp = new Path(a);
+                Path<T> tmp = new Path<T>(a);
                 tmp.addKnot(successor);
                 agenda.add(tmp);
             }
@@ -63,15 +63,15 @@ public class AStar {
      * @param solutionCount Number of solutions you want to get
      * @return Stack with optimal solutions
      */
-    public Stack<Path> search(Knot start, int solutionCount) {
+    public Stack<Path<T>> search(T start, int solutionCount) {
         
         
-        Stack<Path> result = new Stack<Path>();
-        Path next = new Path(start);
+        Stack<Path<T>> result = new Stack<Path<T>>();
+        Path<T> next = new Path<T>(start);
         agenda.add(next);
         
         while (!agenda.isEmpty()) {
-            Knot top = next.getTop();
+            T top = next.getTop();
             if (isGoal(top)) {
                 result.add(next);
                 next = agenda.remove();
