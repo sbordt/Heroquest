@@ -2,6 +2,7 @@ package de.d2dev.heroquest.engine.ai.astar.tests;
 
 import de.d2dev.heroquest.engine.ai.SearchKnot;
 import de.d2dev.heroquest.engine.ai.astar.AStar;
+import de.d2dev.heroquest.engine.ai.astar.Communicator;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
 import de.d2dev.heroquest.engine.ai.astar.Path;
 import java.util.Stack;
@@ -14,7 +15,7 @@ import java.util.Stack;
  *
  * @author Simon + Toni
  */
-public class TestCommunicator {
+public class TestCommunicator implements Communicator {
 
     private int[][] field;
     private final int WALL = -1;
@@ -82,10 +83,10 @@ public class TestCommunicator {
 //**************** MAIN *************************
     public static void main(String[] args) {
         TestCommunicator c = new TestCommunicator();
-        AStar astar = new AStar();
+        AStar<SearchKnot> astar = new AStar<SearchKnot>();
         long startTime = System.currentTimeMillis();
         for (int i = 0; i <= 1; i++) {
-            Stack<Path<Knot>> result = (Knot)astar.search(c.getKnot(0, 0), 100);
+            Stack<Path<SearchKnot>> result = astar.search(c.getKnot(0, 0), 100);
         }
         System.out.println(System.currentTimeMillis() - startTime);
 

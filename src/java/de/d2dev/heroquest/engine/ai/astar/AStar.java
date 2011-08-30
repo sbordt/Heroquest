@@ -52,6 +52,7 @@ public class AStar<T extends Knot> {
                 Path<T> tmp = new Path<T>(a);
                 tmp.addKnot(successor);
                 agenda.add(tmp);
+
             }
 
         }
