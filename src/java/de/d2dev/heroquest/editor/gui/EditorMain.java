@@ -201,8 +201,8 @@ public class EditorMain extends javax.swing.JFrame {
     		
     		this.jmeRenderer = new JmeRenderer (this.editor.renderer.getRederTarget(), this.editor.resourceProvider);
     		
-    		SimpleApplication jmeRenderer = this.jmeRenderer;
-    		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing (this.jmeRenderWindow, jmeRenderer));
+    		JmeRenderer jmeRenderer = this.jmeRenderer;
+    		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing<JmeRenderer> (this.jmeRenderWindow, jmeRenderer));
     	}
     }//GEN-LAST:event_jMonkeyRenderWindowMenuItemActionPerformed
 

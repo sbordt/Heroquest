@@ -22,7 +22,7 @@ import de.d2dev.fourseasons.resource.ResourceLocator;
  *
  * @author Justus
  */
-public class JmeRenderer extends SimpleApplication implements QuadRenderer, QuadRenderModelListener {
+public class JmeRenderer extends SimpleApplication implements QuadRenderer, QuadRenderModelListener, JmeResizeableApp {
 	
 	// Variablen die die Cameraeinstellungen bestimmen
 	private float cameraSpeed = 2f;
@@ -201,13 +201,13 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 	
 	@Override
 	public void onResize(int width, int height) {
-		// TODO Auto-generated method stub
 		
+	}	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////// Getter & Setter /////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////
-	}
+	
 	public void setCameraSpeed(float cameraSpeed) {
 		this.cameraSpeed = cameraSpeed;
 	}
