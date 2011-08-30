@@ -97,42 +97,46 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         // Die Pfeil Rechts Taste soll die Kamera nach rechts bewegen
     	// aber es soll überprüft werden, dass das Kamerabild die Map nicht verlässt
     	if (name.equals("right")) {
-        	float rechterBildschirmrand_XPos = (cam.getLocation().x + (cam.getFrustumRight() - cam.getFrustumLeft())/2);
+    		moveCamera (cameraSpeed*tpf*zoomLevel, 0, true);
+        	/*float rechterBildschirmrand_XPos = (cam.getLocation().x + (cam.getFrustumRight() - cam.getFrustumLeft())/2);
         	// hier wird überprüft ob der neue Kameraausschnitt den Speilfeldbereich verlassen würde
         	if (rechterBildschirmrand_XPos + cameraSpeed*tpf*zoomLevel <= quadRenderModel.getWidth()){
         		// Die Kamera kann nun bewegt werden
         		cam.setLocation(cam.getLocation().add(new Vector3f(cameraSpeed*tpf*zoomLevel, 0, 0)));	
-        	}
+        	}*/
         }
     	// Die Pfeil links Taste soll die Kamera nach links bewegen
     	// aber es soll überprüft werden, dass das Kamerabild die Map nicht verlässt
     	else if (name.equals("left")) {
-        	float linkerBildschirmrand_XPos = (cam.getLocation().x - (cam.getFrustumRight() - cam.getFrustumLeft())/2);
+    		moveCamera (-cameraSpeed*tpf*zoomLevel, 0, true);
+        	/*float linkerBildschirmrand_XPos = (cam.getLocation().x - (cam.getFrustumRight() - cam.getFrustumLeft())/2);
         	// hier wird überprüft ob der neue Kameraausschnitt den Speilfeldbereich verlassen würde
         	if (linkerBildschirmrand_XPos - cameraSpeed*tpf*zoomLevel >= 0){
         		// Die Kamera kann nun bewegt werden
         		cam.setLocation(cam.getLocation().add(new Vector3f(-cameraSpeed*tpf*zoomLevel, 0, 0)));	
-    		}
+    		}*/
         }
     	// Die Pfeil oben Taste soll die Kamera nach oben bewegen
     	// aber es soll überprüft werden, dass das Kamerabild die Map nicht verlässt
     	else if (name.equals("up")) {
-        	float obererBildschirmrand_YPos = cam.getLocation().y + (cam.getFrustumTop() - cam.getFrustumBottom())/2;
+    		moveCamera (0, cameraSpeed*tpf*zoomLevel, true);
+        	/*float obererBildschirmrand_YPos = cam.getLocation().y + (cam.getFrustumTop() - cam.getFrustumBottom())/2;
         	// hier wird überprüft ob der neue Kameraausschnitt den Speilfeldbereich verlassen würde
         	if (obererBildschirmrand_YPos + cameraSpeed*tpf*zoomLevel <= quadRenderModel.getHeight()){
         		// Die Kamera kann nun bewegt werden
         		cam.setLocation(cam.getLocation().add(new Vector3f(0, cameraSpeed*tpf*zoomLevel, 0)));
-        	}
+        	}*/
         }
     	// Die Pfeil unten Taste soll die Kamera nach unten bewegen
     	// aber es soll überprüft werden, dass das Kamerabild die Map nicht verlässt
     	else if (name.equals("down")) {
-    		float untererBildschirmrand_YPos = cam.getLocation().y - (cam.getFrustumTop() - cam.getFrustumBottom())/2;
+    		moveCamera (0, -cameraSpeed*tpf*zoomLevel, true);
+    		/*float untererBildschirmrand_YPos = cam.getLocation().y - (cam.getFrustumTop() - cam.getFrustumBottom())/2;
         	// hier wird überprüft ob der neue Kameraausschnitt den Speilfeldbereich verlassen würde
         	if (untererBildschirmrand_YPos - cameraSpeed*tpf*zoomLevel >= 0){
         		// Die Kamera kann nun bewegt werden
         		cam.setLocation(cam.getLocation().add(new Vector3f(0, -cameraSpeed*tpf*zoomLevel, 0)));	
-        	}
+        	}*/
         }
         else if (name.equals("zoomOut")){
         	float aspect = (float) cam.getWidth() / cam.getHeight();
