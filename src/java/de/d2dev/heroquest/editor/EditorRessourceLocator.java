@@ -28,12 +28,26 @@ public class EditorRessourceLocator implements ResourceLocator {
 			if ( ( resource = new TFile( this.editor.globalRessources.textures.getAbsolutePath() + "/" + r.getName() ) ).exists() ) {
 				return resource.getAbsolutePath();
 			}
+			
+			// dropbox global resources
+			if ( this.editor.dropboxResources != null ) {
+				if ( ( resource = new TFile( this.editor.dropboxResources.textures.getAbsolutePath() + "/" + r.getName() ) ).exists() ) {
+					return resource.getAbsolutePath();
+				}
+			}
 		}
 		
 		// lua script
 		if ( r.getType().isType( LuaResource.TYPENAME ) ) {
 			if ( ( resource = new TFile( this.editor.scriptFolder.getAbsolutePath() + "/" + r.getName() ) ).exists() ) {
 				return resource.getAbsolutePath();
+			}
+			
+			// dropbox
+			if ( this.editor.dropboxScriptFolder != null ) {
+				if ( ( resource = new TFile( this.editor.dropboxScriptFolder.getAbsolutePath() + "/" + r.getName() ) ).exists() ) {
+					return resource.getAbsolutePath();
+				} 
 			}
 			
 		}
