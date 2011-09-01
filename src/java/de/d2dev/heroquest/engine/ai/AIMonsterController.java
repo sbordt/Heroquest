@@ -30,6 +30,8 @@ public class AIMonsterController implements AIController {
         this.communicator = new MapCommunicator(this.map);
     }
 
+
+
     @Override
     public List<GameAction> getActions() {
         for (Unit heroe : map.getHeroes()) {
@@ -39,7 +41,7 @@ public class AIMonsterController implements AIController {
                     heroe));
         }
         
-        targets.poll().getPathToMonster();
+        Stack<SearchKnot> actionPath = targets.poll().getPathToMonster();
         
         
         return null;
