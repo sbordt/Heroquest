@@ -31,15 +31,6 @@ public class AIMonsterController implements AIController {
     }
 
     @Override
-    public void startTurn() {
-    }
-
-    @Override
-    public void endTurn() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public List<GameAction> getActions() {
         for (Unit heroe : map.getHeroes()) {
             targets.add(
