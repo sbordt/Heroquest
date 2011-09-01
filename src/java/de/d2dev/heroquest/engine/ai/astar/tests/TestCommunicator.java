@@ -53,6 +53,8 @@ public class TestCommunicator implements Communicator {
                         if (!blocked(i, j)) {
 
                             speicher.add(getKnot(i, j));
+                        } else if (i == goalX && j == goalY) {
+                            speicher.add(getKnot(i, j));
                         }
                     }
                 }
@@ -66,13 +68,12 @@ public class TestCommunicator implements Communicator {
         return 1;
     }
 
-
     public Stack<Path<SearchKnot>> search(
             int[][] field,
             int startX, int startY,
             int goalX, int goalY,
             int solutionCount) {
-        
+
         this.field = field;
         this.goalX = goalX;
         this.goalY = goalY;
@@ -94,8 +95,5 @@ public class TestCommunicator implements Communicator {
         return Math.abs(goalX - x) + Math.abs(goalY - y);
     }
 
-    @Override
-    public Stack<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+
 }

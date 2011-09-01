@@ -5,6 +5,7 @@
 package de.d2dev.heroquest.engine.ai.astar;
 
 import de.d2dev.heroquest.engine.ai.SearchKnot;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -17,7 +18,8 @@ public interface Communicator {
 
     public int getTransitionCosts(Knot a, Knot b);
 
-    public Stack<Path<SearchKnot>> search( int startX, int startY, int goalX, int goalY, int solutionCount);
-    
-    
+    public List<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount);
+
+    public int getCostSearch(int startX, int startY, int goalX, int goalY);
+    public Stack<SearchKnot> getPathSearch(int startX, int startY, int goalX, int goalY);
 }

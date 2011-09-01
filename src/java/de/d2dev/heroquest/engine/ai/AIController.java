@@ -5,6 +5,7 @@
 package de.d2dev.heroquest.engine.ai;
 
 import de.d2dev.heroquest.engine.game.action.GameAction;
+import java.util.List;
 
 /**
  *
@@ -20,7 +21,7 @@ public interface AIController {
      * @return A {@code GameAction} or {@code null} if there are no more
      * actions to execute in this turn!
      */
-    public GameAction getNextAction();
+    public List<GameAction> getAction();
     
     public void endTurn();
     
