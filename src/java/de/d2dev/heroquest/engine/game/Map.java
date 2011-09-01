@@ -45,6 +45,12 @@ public final class Map implements Observed<MapListener> {
 			l.onUnitLeavesField(field);
 		}
 	}
+	
+	void fireOnFieldTextureChanges(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onFieldTextureChanges(field);
+		}
+	}
 
 	/**
 	 * Construct a new empty map.

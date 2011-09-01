@@ -59,17 +59,7 @@ public class Renderer implements MapListener {
 			
 			for (Field[] row : map.getFields()) {
 				for (Field field : row) {
-					// field textures
-					this.fieldTextures.put( field, new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, GROUND, field.getTexture() ) );
-					this.renderTarget.addQuad( this.fieldTextures.get( field ) );
-					
-					// walls
-					if ( field.isWall() ) {
-						Resource wallTexture = this.wallTextureCreator.createWallTexture( field );
-						
-						this.walls.put( field, new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, WALLS,  wallTexture ) );
-						this.renderTarget.addQuad( this.walls.get( field ) );
-					}
+					this.renderField( field );
 				}
 			}	
 			
@@ -106,6 +96,12 @@ public class Renderer implements MapListener {
 		this.renderUnits();
 	}
 	
+
+	@Override
+	public void onFieldTextureChanges(Field field) {
+		this.renderField( field );
+	}
+	
 	private void renderUnits() {
 		// remove all currently rendered units
 		for ( RenderQuad quad : this.units.values() ) {
@@ -123,6 +119,30 @@ public class Renderer implements MapListener {
 				}
 			}
 		}		
+	}
+	
+	private void renderField(Field field) {
+		// remove previous quad
+		RenderQuad quad;
+		
+		if ( (quad = this.fieldTextures.get( field ) ) != null ) {
+			this.renderTarget.removeQuad( quad );
+			this.fieldTextures.remove( field );
+		}
+		
+		// create the new texture
+		quad = new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, GROUND, field.getTexture() );
+		
+		this.fieldTextures.put( field, quad );
+		this.renderTarget.addQuad( this.fieldTextures.get( field ) );
+		
+		// walls
+		if ( field.isWall() ) {
+			Resource wallTexture = this.wallTextureCreator.createWallTexture( field );
+			
+			this.walls.put( field, new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, WALLS,  wallTexture ) );
+			this.renderTarget.addQuad( this.walls.get( field ) );
+		}
 	}
 	
 	private RenderQuad renderUnit(Unit unit) {

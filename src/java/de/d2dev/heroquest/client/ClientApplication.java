@@ -4,6 +4,7 @@ import de.d2dev.fourseasons.gamestate.GameStateException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import de.d2dev.fourseasons.gamestate.GameStateException;
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.resource.types.TextureResource;
 import de.d2dev.heroquest.engine.ai.MapCommunicator;
