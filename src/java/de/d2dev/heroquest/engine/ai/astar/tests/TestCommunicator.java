@@ -94,6 +94,4 @@ public class TestCommunicator implements Communicator {
     private int getHeuristic(int x, int y) {
         return Math.abs(goalX - x) + Math.abs(goalY - y);
     }
-
-
 }
