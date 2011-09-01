@@ -4,8 +4,11 @@
  */
 package de.d2dev.heroquest.engine.ai;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.Unit;
-import java.util.Map;
 
 /**
  *

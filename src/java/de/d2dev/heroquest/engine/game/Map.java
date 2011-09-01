@@ -3,7 +3,9 @@ package de.d2dev.heroquest.engine.game;
 import de.d2dev.fourseasons.files.FileUtil;
 import de.d2dev.fourseasons.util.Observed;
 import de.d2dev.fourseasons.util.ListenerUtil;
-import java.util.List;
+
+import java.util.*;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -28,6 +30,10 @@ public final class Map implements Observed<MapListener> {
 	private int height;
 	
 	private Field[][] fields;
+	
+	private List<Unit> units = new Vector<Unit>();
+	private List<Unit> heroes = new Vector<Unit>();
+	private List<Unit> monsters = new Vector<Unit>();
 	
 	/**
 	 * The upper left field of the four fields at
@@ -137,14 +143,18 @@ public final class Map implements Observed<MapListener> {
 	public Field[][] getFields() {
 		return fields;
 	}
+	
+	public List<Unit> getUnits() {
+		return null;
+	}
         
-        public List<Unit> getHeroes() {
-            return null;
-        }
-        
-        public List<Unit> getMonsters() {
-            return null;
-        }
+    public List<Unit> getHeroes() {
+        return null;
+    }
+    
+    public List<Unit> getMonsters() {
+        return null;
+    }
 	
 	public Field getStartingField() {
 		return startingField;
