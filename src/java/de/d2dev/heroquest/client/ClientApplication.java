@@ -71,7 +71,7 @@ public class ClientApplication extends Game implements KeyListener {
 //            }
 
         MapCommunicator communicator = new MapCommunicator(this.map);
-        Stack<Path<SearchKnot>> result = communicator.search(0, 1, field.length - 2, field[0].length - 1, 1);
+        Stack<Path<SearchKnot>> result = communicator.search(0, 1, field.length - 2, field[0].length - 1, 3);
         System.out.println(result.size());
         for (Path<SearchKnot> path : result) {
             for (SearchKnot knot : path.getTrace()) {
