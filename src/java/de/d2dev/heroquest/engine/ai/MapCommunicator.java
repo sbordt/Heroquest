@@ -4,8 +4,10 @@
  */
 package de.d2dev.heroquest.engine.ai;
 
+import de.d2dev.heroquest.engine.ai.astar.AStar;
 import de.d2dev.heroquest.engine.ai.astar.Communicator;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
+import de.d2dev.heroquest.engine.ai.astar.Path;
 import de.d2dev.heroquest.engine.game.Map;
 import java.util.Stack;
 
@@ -17,12 +19,12 @@ public class MapCommunicator implements Communicator {
 
     private Map map;
     private int goalX, goalY;
+    private AStar<SearchKnot> astar;
 
 //********************Public*****************************   
-    public MapCommunicator(Map map, int goalX, int goalY) {
+    public MapCommunicator(Map map) {
         this.map = map;
-        this.goalX = goalX;
-        this.goalY = goalY;
+        this.astar = new AStar<SearchKnot>();
     }
 
     public void setGoal(int goalX, int goalY) {
@@ -67,5 +69,13 @@ public class MapCommunicator implements Communicator {
 
     private int getHeuristic(int x, int y) {
         return Math.abs(goalX - x) + Math.abs(goalY - y);
+    }
+
+    @Override
+    public Stack<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount) {
+
+        this.goalX = goalX;
+        this.goalY = goalY;
+        return astar.search(getKnot(startX, startY), solutionCount);
     }
 }

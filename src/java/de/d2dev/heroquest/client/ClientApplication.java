@@ -65,18 +65,17 @@ public class ClientApplication extends Game implements KeyListener {
             
             Field[][] field = this.map.getFields();
             
-            for (int i = 0; i < field.length; i++) {
-                
-                for (int j = 0; j < field[i].length; j++) {
-                    System.out.print(field[i][j].isBlocked() ? "# " : "0 ");               
-                }
-                System.out.println();
-                
-            }
+//            for (int i = 0; i < field.length; i++) {
+//                
+//                for (int j = 0; j < field[i].length; j++) {
+//                    System.out.print(field[i][j].isBlocked() ? "# " : "0 ");               
+//                }
+//                System.out.println();
+//                
+//            }
             
-            MapCommunicator communicator = new MapCommunicator(this.map,this.map.getHeight(),19);
-            AStar<SearchKnot> astar = new AStar<SearchKnot>();
-            Stack<Path<SearchKnot>> result = astar.search(communicator.getKnot(0,1), 4);
+            MapCommunicator communicator = new MapCommunicator(this.map);
+            Stack<Path<SearchKnot>> result = communicator.search(0, 1, field.length-2, field[0].length-1, 1);
             System.out.println(result.size());
             for(Path<SearchKnot> path : result){
                 int[][] printPath = new int[30][30];
@@ -84,7 +83,7 @@ public class ClientApplication extends Game implements KeyListener {
                     
                     int x = knot.getX();
                     int y = knot.getY();
-//                    this.map.getField(x, y).setTexture( TextureResource.createTextureResource("error.jpg"));
+                    this.map.getField(x, y).setTexture( TextureResource.createTextureResource("error.jpg"));
                     printPath[x][y] = 1;
 
                 }
