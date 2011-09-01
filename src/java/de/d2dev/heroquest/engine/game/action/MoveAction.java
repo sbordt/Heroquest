@@ -4,12 +4,13 @@
  */
 package de.d2dev.heroquest.engine.game.action;
 
+import de.d2dev.fourseasons.gamestate.GameStateException;
 import de.d2dev.heroquest.engine.game.Direction2D;
 import de.d2dev.heroquest.engine.game.Unit;
 
 /**
  *
- * @author Simon + Toni
+ * @author Simon
  */
 public class MoveAction implements GameAction {
 
@@ -22,7 +23,20 @@ public class MoveAction implements GameAction {
     }
     
     @Override
-    public void excecute() {
-        
+    public void excecute() throws GameStateException {
+    	switch ( this.direction ) {
+    	case UP:
+    		this.unit.moveUp();
+    		break;
+    	case LEFT:
+    		this.unit.moveLeft();
+    		break;
+    	case RIGHT:
+    		this.unit.moveRight();
+    		break;
+    	case DOWN:
+    		this.unit.moveDown();
+    		break;
+    	}
     }
 }

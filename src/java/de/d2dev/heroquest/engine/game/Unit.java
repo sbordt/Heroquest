@@ -1,6 +1,9 @@
 package de.d2dev.heroquest.engine.game;
 
+import com.google.common.base.Preconditions;
+
 import de.d2dev.fourseasons.gamestate.GameStateException;
+import de.d2dev.fourseasons.gamestate.Gamestate;
 import de.d2dev.heroquest.engine.ai.AIController;
 
 /**
@@ -17,6 +20,8 @@ public class Unit {
 	
 	private Type type;
 	
+	private Map map;
+	
 	private Field field;
 	
 	private Direction2D viewDir = Direction2D.UP;
@@ -28,6 +33,9 @@ public class Unit {
 	private AIController aiController;
 
 	public Unit(Field field, Type type) throws GameStateException {
+		Preconditions.checkNotNull( field );	// the field must not be null
+		
+		this.map = field.getMap();
 		this.moveTo( field );
 		
 		this.type = type;
@@ -38,6 +46,14 @@ public class Unit {
 	 * 										GAME STATE
 	 * 
 	 **************************************************************************************/
+	
+	/**
+	 * The map the unit belongs to.
+	 * @return
+	 */
+	public Map getMap() {
+		return this.map;
+	}
 	
 	/**
 	 * The field the unit is standing on.
@@ -51,8 +67,7 @@ public class Unit {
 	 * Move the unit to another field.
 	 */
 	public void moveTo(Field field) throws GameStateException {
-		if ( field.isBlocked() )	// validity
-			throw new GameStateException( "Attempt to place a unit on a blocked field." );
+		Gamestate.checkState( !field.isBlocked() , "Attempt to place a unit on a blocked field." );
 		
 		if ( this.field != null ) {	// this is not the case when the unit is first placed on the map
 			this.field.getMap().fireOnUnitLeavesField(field);
@@ -64,6 +79,94 @@ public class Unit {
 		
 		this.field.getMap().fireOnUnitEntersField(field);
 	}
+	
+	/**
+	 * Can the unit move one field up?
+	 * @return
+	 */
+	public boolean canMoveUp() {
+		// unit can't move up if there is no upper field or if the upper field is blocked
+		if ( this.field.getUpperField() == null || this.field.getUpperField().isBlocked() )
+			return false;
+			
+		return true;
+	}
+	
+	/**
+	 * Can the unit move one field to the left?
+	 * @return
+	 */
+	public boolean canMoveLeft() {
+		// unit can't move left if there is no left field or if the left field is blocked
+		if ( this.field.getLeftField() == null || this.field.getLeftField().isBlocked() )
+			return false;
+			
+		return true;
+	}
+	
+	/**
+	 * Can the unit move one field to the right?
+	 * @return
+	 */
+	public boolean canMoveRight() {
+		// unit can't move right if there is no right field or if the right field is blocked
+		if ( this.field.getRightField() == null || this.field.getRightField().isBlocked() )
+			return false;
+			
+		return true;		
+	}
+	
+	/**
+	 * Can the unit move one field down?
+	 * @return
+	 */
+	public boolean canMoveDown() {
+		// unit can't move down if there is no lower field or if the lower field is blocked
+		if ( this.field.getLowerField() == null || this.field.getLowerField().isBlocked() )
+			return false;
+			
+		return true;
+	}
+	
+	/**
+	 * Move the unit one field up.
+	 * @throws GameStateException
+	 */
+	public void moveUp() throws GameStateException {
+		Gamestate.checkState( this.canMoveUp(), "Unit can't move up." );
+		
+		this.moveTo( this.field.getUpperField() );
+	}
+	
+	/**
+	 * Move the unit one field to the left.
+	 * @throws GameStateException
+	 */
+	public void moveLeft() throws GameStateException {
+		Gamestate.checkState( this.canMoveLeft(), "Unit can't move left." );
+		
+		this.moveTo( this.field.getLeftField() );
+	}
+	
+	/**
+	 * Move the unit one field to the right.
+	 * @throws GameStateException
+	 */
+	public void moveRight() throws GameStateException {
+		Gamestate.checkState( this.canMoveRight(), "Unit can't move right." );
+		
+		this.moveTo( this.field.getRightField() );
+	}	
+	
+	/**
+	 * Move the unit one field down.
+	 * @throws GameStateException
+	 */
+	public void moveDown() throws GameStateException {
+		Gamestate.checkState( this.canMoveDown(), "Unit can't move dowm." );
+		
+		this.moveTo( this.field.getLowerField() );
+	}	
 	
 	public Direction2D getViewDir() {
 		return viewDir;

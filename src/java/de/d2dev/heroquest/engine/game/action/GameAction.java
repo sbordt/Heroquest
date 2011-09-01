@@ -4,7 +4,7 @@
  */
 package de.d2dev.heroquest.engine.game.action;
 
-import de.d2dev.heroquest.engine.game.Unit;
+import de.d2dev.fourseasons.gamestate.GameStateException;
 
 /**
  *
@@ -12,5 +12,5 @@ import de.d2dev.heroquest.engine.game.Unit;
  */
 public interface GameAction {
     
-    public void excecute();
+    public void excecute() throws GameStateException ;
 }

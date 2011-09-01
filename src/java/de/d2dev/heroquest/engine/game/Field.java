@@ -113,6 +113,12 @@ public final class Field {
 		this.texture = TextureResource.createTextureResource( FileUtil.readStringAttribute( xml, TEXTURE ) );
 	}
 	
+	/**************************************************************************************
+	 * 
+	 * 										GAME STATE
+	 * 
+	 **************************************************************************************/
+	
 	/**
 	 * Getter for the map the fields belongs to.
 	 * @return
@@ -135,6 +141,54 @@ public final class Field {
 	 */
 	public int getY() {
 		return y;
+	}
+	
+	/**
+	 * Get the field on top of the given field.
+	 * @return {@code null} in case there is none - field is in upper row.
+	 */
+	public Field getUpperField() {
+		// there is no upper field if we are in the upper row
+		if ( this.y == 0 )
+			return null;
+		
+		return this.map.getField( this.x, this.y -1 );
+	}
+	
+	/**
+	 * Get the field left to the given field.
+	 * @return {@code null} in case there is none - field is in left column.
+	 */
+	public Field getLeftField() {
+		// there is no left field if we are in the left column
+		if ( this.x == 0 )
+			return null;
+		
+		return this.map.getField( this.x -1, this.y );
+	}
+	
+	/**
+	 * Get the field under to the given field.
+	 * @return {@code null} in case there is none - field is in lower row.
+	 */
+	public Field getLowerField() {
+		// there is no lower field if we are in the lower row
+		if ( this.y == this.map.getHeight()-1 )
+			return null;
+		
+		return this.map.getField( this.x, this.y +1 );
+	}
+	
+	/**
+	 * Get the field right to the given field.
+	 * @return {@code null} in case there is none - field is in right column.
+	 */
+	public Field getRightField() {
+		// there is no right field if we are in the right column
+		if ( this.x == this.map.getWidth()-1 )
+			return null;
+		
+		return this.map.getField( this.x +1, this.y );
 	}
 	
 	/**
@@ -217,6 +271,12 @@ public final class Field {
 		
 		this.map.fireOnFieldTextureChanges( this );	// fire event
 	}
+	
+	/**************************************************************************************
+	 * 
+	 * 										OTHER METHODS
+	 * 
+	 **************************************************************************************/
 	
 	public Element toXML() {
 		Element xml = new Element( FIELD );

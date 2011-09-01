@@ -13,7 +13,7 @@ import de.d2dev.heroquest.engine.ai.astar.Path;
 import de.d2dev.heroquest.engine.files.HqMapFile;
 import de.d2dev.heroquest.engine.game.Direction2D;
 import de.d2dev.heroquest.engine.game.Field;
-import de.d2dev.heroquest.engine.game.Game;
+import de.d2dev.heroquest.engine.game.RunningGameContext;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.game.action.GameAction;
@@ -30,7 +30,7 @@ import java.util.concurrent.Future;
 
 import javax.swing.SwingUtilities;
 
-public class ClientApplication extends Game implements KeyListener {
+public class ClientApplication implements KeyListener {
 
     private String settingsPath = "";
     private Map map;
@@ -46,12 +46,7 @@ public class ClientApplication extends Game implements KeyListener {
     
     private boolean heroesRound = true;
     
-    private List<Unit> monstersToGo = new Vector<Unit>();
-    private Unit currentMonster;
-    
-    private Future<?> startTurnFuture;
-    private Future<GameAction> nextActionFuture;
-    private Future<?> endTurnFuture;
+    private List<GameAction> actionsToPerform;
 
     public ClientApplication() {
     }
@@ -120,59 +115,34 @@ public class ClientApplication extends Game implements KeyListener {
     public void heroesRound() {
     }
 
-//    public void monstersRound() {
-//    	// monster now! initialization...
-//    	if ( this.heroesRound == true ) {
-//    		this.heroesRound = false;
-//    		
-//    		this.monstersToGo.add( this.monster );
-//    		this.currentMonster = this.monstersToGo.get(0);
-//    		
-//    		// execute!
-//    		this.startTurnFuture = AIExecutor.executeStartTurn(aiExecutor, this.currentMonster.getAIController());
-//    		
-//    		SwingUtilities.invokeLater( new Runnable() {
-//
-//				@Override
-//				public void run() {
-//					ClientApplication.this.onStartTurn();
-//				}
-//    		});
-//    	}
-// 	
-//    }
-//    
-//    public void onStartTurn() {
-//    	if ( this.startTurnFuture.isDone() ) {
-//    		
-//    		// action!
-//    		this.nextActionFuture = AIExecutor.executeNextAction(aiExecutor, this.currentMonster.getAIController()); 
-//    		
-//    		SwingUtilities.invokeLater( new Runnable() {
-//
-//				@Override
-//				public void run() {
-//					ClientApplication.this.onMonsterAction();
-//				}
-//    		});    		
-//    	} else {	// try again next time!
-//    		SwingUtilities.invokeLater( new Runnable() {
-//
-//				@Override
-//				public void run() {
-//					ClientApplication.this.onStartTurn();
-//				}
-//    		});
-//    	}
-//    }
-//    
-//    public void onMonsterAction() {
-//    	if ( this.)
-//    }
-//    
-//    public void onMonsterEndTurn() {
-//    	
-//    }
+    public void monstersRound() {
+    	// monster now! initialization...
+    	if ( this.heroesRound == true ) {
+    		this.heroesRound = false;
+    	}
+    	
+    	this.actionsToPerform = this.monster.getAIController().getActions();
+    }
+    
+    public void performMonsterActions() {
+    	if ( this.actionsToPerform.isEmpty() ) {
+    		this.heroesRound = true;
+    		return;
+    	}
+    	
+    	this.performAction( this.actionsToPerform.get(0) );
+    	this.actionsToPerform.remove(0);	
+    }
+    
+    public void performAction(GameAction action) {
+    	try {
+			action.excecute();
+		} catch (GameStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -181,9 +151,8 @@ public class ClientApplication extends Game implements KeyListener {
         if ( this.heroesRound ) {
             if (e.getKeyChar() == 's') {	// walk down
                 try {
-                    if (this.hero.getField().getY() != this.map.getHeight() - 1
-                            && !this.map.getField(this.hero.getField().getX(), this.hero.getField().getY() + 1).isBlocked()) {
-                        this.hero.moveTo(this.map.getField(this.hero.getField().getX(), this.hero.getField().getY() + 1));
+                    if ( this.hero.canMoveDown() ) {
+                    	this.hero.moveDown();
                         this.hero.setViewDir(Direction2D.DOWN);
                     }
                 } catch (GameStateException e1) {
@@ -192,9 +161,8 @@ public class ClientApplication extends Game implements KeyListener {
                 }
             } else if (e.getKeyChar() == 'w') {	// walk up
                 try {
-                    if (this.hero.getField().getY() != 0
-                            && !this.map.getField(this.hero.getField().getX(), this.hero.getField().getY() - 1).isBlocked()) {
-                        this.hero.moveTo(this.map.getField(this.hero.getField().getX(), this.hero.getField().getY() - 1));
+                    if ( this.hero.canMoveUp() ) {
+                        this.hero.moveUp();
                         this.hero.setViewDir(Direction2D.UP);
                     }
                 } catch (GameStateException e1) {
@@ -203,9 +171,8 @@ public class ClientApplication extends Game implements KeyListener {
                 }
             } else if (e.getKeyChar() == 'a') {	// walk left
                 try {
-                    if (this.hero.getField().getX() != 0
-                            && !this.map.getField(this.hero.getField().getX() - 1, this.hero.getField().getY()).isBlocked()) {
-                        this.hero.moveTo(this.map.getField(this.hero.getField().getX() - 1, this.hero.getField().getY()));
+                    if ( this.hero.canMoveLeft() ) {
+                        this.hero.moveLeft();
                         this.hero.setViewDir(Direction2D.LEFT);
                     }
                 } catch (GameStateException e1) {
@@ -214,9 +181,8 @@ public class ClientApplication extends Game implements KeyListener {
                 }
             } else if (e.getKeyChar() == 'd') {	// walk right
                 try {
-                    if (this.hero.getField().getX() != this.map.getWidth() - 1
-                            && !this.map.getField(this.hero.getField().getX() + 1, this.hero.getField().getY()).isBlocked()) {
-                        this.hero.moveTo(this.map.getField(this.hero.getField().getX() + 1, this.hero.getField().getY()));
+                    if ( this.hero.canMoveRight() ) {
+                        this.hero.moveRight();
                         this.hero.setViewDir(Direction2D.RIGHT);
                     }
                 } catch (GameStateException e1) {
