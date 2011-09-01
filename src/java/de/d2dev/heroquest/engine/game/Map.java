@@ -1,8 +1,8 @@
 package de.d2dev.heroquest.engine.game;
 
 import de.d2dev.fourseasons.files.FileUtil;
-import de.d2dev.fourseasons.util.Observable;
-import de.d2dev.fourseasons.util.Observers;
+import de.d2dev.fourseasons.util.Observed;
+import de.d2dev.fourseasons.util.ListenerUtil;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -14,14 +14,14 @@ import nu.xom.Elements;
  * @author Sebastian Bordt
  *
  */
-public final class Map implements Observable<MapListener> {
+public final class Map implements Observed<MapListener> {
 	
 	private static final String HERO_QUEST_MAP = "heroquestmap";
 	private static final String WIDTH = "width";
 	private static final String HEIGHT = "height";
 	private static final String FIELDS = "fields";
 	
-	private Observers<MapListener> listeners;
+	private ListenerUtil<MapListener> listeners = new ListenerUtil<MapListener>();
 	
 	private int width;
 	private int height;
@@ -34,7 +34,17 @@ public final class Map implements Observable<MapListener> {
 	 */
 	private Field startingField;
 	
-
+	void fireOnUnitEntersField(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onUnitEntersField(field);
+		}
+	}
+	
+	void fireOnUnitLeavesField(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onUnitLeavesField(field);
+		}
+	}
 
 	/**
 	 * Construct a new empty map.

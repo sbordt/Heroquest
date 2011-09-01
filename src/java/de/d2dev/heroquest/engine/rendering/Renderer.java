@@ -11,6 +11,7 @@ import de.d2dev.heroquest.engine.game.MapListener;
 import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.rendering.quads.RenderQuad;
+import de.d2dev.heroquest.engine.rendering.quads.RenderQuad.TextureTurn;
 
 /**
  * This class renders a heroquest map. The render source is the given {@link Map}, the
@@ -129,27 +130,31 @@ public class Renderer implements MapListener {
 		
 		String pictureName = "error.jpg";
 		
-		
 		if ( unit.getType() == Unit.Type.HERO ) {
-			pictureName = "units/heroes/barbarian/";
-			
- 		
+			pictureName = "units/heroes/barbarian/barbarian.jpg";
 		}
 		else if ( unit.getType() == Unit.Type.MONSTER ) {
-			pictureName = "units/monsters/orc/";
+			pictureName = "units/monsters/orc/orc.jpg";
 		}
 		
 		// view direction specific picture!
-		if ( unit.getViewDir() == Unit.ViewDirection.UP ) {
-			pictureName += "top.jpg";
-		} else if ( unit.getViewDir() == Unit.ViewDirection.LEFT ) {
-			pictureName += "left.jpg";
-		} else if ( unit.getViewDir() == Unit.ViewDirection.RIGHT ) {
-			pictureName += "right.jpg";
-		} else {	// bottom
-			pictureName += "bottom.jpg";
-		} 
+		TextureTurn turn;
 		
-		return new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, UNITS,  TextureResource.createTextureResource(pictureName) );
+		switch( unit.getViewDir() ) {
+		case UP:
+			turn = TextureTurn.NORMAL;
+			break;
+		case LEFT:
+			turn = TextureTurn.TURN_LEFT_90_DEGREE;
+			break;
+		case RIGHT:
+			turn = TextureTurn.TURN_LEFT_270_DEGREE;
+			break;	
+		default:	// down
+			turn = TextureTurn.TURN_LEFT_180_DEGREE;
+			break;
+		}
+		
+		return new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, UNITS,  TextureResource.createTextureResource(pictureName), turn );
 	}
 }

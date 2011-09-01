@@ -32,13 +32,12 @@ public class Unit {
 	
 	private Field field;
 	
-	private ViewDirection viewDir;
+	private ViewDirection viewDir = ViewDirection.UP;
 
 	public Unit(Field field, Type type) throws GameStateException {
-		this.setField( field );
+		this.moveTo( field );
 		
 		this.type = type;
-		this.viewDir = ViewDirection.UP;
 	}
 	
 	/**
@@ -50,21 +49,29 @@ public class Unit {
 	}
 	
 	/**
-	 * Set the unit to stand on a specific field.
+	 * Move the unit to another field.
 	 */
-	public void setField(Field field) throws GameStateException {
+	public void moveTo(Field field) throws GameStateException {
 		if ( field.isBlocked() )	// validity
 			throw new GameStateException( "Attempt to place a unit on a blocked field." );
 		
-		if ( this.field != null )
+		if ( this.field != null ) {	// this is not the case when the unit is first placed on the map
+			this.field.getMap().fireOnUnitLeavesField(field);
 			this.field.unit = null;
+		}
 		
 		this.field = field;
-		field.unit = this;
+		field.unit = this ;
+		
+		this.field.getMap().fireOnUnitEntersField(field);
 	}
 	
 	public ViewDirection getViewDir() {
 		return viewDir;
+	}
+	
+	public void setViewDir(ViewDirection dir) {
+		this.viewDir = dir;
 	}
 	
 	public Type getType() {

@@ -16,6 +16,7 @@ import de.d2dev.heroquest.engine.files.HqMapFile;
 import de.d2dev.heroquest.engine.game.Game;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.Unit;
+import de.d2dev.heroquest.engine.game.Unit.ViewDirection;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderWindow;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
@@ -54,6 +55,7 @@ public class ClientApplication extends Game implements KeyListener {
 		this.renderTarget = new QuadRenderModel( map.getWidth(), map.getHeight() );
 		
 		this.renderer = new Renderer( map, renderTarget, this.resourceFinder );
+		this.map.addListener(renderer);
 		this.renderer.render();
 		
 		this.window = new Java2DRenderWindow( this.renderer.getRederTarget(), this.resourceFinder );
@@ -94,10 +96,62 @@ public class ClientApplication extends Game implements KeyListener {
 	public void heroesRound() {}
 	
 	public void monstersRound() {}
-
+	
 	@Override
-	public void keyPressed(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+	public void keyPressed(KeyEvent e) {
+		System.out.println( e.getKeyChar() );
+		
+		if ( e.getKeyChar() == 's' ) {	// walk down
+			try {
+				if ( this.hero.getField().getY() != this.map.getHeight()-1 
+						&& !this.map.getField( this.hero.getField().getX(), this.hero.getField().getY()+1 ).isBlocked() ) {
+					this.hero.moveTo( this.map.getField( this.hero.getField().getX(), this.hero.getField().getY()+1 ) );
+					this.hero.setViewDir( ViewDirection.DOWN );					
+				}
+			} catch (GameStateException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		else if ( e.getKeyChar() == 'w' ) {	// walk up
+			try {
+				if ( this.hero.getField().getY() != 0 
+						&& !this.map.getField( this.hero.getField().getX(), this.hero.getField().getY()-1 ).isBlocked() ) {
+					this.hero.moveTo( this.map.getField( this.hero.getField().getX(), this.hero.getField().getY()-1 ) );
+					this.hero.setViewDir( ViewDirection.UP);					
+				}
+			} catch (GameStateException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		else if ( e.getKeyChar() == 'a' ) {	// walk left
+			try {
+				if ( this.hero.getField().getX() != 0 
+						&& !this.map.getField( this.hero.getField().getX()-1, this.hero.getField().getY() ).isBlocked() ) {
+					this.hero.moveTo( this.map.getField( this.hero.getField().getX()-1, this.hero.getField().getY() ) );
+					this.hero.setViewDir( ViewDirection.LEFT );					
+				}
+			} catch (GameStateException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		else if ( e.getKeyChar() == 'd' ) {	// walk right
+			try {
+				if ( this.hero.getField().getX() != this.map.getWidth()-1 
+						&& !this.map.getField( this.hero.getField().getX()+1, this.hero.getField().getY() ).isBlocked() ) {
+					this.hero.moveTo( this.map.getField( this.hero.getField().getX()+1, this.hero.getField().getY() ) );
+					this.hero.setViewDir( ViewDirection.RIGHT );					
+				}
+			} catch (GameStateException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+		this.renderer.render();
+		this.window.repaint();
 		
 	}
 
@@ -109,6 +163,6 @@ public class ClientApplication extends Game implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent arg0) {
-		System.out.println( arg0.getKeyChar() );
+		// TODO Auto-generated method stub
 	}
 }
