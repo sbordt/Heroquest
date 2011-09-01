@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.util.HashMap;
-import java.util.List;
 
 import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.ResourceLocator;
@@ -49,19 +48,8 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 		graphics.fillRect( 0, 0, this.target.getWidth(), this.target.getHeight() );
 		
 		// render the quads
-		List<RenderQuad> quads = this.model.getQuads();
-		
-		for ( RenderQuad quad : quads ) {
-			BufferedImage img = this.provideTexture( quad.getTexture() );
-			
-			AffineTransform scaling = new AffineTransform();
-			scaling.setToScale( quad.getWidth() * this.ppUnit /  ((float) img.getWidth()), quad.getHeight() * this.ppUnit /  ((float) img.getHeight()) ); 
-			
-			AffineTransform translation = new AffineTransform();
-			translation.setToTranslation( quad.getX() * this.ppUnit, quad.getY() * this.ppUnit );
-			
-			translation.concatenate( scaling );
-			graphics.drawImage( img, translation, null);
+		for ( RenderQuad quad : this.model.getQuads()  ) {
+			this.renderQuad(graphics, quad);
 		}
 		
 		// done!
@@ -96,6 +84,64 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 		return this.resourceProvider;
 	}
 	
+	@Override
+	public void onResize(int width, int height) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAddQuad(RenderQuad quad) {
+		System.out.println("Add");
+	}
+
+	@Override
+	public void onRemoveQuad(RenderQuad quad) {
+		System.out.println("remove");
+		
+	}
+
+	@Override
+	public void onQuadMoved(RenderQuad quad) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onQuadTextureChanged(RenderQuad quad) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void renderQuad(Graphics2D g, RenderQuad quad) {
+		// load the texture
+		BufferedImage img = this.provideTexture( quad.getTexture() );
+		
+		// Scaling for the resolution, rotation for the turn and translation for the position
+		AffineTransform transform = new AffineTransform();
+
+		transform.translate( quad.getX() * this.ppUnit, quad.getY() * this.ppUnit );
+		
+		switch( quad.getTextureTurn() ) {
+		case NORMAL:	// no rotation needed
+			break;
+		case TURN_LEFT_90_DEGREE:
+			transform.rotate(Math.PI * 1.5, img.getWidth() / 2.0, img.getHeight() / 2.0);
+			break;
+		case TURN_LEFT_180_DEGREE:
+			transform.rotate(Math.PI, img.getWidth() / 2.0, img.getHeight() / 2.0);
+			break;
+		case TURN_LEFT_270_DEGREE:
+			transform.rotate(Math.PI / 2.0, img.getWidth() / 2.0, img.getHeight() / 2.0);
+			break;
+		}
+		
+		transform.scale( quad.getWidth() * this.ppUnit /  ((float) img.getWidth()), quad.getHeight() * this.ppUnit /  ((float) img.getHeight()) );
+		
+		// draw!
+		g.drawImage( img, transform, null);
+	}
+	
 	private BufferedImage provideTexture(Resource texture) {
 		BufferedImage img;
 		
@@ -118,33 +164,4 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 		return img;
 	}
 
-	@Override
-	public void onResize(int width, int height) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onAddQuad(RenderQuad quad) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRemoveQuad(RenderQuad quad) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onQuadMoved(RenderQuad quad) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onQuadTextureChanged(RenderQuad quad) {
-		// TODO Auto-generated method stub
-		
-	}
 }

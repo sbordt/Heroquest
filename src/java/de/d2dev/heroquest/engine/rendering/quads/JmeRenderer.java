@@ -22,17 +22,20 @@ import de.d2dev.fourseasons.resource.ResourceLocator;
  *
  * @author Justus
  */
-public class JmeRenderer extends SimpleApplication implements QuadRenderer, QuadRenderModelListener {
+public class JmeRenderer extends SimpleApplication implements QuadRenderer, QuadRenderModelListener, JmeResizeableApp {
 	
 	// Variablen die die Cameraeinstellungen bestimmen
 	private float cameraSpeed = 2f;
     private float zoomLevel = 5.0f;
     private float zoomSpeed = 3f;
+
     
-    
-    // Spielfeldvariablen
+	// Spielfeldvariablen
     QuadRenderModel quadRenderModel = null;
-    HashMap<RenderQuad, Geometry> geometrics = new HashMap<RenderQuad, Geometry>();
+	HashMap<RenderQuad, Geometry> geometrics = new HashMap<RenderQuad, Geometry>();
+    
+    // Listener
+    JmeUserInputListener userListener;
     
     
     ResourceLocator resourceLocator;
@@ -42,6 +45,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         
         this.quadRenderModel = model;
         this.resourceLocator = locator;
+        userListener = new JmeUserInputListener (this);
     }
     /** 
      * zeichnet den übergebenen Spielfeldstatus(StupidRenderModel) als 3D Szene.
@@ -88,116 +92,10 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
        inputManager.addMapping("zoomOut", new KeyTrigger(KeyInput.KEY_O));
        inputManager.addMapping("zoomIn", new KeyTrigger(KeyInput.KEY_I));
        
-       inputManager.addListener(analogListener, new String[]{"left", "right", "up", "down", "zoomOut", "zoomIn"});
+       inputManager.addListener(userListener, new String[]{"left", "right", "up", "down", "zoomOut", "zoomIn"});
     }
     
-    private AnalogListener analogListener = new AnalogListener() {
     
-    public void onAnalog(String name, float value, float tpf) {
-        // Die Pfeil Rechts Taste soll die Kamera nach rechts bewegen
-    	// aber es soll überprüft werden, dass das Kamerabild die Map nicht verlässt
-    	if (name.equals("right")) {
-        	float rechterBildschirmrand_XPos = (cam.getLocation().x + (cam.getFrustumRight() - cam.getFrustumLeft())/2);
-        	// hier wird überprüft ob der neue Kameraausschnitt den Speilfeldbereich verlassen würde
-        	if (rechterBildschirmrand_XPos + cameraSpeed*tpf*zoomLevel <= quadRenderModel.getWidth()){
-        		// Die Kamera kann nun bewegt werden
-        		cam.setLocation(cam.getLocation().add(new Vector3f(cameraSpeed*tpf*zoomLevel, 0, 0)));	
-        	}
-        }
-    	// Die Pfeil links Taste soll die Kamera nach links bewegen
-    	// aber es soll überprüft werden, dass das Kamerabild die Map nicht verlässt
-    	else if (name.equals("left")) {
-        	float linkerBildschirmrand_XPos = (cam.getLocation().x - (cam.getFrustumRight() - cam.getFrustumLeft())/2);
-        	// hier wird überprüft ob der neue Kameraausschnitt den Speilfeldbereich verlassen würde
-        	if (linkerBildschirmrand_XPos - cameraSpeed*tpf*zoomLevel >= 0){
-        		// Die Kamera kann nun bewegt werden
-        		cam.setLocation(cam.getLocation().add(new Vector3f(-cameraSpeed*tpf*zoomLevel, 0, 0)));	
-    		}
-        }
-    	// Die Pfeil oben Taste soll die Kamera nach oben bewegen
-    	// aber es soll überprüft werden, dass das Kamerabild die Map nicht verlässt
-    	else if (name.equals("up")) {
-        	float obererBildschirmrand_YPos = cam.getLocation().y + (cam.getFrustumTop() - cam.getFrustumBottom())/2;
-        	// hier wird überprüft ob der neue Kameraausschnitt den Speilfeldbereich verlassen würde
-        	if (obererBildschirmrand_YPos + cameraSpeed*tpf*zoomLevel <= quadRenderModel.getHeight()){
-        		// Die Kamera kann nun bewegt werden
-        		cam.setLocation(cam.getLocation().add(new Vector3f(0, cameraSpeed*tpf*zoomLevel, 0)));
-        	}
-        }
-    	// Die Pfeil unten Taste soll die Kamera nach unten bewegen
-    	// aber es soll überprüft werden, dass das Kamerabild die Map nicht verlässt
-    	else if (name.equals("down")) {
-    		float untererBildschirmrand_YPos = cam.getLocation().y - (cam.getFrustumTop() - cam.getFrustumBottom())/2;
-        	// hier wird überprüft ob der neue Kameraausschnitt den Speilfeldbereich verlassen würde
-        	if (untererBildschirmrand_YPos - cameraSpeed*tpf*zoomLevel >= 0){
-        		// Die Kamera kann nun bewegt werden
-        		cam.setLocation(cam.getLocation().add(new Vector3f(0, -cameraSpeed*tpf*zoomLevel, 0)));	
-        	}
-        }
-        else if (name.equals("zoomOut")){
-        	float aspect = (float) cam.getWidth() / cam.getHeight();
-            // Wenn keiner den Kameraränder den Bildschirm verlassen würde wird normal gezoomt
-        	if (
-            	// Es würde den links Speilfeldrand nicht überschreiten / ist rechts nicht am rand
-            	((cam.getLocation().x - (zoomLevel + zoomSpeed*tpf)*aspect) > 0)&&
-            	// Es darf nicht rechts aus dem Bild gezoomt werden
-            	((cam.getLocation().x + (zoomLevel + zoomSpeed*tpf)*aspect) < quadRenderModel.getWidth())&&
-            	// Es darf nicht oben aus dem Bild gezoomt werden
-            	((cam.getLocation().y + (zoomLevel + zoomSpeed*tpf)) < quadRenderModel.getHeight())&&
-            	// Es darf nicht unten aus dem Bild gezoomt werden
-            	((cam.getLocation().y - (zoomLevel + zoomSpeed*tpf)) > 0)
-            	){
-            	zoomLevel = zoomLevel + zoomSpeed*tpf;
-            	cam.setFrustum( -100, 1000, -zoomLevel * aspect, zoomLevel * aspect, zoomLevel, -zoomLevel );
-            }
-        	// Wenn 
-        	else{
-        		// Wenn es links am rand ist und rechts nicht versuche es nach rechts zu bewegen
-        		if (
-        			(((cam.getLocation().x - (zoomLevel + zoomSpeed*tpf)*aspect) > 0) != true)&&
-        			((cam.getLocation().x + (zoomLevel + zoomSpeed*tpf)*aspect) < quadRenderModel.getWidth())
-        			){
-        			moveCamera (1, 0, true);
-        		}
-        		// Wenn es rechts am rand ist und links nicht versuche es nach links zu bewegen
-        		if (
-        			(((cam.getLocation().x + (zoomLevel + zoomSpeed*tpf)*aspect) < quadRenderModel.getWidth()) != true)&&
-        			((cam.getLocation().x - (zoomLevel + zoomSpeed*tpf)*aspect) > 0)
-        			){
-        			moveCamera (-1, 0, true);
-        		}
-        		// Wenn es oben am rand ist und unten nicht versuche es nach unten zu bewegen
-        		if (
-        			(((cam.getLocation().y + (zoomLevel + zoomSpeed*tpf)) < quadRenderModel.getHeight())!= true)&&
-        			((cam.getLocation().y - (zoomLevel + zoomSpeed*tpf)) > 0)
-        			){
-        			moveCamera (0, -1, true);
-        		}
-        		// Wenn es unten am rand ist und oben nicht versuche es nach oben zu bewegen
-        		if (
-        			(((cam.getLocation().y - (zoomLevel + zoomSpeed*tpf)) > 0)!= true)&&
-        			((cam.getLocation().y + (zoomLevel + zoomSpeed*tpf)) < quadRenderModel.getHeight())
-        			){
-        			moveCamera (0, 1, true);
-        		}
-        	}
-        }
-        else if (name.equals("zoomIn")){
-            zoomLevel = zoomLevel - zoomSpeed*tpf;
-            float aspect = (float) cam.getWidth() / cam.getHeight();
-            cam.setFrustum( -100, 1000, -zoomLevel * aspect, zoomLevel * aspect, zoomLevel, -zoomLevel );
-        }
-        System.out.println("Höhe: " + (cam.getFrustumTop() - cam.getFrustumBottom()));
-        System.out.println("Breite: " + (cam.getFrustumRight() - cam.getFrustumLeft()));
-        System.out.println("X: " + cam.getLocation().x);
-        System.out.println("Y: " + cam.getLocation().y);
-        System.out.println("Z: " + cam.getLocation().z);
-        System.out.println("Linker Rand: " + (cam.getLocation().x - (cam.getFrustumRight() - cam.getFrustumLeft())/2));
-        System.out.println("rechter Rand: " + (cam.getLocation().x + (cam.getFrustumRight() - cam.getFrustumLeft())/2));
-        System.out.println("Unterer Rand: " + (cam.getLocation().y - (cam.getFrustumTop() - cam.getFrustumBottom())/2));
-        System.out.println("Oberer Rand: " + (cam.getLocation().y + (cam.getFrustumTop() - cam.getFrustumBottom())/2));
-      }
-   };
     
     /**
      * Setzt die Kameraprojektionsart auf parallele Projektion und passt die restlichen Werte an.
@@ -303,7 +201,35 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 	
 	@Override
 	public void onResize(int width, int height) {
-		// TODO Auto-generated method stub
 		
+	}	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////// Getter & Setter /////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public void setCameraSpeed(float cameraSpeed) {
+		this.cameraSpeed = cameraSpeed;
+	}
+	public float getCameraSpeed() {
+		return cameraSpeed;
+	}
+	public void setZoomSpeed(float zoomSpeed) {
+		this.zoomSpeed = zoomSpeed;
+	}
+	public float getZoomSpeed() {
+		return zoomSpeed;
+	}
+	public float getZoomLevel() {
+		return zoomLevel;
+	}
+	public void setZoomLevel(float zoomLevel) {
+		this.zoomLevel = zoomLevel;
+	}
+	public QuadRenderModel getQuadRenderModel() {
+		return quadRenderModel;
+	}
+	public void setQuadRenderModel(QuadRenderModel quadRenderModel) {
+		this.quadRenderModel = quadRenderModel;
 	}
 }

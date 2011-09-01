@@ -73,7 +73,7 @@ public final class Field {
 	 * A unit that might be standing on the field. Visible to the package because 
 	 * the unit has the {@code setField} method.
 	 */
-	Unit unit;
+	Unit unit = null;
 	
 	/**
 	 * The fields texture. Simply the texture to be rendered when there is nothing on
@@ -91,8 +91,6 @@ public final class Field {
 		
 		this.isWall = false;
 		this.isDoor = false;
-		
-		this.unit = null;
 		
 		this.texture = TextureResource.createTextureResource( "fields/default.jpg" );
 	}

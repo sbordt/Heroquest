@@ -38,6 +38,26 @@ public class Editor {
 	
 	public String publicDataStoragePath;
 	
+	/**
+	 * {@code null} if not found.
+	 */
+	public String dropboxFolderPath = null;
+	
+	/**
+	 * {@code null} if not found.
+	 */
+	public String dropboxEditorFolder = null;
+	
+	/**
+	 * {@code null} if not found.
+	 */
+	public HqRessourceFile dropboxResources = null;
+	
+	/**
+	 * {@code null} if not found.
+	 */	
+	public TFile dropboxScriptFolder = null;
+	
 	public Properties properties = new Properties();
 	
 	public TFile scriptFolder;
@@ -70,10 +90,13 @@ public class Editor {
     	}
     	
     	// global resources are in globalRessources.zip
-    	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalRessources.zip" );
+    	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalResources.zip" );
     	
     	// script folder 'script'
     	this.scriptFolder = new TFile( this.publicDataStoragePath + "/script" );
+    	
+    	// init dropbox data
+    	this.initDropbox();
     	
     	// our resource locator
     	this.resourceProvider = new EditorRessourceLocator( this );
@@ -87,10 +110,10 @@ public class Editor {
     		
     		LuaScriptLoader loader = new LuaScriptLoader( _G, decomposer );
     		
-    		loader.load( new TFile( this.publicDataStoragePath + "/script/bindings.lua" ) );
-    		loader.load( new TFile( this.publicDataStoragePath + "/script/map templates/map_creation.lua" ) );
+    		loader.load( new TFile( this.dropboxFolderPath + "/script/bindings.lua" ) );
+    		loader.load( new TFile( this.dropboxFolderPath + "/script/map templates/map_creation.lua" ) );
     		
-    		LuaScript script = (LuaScript) loader.load( new TFile( this.publicDataStoragePath + "/script/map templates/classical.lua" ) );
+    		LuaScript script = (LuaScript) loader.load( new TFile( this.dropboxFolderPath + "/script/map templates/classical.lua" ) );
     		assert script != null;
     		
     		script.getScript().call();
@@ -115,6 +138,28 @@ public class Editor {
     	
 		this.renderer = new Renderer( this.map, this.renderTarget, this.resourceProvider );
 		this.renderer.render();
+	}
+	
+	public void initDropbox() throws Exception {
+    	// is there a dropbox storage location?	
+    	if ( (this.dropboxFolderPath = Application.getFileSystemDropbox()) != null ) {
+    		this.dropboxFolderPath += "/HeroQuest/HeroQuest Editor";
+    		
+    		if ( !new File( this.dropboxFolderPath ).exists() ) {
+    			this.dropboxFolderPath = null;
+    			return;
+    		}
+    	}
+    	
+    	// dropbox resources
+    	if ( this.dropboxFolderPath != null ) {
+    		this.dropboxResources = new HqRessourceFile( this.dropboxFolderPath + "/" + "globalResources.zip" );
+    	}		
+
+    	// dropbox script folder 'script'
+    	if ( this.dropboxFolderPath != null ) {
+    		this.dropboxScriptFolder = new TFile( this.dropboxFolderPath + "/script" );
+    	}
 	}
 	
 	public void start() {
@@ -153,6 +198,6 @@ public class Editor {
     	editor.publicDataStoragePath = Application.getPublicStoragePath("HeroQuest Editor");
     	editor.initialize();
     	editor.start();
- 
 	}
+	
 }
