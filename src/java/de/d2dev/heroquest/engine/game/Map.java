@@ -3,6 +3,7 @@ package de.d2dev.heroquest.engine.game;
 import de.d2dev.fourseasons.files.FileUtil;
 import de.d2dev.fourseasons.util.Observed;
 import de.d2dev.fourseasons.util.ListenerUtil;
+import de.d2dev.heroquest.engine.game.Unit.Type;
 
 import java.util.*;
 
@@ -145,15 +146,48 @@ public final class Map implements Observed<MapListener> {
 	}
 	
 	public List<Unit> getUnits() {
-		return null;
+        // TODO better
+    	Vector<Unit> units = new Vector<Unit>();
+    	
+    	for (Field[] fields : this.fields) {
+			for(Field field : fields) {
+				if ( field.hasUnit() ) {
+					units.add( field.getUnit() );
+				}
+			}
+		}
+    	
+    	return units;
 	}
         
     public List<Unit> getHeroes() {
-        return null;
+        // TODO better
+    	Vector<Unit> heroes = new Vector<Unit>();
+    	
+    	for (Field[] fields : this.fields) {
+			for(Field field : fields) {
+				if ( field.hasUnit() && field.getUnit().getType() == Type.HERO) {
+					heroes.add( field.getUnit() );
+				}
+			}
+		}
+    	
+    	return heroes;
     }
     
     public List<Unit> getMonsters() {
-        return null;
+        // TODO better
+    	Vector<Unit> monsters = new Vector<Unit>();
+    	
+    	for (Field[] fields : this.fields) {
+			for(Field field : fields) {
+				if ( field.hasUnit() && field.getUnit().getType() == Type.MONSTER ) {
+					monsters.add( field.getUnit() );
+				}
+			}
+		}
+    	
+    	return monsters;
     }
 	
 	public Field getStartingField() {
