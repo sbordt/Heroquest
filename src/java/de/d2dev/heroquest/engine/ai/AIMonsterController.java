@@ -30,14 +30,7 @@ public class AIMonsterController implements AIController {
         this.communicator = new MapCommunicator(this.map);
     }
 
-    @Override
-    public void startTurn() {
-    }
 
-    @Override
-    public void endTurn() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
     public List<GameAction> getActions() {
@@ -48,7 +41,7 @@ public class AIMonsterController implements AIController {
                     heroe));
         }
         
-        targets.poll().getPathToMonster();
+        Stack<SearchKnot> actionPath = targets.poll().getPathToMonster();
         
         
         return null;
