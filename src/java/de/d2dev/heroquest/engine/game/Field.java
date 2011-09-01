@@ -214,6 +214,8 @@ public final class Field {
 	
 	public void setTexture(Resource texture) {
 		this.texture = texture;
+		
+		this.map.fireOnFieldTextureChanges( this );	// fire event
 	}
 	
 	public Element toXML() {

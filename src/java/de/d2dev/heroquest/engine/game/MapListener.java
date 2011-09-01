@@ -4,5 +4,7 @@ public interface MapListener {
 	
 	public void onUnitEntersField(Field field);
 	public void onUnitLeavesField(Field field);
+	
+	public void onFieldTextureChanges(Field field);
 
 }
