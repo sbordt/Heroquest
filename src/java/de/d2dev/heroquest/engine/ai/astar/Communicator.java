@@ -18,8 +18,6 @@ public interface Communicator {
 
     public int getTransitionCosts(Knot a, Knot b);
 
-    public List<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount);
-
-    public int getCostSearch(int startX, int startY, int goalX, int goalY);
-    public Stack<SearchKnot> getPathSearch(int startX, int startY, int goalX, int goalY);
+    
+    
 }
