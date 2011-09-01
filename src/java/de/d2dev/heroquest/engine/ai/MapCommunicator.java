@@ -8,6 +8,7 @@ import de.d2dev.heroquest.engine.ai.astar.AStar;
 import de.d2dev.heroquest.engine.ai.astar.Communicator;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
 import de.d2dev.heroquest.engine.ai.astar.Path;
+import de.d2dev.heroquest.engine.game.Field;
 import de.d2dev.heroquest.engine.game.Map;
 import java.util.Stack;
 
@@ -36,6 +37,52 @@ public class MapCommunicator implements Communicator {
         return new SearchKnot(x, y, getHeuristic(x, y), this);
     }
 
+//*****************search Methods***********************************
+    public Stack<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount) {
+
+        this.goalX = goalX;
+        this.goalY = goalY;
+        return astar.search(getKnot(startX, startY), solutionCount);
+    }
+
+    public int getCostSearch(int startX, int startY, int goalX, int goalY) {
+        Stack<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
+        if (result.isEmpty()) {
+            return -1;
+        }
+        return result.pop().getCosts();
+    }
+
+    public int getCostSearch(Field start, Field goal) {
+        this.goalX = goal.getX();
+        this.goalY = goal.getY();
+        Stack<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
+        if (result.isEmpty()) {
+            return -1;
+        }
+        return result.pop().getCosts();
+    }
+
+    public Stack<SearchKnot> getPathSearch(Field start, Field goal) {
+        this.goalX = goal.getX();
+        this.goalY = goal.getY();
+        Stack<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result.pop().getTrace();
+    }
+
+    public Stack<SearchKnot> getPathSearch(int startX, int startY, int goalX, int goalY) {
+        Stack<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        return result.pop().getTrace();
+    }
+
+//***********InterFace Communicator*******************
     @Override
     public int getTransitionCosts(Knot a, Knot b) {
         return 1;
@@ -54,6 +101,8 @@ public class MapCommunicator implements Communicator {
                     if (fieldExists(i, j)) {
                         if (!map.getField(i, j).isBlocked()) {
                             speicher.add(getKnot(i, j));
+                        } else if (i == goalX && j == goalY) {
+                            speicher.add(getKnot(i, j));
                         }
                     }
                 }
@@ -69,13 +118,5 @@ public class MapCommunicator implements Communicator {
 
     private int getHeuristic(int x, int y) {
         return Math.abs(goalX - x) + Math.abs(goalY - y);
-    }
-
-    @Override
-    public Stack<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount) {
-
-        this.goalX = goalX;
-        this.goalY = goalY;
-        return astar.search(getKnot(startX, startY), solutionCount);
     }
 }

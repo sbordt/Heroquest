@@ -16,9 +16,9 @@ public interface AIController {
 
     /**
      * 
-     * @return A {@code GameAction} or {@code null} if there are no more
-     * actions to execute in this turn!
+     * @return A list of {@code GameAction}s to perform in this turn.
      */
     public List<GameAction> getActions();
  
 }
+
