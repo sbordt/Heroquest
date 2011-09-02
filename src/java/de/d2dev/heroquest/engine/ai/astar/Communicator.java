@@ -13,7 +13,7 @@ import java.util.LinkedList;
  */
 public interface Communicator {
 
-    public LinkedList<Knot> getSuccessors(Field field);
+    public LinkedList<Knot> getSuccessors(Knot knot);
 
     public int getTransitionCosts(Knot a, Knot b);
 

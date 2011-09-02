@@ -25,8 +25,25 @@ public class SearchKnot implements Knot {
         this.y = field.getY();
     }
 
+    public SearchKnot(int heuristic, Communicator communicator, int x, int y) {
+        this.field = null;
+        this.heuristic = heuristic;
+        this.communicator = communicator;
+        this.x = x;
+        this.y = y;
+    }
+    
+
     public Field getField() {
         return field;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
     
     
@@ -34,7 +51,7 @@ public class SearchKnot implements Knot {
     
     @Override
     public LinkedList<Knot> getSuccessors() {
-        return communicator.getSuccessors(field);
+        return communicator.getSuccessors(this);
     }
 
     @Override

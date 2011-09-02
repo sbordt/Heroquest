@@ -91,10 +91,10 @@ public class MapCommunicator implements Communicator {
     }
 
     @Override
-    public LinkedList<Knot> getSuccessors(Field actual) {
+    public LinkedList<Knot> getSuccessors(Knot actual) {
         LinkedList<Knot> speicher = new LinkedList<Knot>();
 
-        for (Field f : actual.getNeighbours()) {
+        for (Field f : ((SearchKnot)actual).getField().getNeighbours()) {
             if (!f.isBlocked()) {
                 speicher.add(getKnot(f));
             } else if (f.getX() == goalX && f.getY() == goalY) {

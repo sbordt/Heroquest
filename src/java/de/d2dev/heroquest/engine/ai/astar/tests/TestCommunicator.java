@@ -5,8 +5,8 @@ import de.d2dev.heroquest.engine.ai.astar.AStar;
 import de.d2dev.heroquest.engine.ai.astar.Communicator;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
 import de.d2dev.heroquest.engine.ai.astar.Path;
+import de.d2dev.heroquest.engine.game.Field;
 import java.util.LinkedList;
-import java.util.Stack;
 
 /*
  * To change this template, choose Tools | Templates
@@ -16,7 +16,7 @@ import java.util.Stack;
  *
  * @author Simon + Toni
  */
-public class TestCommunicator {
+public class TestCommunicator implements Communicator {
 
     private int[][] field;
     private final int WALL = -1;
@@ -25,10 +25,10 @@ public class TestCommunicator {
     private final int GOAL = -3;
     private int goalX;
     private int goalY;
-    private AStar<SearchKnot> astar;
+
 
     public TestCommunicator() {
-        this.astar = new AStar<SearchKnot>();
+
     }
 
     //****************Public*********************
@@ -37,11 +37,14 @@ public class TestCommunicator {
     }
 
     public SearchKnot getKnot(int x, int y) {
-        return new SearchKnot(x, y, getHeuristic(x, y), this);
+        return new SearchKnot(getHeuristic(x, y), this ,x, y);
     }
 
+
     @Override
-    public LinkedList<Knot> getSuccessors(int x, int y) {
+    public LinkedList<Knot> getSuccessors(Knot knot) {
+        int x = ((SearchKnot)knot).getX();
+        int y = ((SearchKnot)knot).getY();
         LinkedList<Knot> speicher = new LinkedList<Knot>();
         for (int i = x - 1; i <= x + 1; i++) {
             for (int j = y - 1; j <= y + 1; j++) {
@@ -64,17 +67,17 @@ public class TestCommunicator {
         return speicher;
     }
 
-    @Override
+
     public int getTransitionCosts(Knot a, Knot b) {
         return 1;
     }
 
-    public Stack<Path<SearchKnot>> search(
+    public LinkedList<Path<SearchKnot>> search(
             int[][] field,
             int startX, int startY,
             int goalX, int goalY,
             int solutionCount) {
-
+        AStar<SearchKnot> astar = new AStar<SearchKnot>();
         this.field = field;
         this.goalX = goalX;
         this.goalY = goalY;
@@ -95,4 +98,6 @@ public class TestCommunicator {
     private int getHeuristic(int x, int y) {
         return Math.abs(goalX - x) + Math.abs(goalY - y);
     }
+
+
 }
