@@ -7,7 +7,7 @@ public class UnitFactory {
 	
 	private Map map;
 	
-	UnitFactory(Map map) {
+	public UnitFactory(Map map) {
 		this.map = map;
 	}
 	

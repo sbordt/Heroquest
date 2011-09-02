@@ -201,7 +201,7 @@ public final class Field {
 	 * maps upper left corner.
 	 * @return
 	 */
-	public List<Field> getNeigbours() {
+	public List<Field> getNeighbours() {
 		List<Field> neighbours = new Vector<Field>();
 		
 		Field field;
