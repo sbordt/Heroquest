@@ -10,9 +10,8 @@ import de.d2dev.heroquest.engine.ai.astar.Knot;
 import de.d2dev.heroquest.engine.ai.astar.Path;
 import de.d2dev.heroquest.engine.game.Field;
 import de.d2dev.heroquest.engine.game.Map;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.ArrayDeque;
 
 /**
  *
@@ -23,11 +22,10 @@ public class MapCommunicator implements Communicator {
     private Map map;
     private int goalX, goalY;
 
-
 //********************Public*****************************   
     public MapCommunicator(Map map) {
         this.map = map;
-        
+
     }
 
     public void setGoal(int goalX, int goalY) {
@@ -40,7 +38,7 @@ public class MapCommunicator implements Communicator {
     }
 
 //*****************search Methods***********************************
-    public LinkedList<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount) {
+    public ArrayDeque<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount) {
         AStar<SearchKnot> astar = new AStar<SearchKnot>();
         this.goalX = goalX;
         this.goalY = goalY;
@@ -48,7 +46,7 @@ public class MapCommunicator implements Communicator {
     }
 
     public int getCostSearch(int startX, int startY, int goalX, int goalY) {
-        LinkedList<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
+        ArrayDeque<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
         if (result.isEmpty()) {
             return -1;
         }
@@ -58,25 +56,25 @@ public class MapCommunicator implements Communicator {
     public int getCostSearch(Field start, Field goal) {
         this.goalX = goal.getX();
         this.goalY = goal.getY();
-        LinkedList<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
+        ArrayDeque<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
         if (result.isEmpty()) {
             return -1;
         }
         return result.pop().getCosts();
     }
 
-    public LinkedList<SearchKnot> getPathSearch(Field start, Field goal) {
+    public ArrayDeque<SearchKnot> getPathSearch(Field start, Field goal) {
         this.goalX = goal.getX();
         this.goalY = goal.getY();
-        LinkedList<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
+        ArrayDeque<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
         if (result.isEmpty()) {
             return null;
         }
         return result.pop().getTrace();
     }
 
-    public LinkedList<SearchKnot> getPathSearch(int startX, int startY, int goalX, int goalY) {
-        LinkedList<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
+    public ArrayDeque<SearchKnot> getPathSearch(int startX, int startY, int goalX, int goalY) {
+        ArrayDeque<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
         if (result.isEmpty()) {
             return null;
         }
@@ -91,22 +89,22 @@ public class MapCommunicator implements Communicator {
     }
 
     @Override
-    public LinkedList<Knot> getSuccessors(Knot actual) {
-        LinkedList<Knot> speicher = new LinkedList<Knot>();
+    public ArrayDeque<Knot> getSuccessors(Knot actual) {
+        ArrayDeque<Knot> speicher = new ArrayDeque<Knot>();
 
-        for (Field f : ((SearchKnot)actual).getField().getNeighbours()) {
+        for (Field f : ((SearchKnot) actual).getField().getNeighbours()) {
             if (!f.isBlocked()) {
                 speicher.add(getKnot(f));
-            } else if (f.getX() == goalX && f.getY() == goalY) {
+            } else if ((f.getX() == goalX && f.getY() == goalY) || (f.hasUnit())) {
                 speicher.add(getKnot(f));
             }
+
         }
 
 
         return speicher;
     }
     //******************Private*************************   
-
 
     private int getHeuristic(Field field) {
         return Math.abs(goalX - field.getX()) + Math.abs(goalY - field.getY());

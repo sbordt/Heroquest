@@ -1,9 +1,6 @@
 package de.d2dev.heroquest.engine.ai.astar;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 /**
  * Path class for Astar search
@@ -13,7 +10,7 @@ import java.util.Stack;
 public class Path<T extends Knot> implements Comparable<Path<T>> {
 
     /** Storage for the path knots */
-    private LinkedList<T> trace;
+    private ArrayDeque<T> trace;
     /**real costs from start to end*/
     private int costs;
     /**estimated costs from end to goal*/
@@ -31,7 +28,7 @@ public class Path<T extends Knot> implements Comparable<Path<T>> {
      * 
      */
     public Path(
-            LinkedList<T> trace, 
+            ArrayDeque<T> trace, 
             int costs, 
             int estimateCosts, 
             int totalCosts
@@ -54,7 +51,7 @@ public class Path<T extends Knot> implements Comparable<Path<T>> {
      */
     public Path(Path<T> copy) {
 
-        this(new LinkedList<T>(),
+        this(new ArrayDeque<T>(),
                 copy.getCosts(),
                 copy.getEstimateCosts(),
                 copy.getTotalCosts()
@@ -69,7 +66,7 @@ public class Path<T extends Knot> implements Comparable<Path<T>> {
      */
     public Path(T start) {
 
-        this(new LinkedList<T>(),
+        this(new ArrayDeque<T>(),
                 0,
                 start.getHeuristic(),
                 start.getHeuristic()
@@ -94,8 +91,7 @@ public class Path<T extends Knot> implements Comparable<Path<T>> {
         return totalCosts;
     }
 
-    public LinkedList<T> getTrace() {
-//        Collections.reverse(trace);
+    public ArrayDeque<T> getTrace() {
         return trace;
     }
 

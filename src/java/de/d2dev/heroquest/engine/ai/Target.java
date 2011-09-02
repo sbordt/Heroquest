@@ -5,9 +5,8 @@
 package de.d2dev.heroquest.engine.ai;
 
 import de.d2dev.heroquest.engine.game.Unit;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.ArrayDeque;
+
 
 /**
  *
@@ -15,10 +14,10 @@ import java.util.Stack;
  */
 public class Target implements Comparable<Target> {
 
-    private LinkedList<SearchKnot> pathToMonster;
+    private ArrayDeque<SearchKnot> pathToMonster;
     private Unit unit;
 
-    public Target(LinkedList<SearchKnot> pathToMonster, Unit unit) {
+    public Target(ArrayDeque<SearchKnot> pathToMonster, Unit unit) {
         if (pathToMonster == null) {
             throw new RuntimeException("TargetConstructor: pathToMonster == Null");
         }
@@ -33,7 +32,7 @@ public class Target implements Comparable<Target> {
         return unit;
     }
 
-    public LinkedList<SearchKnot> getPathToMonster() {
+    public ArrayDeque<SearchKnot> getPathToMonster() {
         return pathToMonster;
     }
 

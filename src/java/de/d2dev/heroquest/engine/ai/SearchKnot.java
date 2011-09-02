@@ -3,7 +3,7 @@ package de.d2dev.heroquest.engine.ai;
 import de.d2dev.heroquest.engine.ai.astar.Communicator;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
 import de.d2dev.heroquest.engine.game.Field;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 
 /**
  *
@@ -14,49 +14,26 @@ public class SearchKnot implements Knot {
     private Field field;
     private int heuristic;
     private Communicator communicator;
-    private int x;
-    private int y;
 
     public SearchKnot(Field field, int heuristic, Communicator communicator) {
         this.field = field;
         this.heuristic = heuristic;
         this.communicator = communicator;
-        this.x = field.getX();
-        this.y = field.getY();
+
     }
 
-    public SearchKnot(int heuristic, Communicator communicator, int x, int y) {
-        this.field = null;
-        this.heuristic = heuristic;
-        this.communicator = communicator;
-        this.x = x;
-        this.y = y;
-    }
-    
-
-    public Field getField() {
-        return field;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-    
-    
-    
-    
     @Override
-    public LinkedList<Knot> getSuccessors() {
+    public ArrayDeque<Knot> getSuccessors() {
         return communicator.getSuccessors(this);
     }
 
     @Override
     public int getHeuristic() {
         return heuristic;
+    }
+
+    public Field getField() {
+        return field;
     }
 
     @Override
@@ -82,8 +59,6 @@ public class SearchKnot implements Knot {
     }
 
     
-
-
     @Override
     public int getTransitionCosts(Knot b) {
         if (b == null) {
