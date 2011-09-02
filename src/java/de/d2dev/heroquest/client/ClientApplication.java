@@ -12,6 +12,8 @@ import de.d2dev.heroquest.engine.ai.AISystem;
 import de.d2dev.heroquest.engine.files.HqMapFile;
 import de.d2dev.heroquest.engine.game.Direction2D;
 import de.d2dev.heroquest.engine.game.Field;
+import de.d2dev.heroquest.engine.game.Hero;
+import de.d2dev.heroquest.engine.game.Hero.HeroType;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.Monster;
 import de.d2dev.heroquest.engine.game.Unit;
@@ -41,14 +43,21 @@ public class ClientApplication implements KeyListener {
     private Java2DRenderWindow window;
     
     private UnitFactory unitFactory;
-    private Unit hero;
     
     private AISystem aiSystem;
         
     private boolean heroesRound = true;
     
+    private Unit activeHero = null;
+    
     private List<Monster> monstersToGo;
     private List<GameAction> actionsToPerform;
+    
+	/**************************************************************************************
+	 * 
+	 * 						  		INITIALIZATION/SETUP
+	 * 
+	 **************************************************************************************/    
 
     public ClientApplication(TFile mapCreatorScript, ResourceLocator resourceFinder) throws Exception {
     	this.initResourceFinder(resourceFinder);
@@ -79,20 +88,6 @@ public class ClientApplication implements KeyListener {
         this.aiSystem = new AISystem(map);
 
     	this.unitFactory = new UnitFactory();
-    	
-        this.hero = this.unitFactory.createBarbarian( this.map.getField(0, 0) );
-
-        this.renderTarget = new QuadRenderModel(map.getWidth(), map.getHeight());
-
-        this.renderer = new Renderer(map, renderTarget, this.resourceFinder);
-        this.map.addListener(renderer);
-        this.renderer.render();
-
-        this.window = new Java2DRenderWindow(this.renderer.getRederTarget(), this.resourceFinder);
-        this.window.setTitle("HeroQuest");
-        this.window.setVisible(true);
-
-        this.window.addKeyListener(this);
     }
     
     public void addTestMonsters(int numMonsters) {
@@ -111,9 +106,31 @@ public class ClientApplication implements KeyListener {
 				e.printStackTrace();
 			}
     	}
+    }
     
-        this.renderer.render();
-        this.window.repaint();
+    public void addTestHeroes(int numHeroes) {
+    	if ( numHeroes <= 0 )
+    		return;
+    	
+    	if ( numHeroes > 4 )
+    		numHeroes = 4;
+    	
+    	try {
+    		this.unitFactory.createBarbarian( this.map.getField(0, 0) );
+    		this.activeHero = this.map.getHeroes().get(0);
+    		
+    		if ( numHeroes > 1)
+    			this.unitFactory.createDwarf( this.map.getField(0, 1 ) );
+    		
+    		if ( numHeroes > 2)
+    			this.unitFactory.createAlb( this.map.getField(0, 2) );
+    		
+    		if ( numHeroes > 3)
+    			this.unitFactory.createWizard( this.map.getField(0, 3) );
+    	} catch (GameStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public void run() {
@@ -134,13 +151,19 @@ public class ClientApplication implements KeyListener {
 //        System.out.println("Hallo");
 //        this.renderer.render();
 //        this.window.repaint();
-    }
+    	
+        this.renderTarget = new QuadRenderModel(map.getWidth(), map.getHeight());
 
-//    public static void main(String[] args) throws Exception {
-//        ClientApplication app = new ClientApplication();
-//        app.init();
-//        app.run();
-//    }
+        this.renderer = new Renderer(map, renderTarget, this.resourceFinder);
+        this.map.addListener(renderer);
+        this.renderer.render();
+
+        this.window = new Java2DRenderWindow(this.renderer.getRederTarget(), this.resourceFinder);
+        this.window.setTitle("HeroQuest");
+        this.window.setVisible(true);
+
+        this.window.addKeyListener(this);
+    }
 
     public void heroesRound() {
     }
@@ -233,56 +256,108 @@ public class ClientApplication implements KeyListener {
 	 * 								INPUT METHODS
 	 * 
 	 **************************************************************************************/
+    
+    public void handleHeroesRoundKeyEvent(KeyEvent e) {
+    	// no active hero => no heroes
+    	if ( this.activeHero == null )
+    		return;
+    	
+		try {
+			/*
+			 * Select heroes
+			 */
+			if (e.getKeyChar() == '1') { // select barbarian
+				Hero barbarian = this.map.getHero( HeroType.BARBARIAN );
+				
+				if ( barbarian != null ) {
+					this.activeHero = barbarian;
+				}
+			} 
+			
+			else if (e.getKeyChar() == '2') { // select dwarf
+				Hero dwarf = this.map.getHero( HeroType.DWARF );
+				
+				if ( dwarf != null ) {
+					this.activeHero = dwarf;
+				}
+			} 
+			
+			else if (e.getKeyChar() == '3') { // select alb
+				Hero alb = this.map.getHero( HeroType.ALB );
+				
+				if ( alb != null ) {
+					this.activeHero = alb;
+				}
+			} 
+			
+			else if (e.getKeyChar() == '4') { // select wizard
+				Hero wizard = this.map.getHero( HeroType.WIZARD );
+				
+				if ( wizard != null ) {
+					this.activeHero = wizard;
+				}
+			} 
+			
+			/*
+			 * Move selected hero
+			 */
+			else if (e.getKeyChar() == 's') { // walk down
+
+				if (this.activeHero.canMoveDown()) {
+					this.activeHero.moveDown();
+				}
+				this.activeHero.setViewDir(Direction2D.DOWN);
+
+			} 
+			else if (e.getKeyChar() == 's') { // walk down
+
+				if (this.activeHero.canMoveDown()) {
+					this.activeHero.moveDown();
+				}
+				this.activeHero.setViewDir(Direction2D.DOWN);
+
+			} 
+			else if (e.getKeyChar() == 'w') { // walk up
+				if (this.activeHero.canMoveUp()) {
+					this.activeHero.moveUp();
+				}
+				this.activeHero.setViewDir(Direction2D.UP);
+
+			} 
+			else if (e.getKeyChar() == 'a') { // walk left
+				if (this.activeHero.canMoveLeft()) {
+					this.activeHero.moveLeft();
+				}
+				this.activeHero.setViewDir(Direction2D.LEFT);
+
+			} 
+			else if (e.getKeyChar() == 'd') { // walk right
+				if (this.activeHero.canMoveRight()) {
+					this.activeHero.moveRight();
+				}
+				this.activeHero.setViewDir(Direction2D.RIGHT);
+			}
+					
+			/*
+			 * Start monsters round!
+			 */			
+			else if (e.getKeyChar() == 'm') { // MONSTER!!!
+				this.startMonstersRound();
+			}
+		} catch (GameStateException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        System.out.println(e.getKeyChar());
-
+    	
         if (this.heroesRound) {
-            if (e.getKeyChar() == 's') {	// walk down
-                try {
-                    if (this.hero.canMoveDown()) {
-                        this.hero.moveDown();
-                    }
-                    this.hero.setViewDir(Direction2D.DOWN);
-                } catch (GameStateException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            } else if (e.getKeyChar() == 'w') {	// walk up
-                try {
-                    if (this.hero.canMoveUp()) {
-                        this.hero.moveUp();
-                    }
-                    this.hero.setViewDir(Direction2D.UP);
-                } catch (GameStateException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            } else if (e.getKeyChar() == 'a') {	// walk left
-                try {
-                    if (this.hero.canMoveLeft()) {
-                        this.hero.moveLeft();
-                    }
-                    this.hero.setViewDir(Direction2D.LEFT);
-                } catch (GameStateException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            } else if (e.getKeyChar() == 'd') {	// walk right
-                try {
-                    if (this.hero.canMoveRight()) {
-                        this.hero.moveRight();
-                    }
-                    this.hero.setViewDir(Direction2D.RIGHT);
-                } catch (GameStateException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            } else if (e.getKeyChar() == 'm') {	// MONSTER!!!
-                this.startMonstersRound();
-            }
+        	this.handleHeroesRoundKeyEvent(e);
         }
+        
+        // print map
         if (e.getKeyChar() == 'z') {
             Field[][] field = this.map.getFields();
 
@@ -293,15 +368,6 @@ public class ClientApplication implements KeyListener {
                 System.out.println();
 
             }
-            
-//            for (Field[] col  : field) {
-//                for (Field f : col) {
-//                   System.out.print(f.isBlocked() ? "# " : ". "); 
-//                }
-//                System.out.println();
-//            }
-            
-
         }
 
         this.renderer.render();

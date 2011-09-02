@@ -68,7 +68,7 @@ public class Editor {
     		this.properties.loadFromXML( new FileInputStream( properties_file ) );
     	}
     	
-    	// global resources are in globalRessources.zip
+    	// global resources are in globalResources.zip
     	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalResources.zip" );
     	
     	this.resourceProvider.textureLocations.add( this.globalRessources.textures );

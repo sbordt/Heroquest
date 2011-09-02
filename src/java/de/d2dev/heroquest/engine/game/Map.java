@@ -3,6 +3,7 @@ package de.d2dev.heroquest.engine.game;
 import de.d2dev.fourseasons.files.FileUtil;
 import de.d2dev.fourseasons.util.Observed;
 import de.d2dev.fourseasons.util.ListenerUtil;
+import de.d2dev.heroquest.engine.game.Hero.HeroType;
 
 import java.util.*;
 
@@ -142,6 +143,24 @@ public final class Map implements Observed<MapListener> {
 		}
     	
     	return heroes;
+    }
+    
+    /**
+     * Get the first hero of the given type found.
+     * @param type
+     * @return {@code null} in case there is none.
+     */
+    public Hero getHero(HeroType type) {
+    	List<Unit> heroes = this.getHeroes();
+    	
+    	for (Unit hero : heroes) {
+    		if ( ((Hero) hero).getHeroType() == type ){
+    			return (Hero) hero;
+    		}
+    	}
+    	
+    	// not found
+    	return null;
     }
     
     public List<Monster> getMonsters() {

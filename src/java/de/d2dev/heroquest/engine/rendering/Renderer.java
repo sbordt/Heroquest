@@ -6,6 +6,7 @@ import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.resource.types.TextureResource;
 import de.d2dev.heroquest.engine.game.Field;
+import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.MapListener;
 import de.d2dev.heroquest.engine.game.Unit;
@@ -147,9 +148,16 @@ public class Renderer implements MapListener {
 		
 		// doors
 		if ( field.isDoor() ) {
-			Resource doorTexture = TextureResource.createTextureResource("doors/closed/vertical.png");
+			Resource vertTexture = TextureResource.createTextureResource("doors/closed/vertical.png");
+			Resource horTexture = TextureResource.createTextureResource("doors/closed/horizontal.png");
 			
-			quad = new RenderQuad( field.getX(), field.getY() - 0.5f, 1.0f, 2f, DOORS, doorTexture ); 
+			// vertical?
+			if ( field.getUpperField().isWall() ) {
+				quad = new RenderQuad( field.getX(), field.getY() - 0.5f, 1.0f, 2f, DOORS, vertTexture ); 
+			} else {
+				quad = new RenderQuad( field.getX() -0.5f, field.getY(), 2, 1, DOORS, horTexture ); 
+			}
+				
 			this.renderTarget.addQuad( quad );
 		}
 	}
@@ -160,7 +168,20 @@ public class Renderer implements MapListener {
 		String pictureName = "error.jpg";
 		
 		if ( unit.isHero() ) {
-			pictureName = "units/heroes/barbarian/barbarian.jpg";
+			switch( ((Hero) unit).getHeroType() ) {
+			case BARBARIAN:
+				pictureName = "units/heroes/barbarian/barbarian.jpg";
+				break;
+			case DWARF:
+				pictureName = "units/heroes/dwarf/dwarf.jpg";
+				break;
+			case ALB:
+				pictureName = "units/heroes/alb/alb.jpg";
+				break;
+			case WIZARD:
+				pictureName = "units/heroes/wizard/wizard.jpg";
+				break;
+			}
 		}
 		else if ( unit.isMonster() ) {
 			pictureName = "units/monsters/orc/orc.jpg";

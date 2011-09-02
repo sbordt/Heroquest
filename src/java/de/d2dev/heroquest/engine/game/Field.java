@@ -7,6 +7,7 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import de.d2dev.fourseasons.files.FileUtil;
 import de.d2dev.fourseasons.gamestate.GameStateException;
+import de.d2dev.fourseasons.gamestate.Gamestate;
 import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.types.TextureResource;
 
@@ -68,9 +69,10 @@ public final class Field {
 	private boolean isWall;
 	
 	/**
-	 * Whether this field is a door. A door is required to be a wall.
+	 * A door that might be on the field. {@code null} if there is none.
 	 */
 	private boolean isDoor;
+	private Door door;
 	
 	/**
 	 * A unit that might be standing on the field. Visible to the package because 
@@ -233,11 +235,21 @@ public final class Field {
 		return isWall;
 	}
 	
-	public void setWall(boolean wall) throws GameStateException {	//TODO new validity!
-		if ( this.isDoor && !wall )	// validity
-			throw new GameStateException( "Attempt to make a door-field a non-wall field." );
-		
-		this.isWall = wall;
+	/**
+	 * Make this field a wall or remove a wall.
+	 * @param wall
+	 * @throws GameStateException
+	 */
+	public void setWall(boolean wall) throws GameStateException {
+		if ( wall ) {	// attempt to create a wall
+			Gamestate.checkState( !this.hasUnit(), "Attempt to set a wall on a unit field." );
+			
+			this.isWall = true;
+		} else {	// attempt to remove a wall
+			Gamestate.checkState( !this.isDoor, "Attempt to make a door-field a non-wall field." );
+				
+			this.isWall = false;
+		}
 	}
 	
 	/**
@@ -248,11 +260,20 @@ public final class Field {
 		return isDoor;
 	}
 	
+	/**
+	 * Make this field a door or remove a door.
+	 * @param door
+	 * @throws GameStateException
+	 */
 	public void setDoor(boolean door) throws GameStateException {
-		if ( !this.isWall && door )	// validity
-			throw new GameStateException( "Attempt to set a door on a non-wall field." );
-		
-		this.isDoor = door;
+		// attempt to create a door
+		if ( door ) {
+			Gamestate.checkState( this.isWall, "Attempt to set a door on a non-wall field." );
+			
+			this.isDoor = true;
+		} else {	// attempt to remove a door
+			this.isDoor = false;
+		}
 	}
 	
 	public boolean isBlocked() {
