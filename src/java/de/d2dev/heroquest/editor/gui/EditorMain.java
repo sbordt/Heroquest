@@ -15,6 +15,7 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import com.jme3.app.SimpleApplication;
 
@@ -198,11 +199,15 @@ public class EditorMain extends javax.swing.JFrame {
     		
     		this.jmeRenderWindow = new JFrame ("JME-Renderer");
     		this.jmeRenderWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    		JPanel panel = new JPanel();
     		
     		this.jmeRenderer = new JmeRenderer (this.editor.renderer.getRederTarget(), this.editor.resourceProvider);
     		
     		JmeRenderer jmeRenderer = this.jmeRenderer;
-    		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing<JmeRenderer> (this.jmeRenderWindow, jmeRenderer));
+    		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing<JmeRenderer> (panel, jmeRenderer));
+    		this.jmeRenderWindow.add(panel);
+    		this.jmeRenderWindow.pack();
+    		this.jmeRenderWindow.setVisible(true);
     	}
     }//GEN-LAST:event_jMonkeyRenderWindowMenuItemActionPerformed
 

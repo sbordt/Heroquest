@@ -142,7 +142,7 @@ public class Editor {
 	
 	public void initDropbox() throws Exception {
     	// is there a dropbox storage location?	
-    	if ( (this.dropboxFolderPath = Application.getFileSystemDropbox()) != null ) {
+    	if ( (this.dropboxFolderPath = "C:/Users/Justus/Desktop/Dropbox") != null ) {
     		this.dropboxFolderPath += "/HeroQuest/HeroQuest Editor";
     		
     		if ( !new File( this.dropboxFolderPath ).exists() ) {
