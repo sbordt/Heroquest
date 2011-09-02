@@ -16,6 +16,7 @@ import de.d2dev.heroquest.engine.game.Field;
 import de.d2dev.heroquest.engine.game.RunningGameContext;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.Unit;
+import de.d2dev.heroquest.engine.game.UnitFactory;
 import de.d2dev.heroquest.engine.game.action.GameAction;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderWindow;
@@ -40,6 +41,8 @@ public class ClientApplication implements KeyListener {
     private Renderer renderer;
     private QuadRenderModel renderTarget;
     private Java2DRenderWindow window;
+    
+    private UnitFactory unitFactory;
     private Unit hero;
     private Unit monster;
     private AISystem aiSystem;
@@ -58,8 +61,8 @@ public class ClientApplication implements KeyListener {
     public void init() throws Exception {
         this.aiSystem = new AISystem(map);
 
-        this.hero = new Unit(this.map.getField(0, 0), Unit.Type.HERO);
-        this.monster = new Unit(this.map.getField(this.map.getWidth() - 1, this.map.getHeight() - 1), Unit.Type.MONSTER);
+        this.hero = this.map.getUnitFactory().createBarbarian( this.map.getField(0, 0) );
+        this.monster = this.map.getUnitFactory().createOrc( this.map.getField( this.map.getWidth()-1, this.map.getHeight()-1 ) );
 
         this.monster.setAiController(this.aiSystem.creatAIController(this.monster));
 

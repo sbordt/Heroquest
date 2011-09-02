@@ -11,34 +11,56 @@ import de.d2dev.heroquest.engine.ai.AIController;
  * @author Sebastian Bordt
  *
  */
-public class Unit {
+public abstract class Unit {
 	
-	public enum Type {
+	/**
+	 * So far there are only heroes and monsters...
+	 * @author Sebastian Bordt
+	 *
+	 */
+	protected enum Type {
 		HERO,
 		MONSTER,
 	}
 	
-	private Type type;
+	/*
+	 * Game State Variables
+	 */
 	
-	private Map map;
+	protected Map map;
 	
-	private Field field;
+	/**
+	 * The units type, e.g. hero or monster!
+	 */
+	protected Type type;
 	
-	private Direction2D viewDir = Direction2D.UP;
+	/**
+	 * The units name, e.g. 'Barbarian' or 'Orc'
+	 */
+	protected String name;
 	
+	protected Field field;
+	
+	protected Direction2D viewDir = Direction2D.UP;
+	
+	/*
+	 * Running Game Variables
+	 */
+	protected RunningGameContext gameContext;
+
+	protected int remainingMoves = 0;
+
 	/**
 	 * If the unit is under ai control, this {@link AIController} determines its actions.
 	 * {@code null} if the unit is not controlled by an ai.
 	 */
-	private AIController aiController;
+	protected AIController aiController;
 
-	public Unit(Field field, Type type) throws GameStateException {
+	protected Unit(Field field) throws GameStateException {
 		Preconditions.checkNotNull( field );	// the field must not be null
 		
 		this.map = field.getMap();
 		this.moveTo( field );
-		
-		this.type = type;
 	}
 	
 	/**************************************************************************************
@@ -53,6 +75,31 @@ public class Unit {
 	 */
 	public Map getMap() {
 		return this.map;
+	}
+	
+	/**
+	 * Is this unit a hero?
+	 * @return
+	 */
+	public boolean isHero() {
+		return this.type == Type.HERO;
+	}
+	
+	/**
+	 * Is this unit a monster?
+	 * @return
+	 */
+	public boolean isMonster() {
+		return this.type == Type.MONSTER;
+	}
+	
+	/**
+	 * The units name, further describing its type, e.g.
+	 * 'Barbarian' or 'Orc'.
+	 * @return
+	 */
+	public String getName() {
+		return this.name;
 	}
 	
 	/**
@@ -75,7 +122,7 @@ public class Unit {
 		}
 		
 		this.field = field;
-		field.unit = this ;
+		field.unit = this;
 		
 		this.field.getMap().fireOnUnitEntersField(field);
 	}
@@ -168,17 +215,44 @@ public class Unit {
 		this.moveTo( this.field.getLowerField() );
 	}	
 	
+	/**
+	 * The direction the unit views into.
+	 * @return
+	 */
 	public Direction2D getViewDir() {
 		return viewDir;
 	}
 	
+	/**
+	 * Set the direction the unit views into.
+	 * @param dir
+	 */
 	public void setViewDir(Direction2D dir) {
 		this.viewDir = dir;
 	}
 	
-	public Type getType() {
-		return this.type;
+	/**************************************************************************************
+	 * 
+	 * 							      RUNNING GAMES STATE
+	 * 
+	 **************************************************************************************/
+
+	public RunningGameContext getGameContext() {
+		return gameContext;
 	}
+
+	public void setGameContext(RunningGameContext gameContext) {
+		this.gameContext = gameContext;
+	}
+	
+	public int getRemainingMoves() {
+		return this.remainingMoves;
+	}
+	
+	public void setRemainingMoves(int remainingMoves) {
+		this.remainingMoves = remainingMoves;
+	}
+
 	
 	/**************************************************************************************
 	 * 
