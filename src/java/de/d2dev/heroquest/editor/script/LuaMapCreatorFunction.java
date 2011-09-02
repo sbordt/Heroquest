@@ -10,6 +10,10 @@ public class LuaMapCreatorFunction extends LuaScriptFunction implements MapCreat
 	
 	public final static String LUA_FUNCTION_NAME = "createMap";
 	
+//	public static LuaMapCreatorFunction loadMapCreatorFnc() {
+//		
+//	}
+	
 	private LuaFunction function;
 	
 	public LuaMapCreatorFunction(LuaFunction function) {

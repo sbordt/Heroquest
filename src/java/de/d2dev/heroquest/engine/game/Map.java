@@ -144,14 +144,14 @@ public final class Map implements Observed<MapListener> {
     	return heroes;
     }
     
-    public List<Unit> getMonsters() {
+    public List<Monster> getMonsters() {
         // TODO better
-    	Vector<Unit> monsters = new Vector<Unit>();
+    	Vector<Monster> monsters = new Vector<Monster>();
     	
     	for (Field[] fields : this.fields) {
 			for(Field field : fields) {
 				if ( field.hasUnit() && field.getUnit().isMonster() ) {
-					monsters.add( field.getUnit() );
+					monsters.add( (Monster)field.getUnit() );
 				}
 			}
 		}

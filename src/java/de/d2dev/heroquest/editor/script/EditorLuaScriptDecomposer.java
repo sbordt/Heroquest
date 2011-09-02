@@ -18,6 +18,7 @@ public class EditorLuaScriptDecomposer extends LuaScriptDecomposer {
 		LuaValue env = script.getfenv();
 				
 		try {
+			// map creation functions
 			LuaValue createMapFnc = env.get( "createMap" );
 			
 			if ( !createMapFnc.isnil() ) {

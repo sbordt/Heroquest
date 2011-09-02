@@ -233,7 +233,7 @@ public final class Field {
 		return isWall;
 	}
 	
-	public void setWall(boolean wall) throws GameStateException {
+	public void setWall(boolean wall) throws GameStateException {	//TODO new validity!
 		if ( this.isDoor && !wall )	// validity
 			throw new GameStateException( "Attempt to make a door-field a non-wall field." );
 		

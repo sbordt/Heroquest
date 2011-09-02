@@ -5,29 +5,24 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import de.d2dev.fourseasons.resource.ResourceLocator;
-import de.d2dev.fourseasons.resource.types.TextureResource;
+import de.d2dev.fourseasons.script.ScriptEngine;
+import de.d2dev.heroquest.editor.script.EditorLuaScriptDecomposer;
+import de.d2dev.heroquest.editor.script.LuaMapCreatorFunction;
 import de.d2dev.heroquest.engine.ai.AISystem;
-import de.d2dev.heroquest.engine.ai.MapCommunicator;
-import de.d2dev.heroquest.engine.ai.SearchKnot;
-import de.d2dev.heroquest.engine.ai.astar.Path;
 import de.d2dev.heroquest.engine.files.HqMapFile;
 import de.d2dev.heroquest.engine.game.Direction2D;
 import de.d2dev.heroquest.engine.game.Field;
-import de.d2dev.heroquest.engine.game.RunningGameContext;
 import de.d2dev.heroquest.engine.game.Map;
+import de.d2dev.heroquest.engine.game.Monster;
 import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.game.UnitFactory;
 import de.d2dev.heroquest.engine.game.action.GameAction;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderWindow;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
+import de.schlichtherle.truezip.file.TFile;
 
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +30,10 @@ import javax.swing.SwingUtilities;
 
 public class ClientApplication implements KeyListener {
 
-    private String settingsPath = "";
+//    private String settingsPath = "";
+    
+    private ScriptEngine scriptEngine;    
+    
     private Map map;
     private ResourceLocator resourceFinder;
     private Renderer renderer;
@@ -44,29 +42,45 @@ public class ClientApplication implements KeyListener {
     
     private UnitFactory unitFactory;
     private Unit hero;
-    private Unit monster;
+    
     private AISystem aiSystem;
-    private ExecutorService aiExecutor = Executors.newSingleThreadExecutor();
+        
     private boolean heroesRound = true;
+    
+    private List<Monster> monstersToGo;
     private List<GameAction> actionsToPerform;
 
-    public ClientApplication() {
+    public ClientApplication(TFile mapCreatorScript, ResourceLocator resourceFinder) throws Exception {
+    	this.initResourceFinder(resourceFinder);
+    	
+    	// load the map creator script  		
+    	LuaMapCreatorFunction function = (LuaMapCreatorFunction) scriptEngine.load( mapCreatorScript ).getFunctions().get(0);
+    	
+    	// run the map creator script  	
+    	this.map = function.createMap();
     }
 
     public ClientApplication(HqMapFile map, ResourceLocator resourceFinder) {
+    	this.initResourceFinder(resourceFinder);
+    	
         this.map = new Map(map.map.getRootElement());
         this.resourceFinder = resourceFinder;
     }
-
+    
+    public void initResourceFinder(ResourceLocator resourceFinder) {
+    	// set the given resource finder
+    	this.resourceFinder = resourceFinder;
+    	
+    	// script engine setup
+    	scriptEngine = ScriptEngine.createDefaultScriptEngine( this.resourceFinder, new EditorLuaScriptDecomposer() );
+    }
+    
     public void init() throws Exception {
         this.aiSystem = new AISystem(map);
 
     	this.unitFactory = new UnitFactory();
     	
         this.hero = this.unitFactory.createBarbarian( this.map.getField(0, 0) );
-        this.monster = this.unitFactory.createOrc( this.map.getField( this.map.getWidth()-1, this.map.getHeight()-1 ) );
-
-        this.monster.setAiController(this.aiSystem.creatAIController(this.monster));
 
         this.renderTarget = new QuadRenderModel(map.getWidth(), map.getHeight());
 
@@ -79,6 +93,27 @@ public class ClientApplication implements KeyListener {
         this.window.setVisible(true);
 
         this.window.addKeyListener(this);
+    }
+    
+    public void addTestMonsters(int numMonsters) {
+    	if ( numMonsters <= 0 )
+    		return;
+    	
+    	if ( numMonsters > 10 )
+    		numMonsters = 10;
+    	
+    	for (int i=0; i<numMonsters; i++) {
+    		try {
+				Monster monster = this.unitFactory.createOrc( this.map.getField( 34, 10 + i ) );
+				monster.setAiController( this.aiSystem.creatAIController(monster) );
+			} catch (GameStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    
+        this.renderer.render();
+        this.window.repaint();
     }
 
     public void run() {
@@ -101,40 +136,71 @@ public class ClientApplication implements KeyListener {
 //        this.window.repaint();
     }
 
-    public static void main(String[] args) throws Exception {
-        ClientApplication app = new ClientApplication();
-        app.init();
-        app.run();
-    }
+//    public static void main(String[] args) throws Exception {
+//        ClientApplication app = new ClientApplication();
+//        app.init();
+//        app.run();
+//    }
 
     public void heroesRound() {
     }
 
-    public void monstersRound() {
-        // monster now! initialization...
-        if (this.heroesRound == true) {
-            this.heroesRound = false;
+    
+	/**************************************************************************************
+	 * 
+	 * 							      LET THE MONSTERS ACT!
+	 * 
+	 **************************************************************************************/    
+    
+    public void startMonstersRound() {
+    	this.heroesRound = false;
+ 
+    	// Get the maps monsters
+        this.monstersToGo = this.map.getMonsters();
+        
+        if ( this.monstersToGo.isEmpty() ) {	// nothing to do
+        	this.endMonstersRound();
+        	return;
         }
-
-        this.actionsToPerform = this.monster.getAIController().getActions();
-
+        
+        // Let the first monster perform actions!
+        this.actionsToPerform = this.monstersToGo.get(0).getAIController().getActions();
+        
         this.performMonsterActions();
+    }
+    
+    public void endMonstersRound() {
+    	this.heroesRound = true;
     }
 
     public void performMonsterActions() {
-        if (this.actionsToPerform.isEmpty()) {
-            this.heroesRound = true;
-            return;
-        }
-
-        this.performAction(this.actionsToPerform.get(0));
-        this.actionsToPerform.remove(0);
+    	// monster perform action
+    	if ( !this.actionsToPerform.isEmpty() ) { 
+            this.performAction( this.actionsToPerform.get(0) );
+            this.actionsToPerform.remove(0);        	
+        }    	
+    	// the current monsters has all actions performed
+    	else {
+        	this.monstersToGo.remove(0);
+        	
+        	// next monster perform actions!
+        	if ( !this.monstersToGo.isEmpty() ) {
+        		this.actionsToPerform = this.monstersToGo.get(0).getAIController().getActions();
+        		
+        		this.performMonsterActions();
+        	} 
+        	// no more monsters - end monsters round
+        	else {
+            	this.endMonstersRound();
+            	return;        		
+        	}
+        } 
     }
 
     public void performAction(GameAction action) {
+    	// perform the action
         try {
             action.excecute();
-            System.out.println("DA");
         } catch (GameStateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -142,20 +208,31 @@ public class ClientApplication implements KeyListener {
 
         this.renderer.render();
         this.window.repaint();
+        
+        // short pause
         try {
             Thread.sleep(10);
         } catch (InterruptedException ex) {
             Logger.getLogger(ClientApplication.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        // what to do next?
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                ClientApplication.this.performMonsterActions();
+            	if ( !ClientApplication.this.heroesRound) {
+            		ClientApplication.this.performMonsterActions();
+            	}
             }
         });
     }
+    
+	/**************************************************************************************
+	 * 
+	 * 								INPUT METHODS
+	 * 
+	 **************************************************************************************/
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -203,7 +280,7 @@ public class ClientApplication implements KeyListener {
                     e1.printStackTrace();
                 }
             } else if (e.getKeyChar() == 'm') {	// MONSTER!!!
-                this.monstersRound();
+                this.startMonstersRound();
             }
         }
         if (e.getKeyChar() == 'z') {
