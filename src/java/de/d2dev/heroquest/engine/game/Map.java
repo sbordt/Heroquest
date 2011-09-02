@@ -1,8 +1,11 @@
 package de.d2dev.heroquest.engine.game;
 
 import de.d2dev.fourseasons.files.FileUtil;
-import de.d2dev.fourseasons.util.Observable;
-import de.d2dev.fourseasons.util.Observers;
+import de.d2dev.fourseasons.util.Observed;
+import de.d2dev.fourseasons.util.ListenerUtil;
+
+import java.util.*;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -14,27 +17,23 @@ import nu.xom.Elements;
  * @author Sebastian Bordt
  *
  */
-public final class Map implements Observable<MapListener> {
+public final class Map implements Observed<MapListener> {
 	
 	private static final String HERO_QUEST_MAP = "heroquestmap";
 	private static final String WIDTH = "width";
 	private static final String HEIGHT = "height";
 	private static final String FIELDS = "fields";
 	
-	private Observers<MapListener> listeners;
+	private ListenerUtil<MapListener> listeners = new ListenerUtil<MapListener>();
 	
 	private int width;
 	private int height;
 	
 	private Field[][] fields;
-	
-	/**
-	 * The upper left field of the four fields at
-	 * witch the heroes start the game!
-	 */
-	private Field startingField;
-	
 
+//	private List<Unit> units = new Vector<Unit>();
+//	private List<Unit> heroes = new Vector<Unit>();
+//	private List<Unit> monsters = new Vector<Unit>();
 
 	/**
 	 * Construct a new empty map.
@@ -55,8 +54,6 @@ public final class Map implements Observable<MapListener> {
 				this.fields[x][y] = new Field( this, x, y );
 			}
 		}
-		
-		this.startingField = this.fields[0][0];
 	}
 	
 	/**
@@ -95,15 +92,11 @@ public final class Map implements Observable<MapListener> {
 		}
 	}
 	
-	@Override
-	public void addListener(MapListener l) {
-		this.listeners.addListener(l);
-	}
-
-	@Override
-	public void removeListener(MapListener l) {
-		this.listeners.removeListener(l);
-	}
+	/**************************************************************************************
+	 * 
+	 * 										GAME STATE
+	 * 
+	 **************************************************************************************/
 	
 	public int getWidth() {
 		return width;
@@ -121,8 +114,83 @@ public final class Map implements Observable<MapListener> {
 		return fields;
 	}
 	
-	public Field getStartingField() {
-		return startingField;
+	public List<Unit> getUnits() {
+        // TODO better
+    	Vector<Unit> units = new Vector<Unit>();
+    	
+    	for (Field[] fields : this.fields) {
+			for(Field field : fields) {
+				if ( field.hasUnit() ) {
+					units.add( field.getUnit() );
+				}
+			}
+		}
+    	
+    	return units;
+	}
+        
+    public List<Unit> getHeroes() {
+        // TODO better
+    	Vector<Unit> heroes = new Vector<Unit>();
+    	
+    	for (Field[] fields : this.fields) {
+			for(Field field : fields) {
+				if ( field.hasUnit() && field.getUnit().isHero()) {
+					heroes.add( field.getUnit() );
+				}
+			}
+		}
+    	
+    	return heroes;
+    }
+    
+    public List<Monster> getMonsters() {
+        // TODO better
+    	Vector<Monster> monsters = new Vector<Monster>();
+    	
+    	for (Field[] fields : this.fields) {
+			for(Field field : fields) {
+				if ( field.hasUnit() && field.getUnit().isMonster() ) {
+					monsters.add( (Monster)field.getUnit() );
+				}
+			}
+		}
+    	
+    	return monsters;
+    }
+    
+	/**************************************************************************************
+	 * 
+	 * 										OTHER METHODS
+	 * 
+	 **************************************************************************************/
+    
+	@Override
+	public void addListener(MapListener l) {
+		this.listeners.addListener(l);
+	}
+
+	@Override
+	public void removeListener(MapListener l) {
+		this.listeners.removeListener(l);
+	}
+	
+	void fireOnUnitEntersField(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onUnitEntersField(field);
+		}
+	}
+	
+	void fireOnUnitLeavesField(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onUnitLeavesField(field);
+		}
+	}
+	
+	void fireOnFieldTextureChanges(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onFieldTextureChanges(field);
+		}
 	}
 	
 	/**

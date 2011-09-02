@@ -4,10 +4,14 @@
  */
 package de.d2dev.heroquest.engine.ai;
 
+import de.d2dev.heroquest.engine.ai.astar.AStar;
 import de.d2dev.heroquest.engine.ai.astar.Communicator;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
+import de.d2dev.heroquest.engine.ai.astar.Path;
+import de.d2dev.heroquest.engine.game.Field;
 import de.d2dev.heroquest.engine.game.Map;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.ArrayDeque;
 
 /**
  *
@@ -19,10 +23,9 @@ public class MapCommunicator implements Communicator {
     private int goalX, goalY;
 
 //********************Public*****************************   
-    public MapCommunicator(Map map, int goalX, int goalY) {
+    public MapCommunicator(Map map) {
         this.map = map;
-        this.goalX = goalX;
-        this.goalY = goalY;
+
     }
 
     public void setGoal(int goalX, int goalY) {
@@ -30,42 +33,80 @@ public class MapCommunicator implements Communicator {
         this.goalY = goalY;
     }
 
-    public SearchKnot getKnot(int x, int y) {
-        return new SearchKnot(x, y, getHeuristic(x, y), this);
+    public SearchKnot getKnot(Field field) {
+        return new SearchKnot(field, getHeuristic(field), this);
     }
 
+//*****************search Methods***********************************
+    public ArrayDeque<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount) {
+        AStar<SearchKnot> astar = new AStar<SearchKnot>();
+        this.goalX = goalX;
+        this.goalY = goalY;
+        return astar.search(getKnot(map.getField(startX, startY)), solutionCount);
+    }
+
+    public int getCostSearch(int startX, int startY, int goalX, int goalY) {
+        ArrayDeque<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
+        if (result.isEmpty()) {
+            return -1;
+        }
+        return result.pop().getCosts();
+    }
+
+    public int getCostSearch(Field start, Field goal) {
+        this.goalX = goal.getX();
+        this.goalY = goal.getY();
+        ArrayDeque<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
+        if (result.isEmpty()) {
+            return -1;
+        }
+        return result.pop().getCosts();
+    }
+
+    public ArrayDeque<SearchKnot> getPathSearch(Field start, Field goal) {
+        this.goalX = goal.getX();
+        this.goalY = goal.getY();
+        ArrayDeque<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result.pop().getTrace();
+    }
+
+    public ArrayDeque<SearchKnot> getPathSearch(int startX, int startY, int goalX, int goalY) {
+        ArrayDeque<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
+        if (result.isEmpty()) {
+            return null;
+        }
+        System.out.println("Weg vielleicht gefunden");
+        return result.pop().getTrace();
+    }
+
+//***********InterFace Communicator*******************
     @Override
     public int getTransitionCosts(Knot a, Knot b) {
         return 1;
     }
 
     @Override
-    public Stack<Knot> getSuccessors(int x, int y) {
-        Stack<Knot> speicher = new Stack<Knot>();
-        for (int i = x - 1; i <= x + 1; i++) {
-            for (int j = y - 1; j <= y + 1; j++) {
-                if (!((i == x - 1 && j == y - 1)
-                        || (i == x + 1 && j == y + 1)
-                        || (i == x - 1 && j == y + 1)
-                        || (i == x + 1 && j == y - 1))) {
+    public ArrayDeque<Knot> getSuccessors(Knot actual) {
+        ArrayDeque<Knot> speicher = new ArrayDeque<Knot>();
 
-                    if (fieldExists(i, j)) {
-                        if (!map.getField(i, j).isBlocked()) {
-                            speicher.add(getKnot(i, j));
-                        }
-                    }
-                }
+        for (Field f : ((SearchKnot) actual).getField().getNeighbours()) {
+            if (!f.isBlocked()) {
+                speicher.add(getKnot(f));
+            } else if ((f.getX() == goalX && f.getY() == goalY) || (f.hasUnit())) {
+                speicher.add(getKnot(f));
             }
+
         }
+
+
         return speicher;
     }
     //******************Private*************************   
 
-    private boolean fieldExists(int x, int y) {
-        return x >= 0 && x < map.getWidth() && y >= 0 && y < map.getHeight();
-    }
-
-    private int getHeuristic(int x, int y) {
-        return Math.abs(goalX - x) + Math.abs(goalY - y);
+    private int getHeuristic(Field field) {
+        return Math.abs(goalX - field.getX()) + Math.abs(goalY - field.getY());
     }
 }

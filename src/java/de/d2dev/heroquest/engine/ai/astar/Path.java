@@ -1,16 +1,16 @@
 package de.d2dev.heroquest.engine.ai.astar;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 /**
  * Path class for Astar search
  * 
  * @author Simon
  */
-public class Path<T extends Knot> implements Comparable<Path> {
+public class Path<T extends Knot> implements Comparable<Path<T>> {
 
     /** Storage for the path knots */
-    private Stack<T> trace;
+    private ArrayDeque<T> trace;
     /**real costs from start to end*/
     private int costs;
     /**estimated costs from end to goal*/
@@ -27,7 +27,14 @@ public class Path<T extends Knot> implements Comparable<Path> {
      * @param totalCosts costs + estimated costs
      * 
      */
-    public Path(Stack<T> trace, int costs, int estimateCosts, int totalCosts) {
+    public Path(
+            ArrayDeque<T> trace, 
+            int costs, 
+            int estimateCosts, 
+            int totalCosts
+            ) {
+        
+        
         if (trace == null) {
             throw new NullPointerException("Constructor: Stack is null");
         }
@@ -44,10 +51,12 @@ public class Path<T extends Knot> implements Comparable<Path> {
      */
     public Path(Path<T> copy) {
 
-        this(new Stack<T>(),
+        this(new ArrayDeque<T>(),
                 copy.getCosts(),
                 copy.getEstimateCosts(),
-                copy.getTotalCosts());
+                copy.getTotalCosts()
+                );
+        
         trace.addAll(copy.getTrace());
     }
 
@@ -57,10 +66,11 @@ public class Path<T extends Knot> implements Comparable<Path> {
      */
     public Path(T start) {
 
-        this(new Stack<T>(),
+        this(new ArrayDeque<T>(),
                 0,
                 start.getHeuristic(),
-                start.getHeuristic());
+                start.getHeuristic()
+                );
 
         if (start == null) {
             throw new NullPointerException("Constructor: The start of the Path is Null");
@@ -81,12 +91,12 @@ public class Path<T extends Knot> implements Comparable<Path> {
         return totalCosts;
     }
 
-    public Stack<T> getTrace() {
+    public ArrayDeque<T> getTrace() {
         return trace;
     }
 
     public T getTop() {
-        return trace.peek();
+        return trace.getLast();
     }
 
 //****************Public Methods************************ 
@@ -104,7 +114,7 @@ public class Path<T extends Knot> implements Comparable<Path> {
 
     //*************Override*******************   
     @Override
-    public int compareTo(Path o) {
+    public int compareTo(Path<T> o) {
         if (o == null) {
             throw new NullPointerException("CompareTo: Object to Compare is null");
         }

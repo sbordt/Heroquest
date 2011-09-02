@@ -45,6 +45,10 @@ function createMap ()
 	return map;
 end
 
+create_classical_map = createMap;
+
+
+
 
 
 

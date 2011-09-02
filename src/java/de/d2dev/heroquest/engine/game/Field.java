@@ -1,5 +1,8 @@
 package de.d2dev.heroquest.engine.game;
 
+import java.util.List;
+import java.util.Vector;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import de.d2dev.fourseasons.files.FileUtil;
@@ -73,7 +76,7 @@ public final class Field {
 	 * A unit that might be standing on the field. Visible to the package because 
 	 * the unit has the {@code setField} method.
 	 */
-	Unit unit;
+	Unit unit = null;
 	
 	/**
 	 * The fields texture. Simply the texture to be rendered when there is nothing on
@@ -91,8 +94,6 @@ public final class Field {
 		
 		this.isWall = false;
 		this.isDoor = false;
-		
-		this.unit = null;
 		
 		this.texture = TextureResource.createTextureResource( "fields/default.jpg" );
 	}
@@ -114,6 +115,12 @@ public final class Field {
 		this.isDoor = FileUtil.readBoleanAttribute( xml, IS_DOOR);
 		this.texture = TextureResource.createTextureResource( FileUtil.readStringAttribute( xml, TEXTURE ) );
 	}
+	
+	/**************************************************************************************
+	 * 
+	 * 										GAME STATE
+	 * 
+	 **************************************************************************************/
 	
 	/**
 	 * Getter for the map the fields belongs to.
@@ -140,6 +147,77 @@ public final class Field {
 	}
 	
 	/**
+	 * Get the field on top of the given field.
+	 * @return {@code null} in case there is none - field is in upper row.
+	 */
+	public Field getUpperField() {
+		// there is no upper field if we are in the upper row
+		if ( this.y == 0 )
+			return null;
+		
+		return this.map.getField( this.x, this.y -1 );
+	}
+	
+	/**
+	 * Get the field left to the given field.
+	 * @return {@code null} in case there is none - field is in left column.
+	 */
+	public Field getLeftField() {
+		// there is no left field if we are in the left column
+		if ( this.x == 0 )
+			return null;
+		
+		return this.map.getField( this.x -1, this.y );
+	}
+	
+	/**
+	 * Get the field under to the given field.
+	 * @return {@code null} in case there is none - field is in lower row.
+	 */
+	public Field getLowerField() {
+		// there is no lower field if we are in the lower row
+		if ( this.y == this.map.getHeight()-1 )
+			return null;
+		
+		return this.map.getField( this.x, this.y +1 );
+	}
+	
+	/**
+	 * Get the field right to the given field.
+	 * @return {@code null} in case there is none - field is in right column.
+	 */
+	public Field getRightField() {
+		// there is no right field if we are in the right column
+		if ( this.x == this.map.getWidth()-1 )
+			return null;		
+		return this.map.getField( this.x +1, this.y );
+	}
+	
+	/**
+	 * Get a {@code List} containing the fields direct neighbours,
+	 * that are the (at most) 4 fields directly next to the field.
+	 * There might be fewer than 4 direct neighbours, e.g. in case of the 
+	 * maps upper left corner.
+	 * @return
+	 */
+	public List<Field> getNeighbours() {
+		List<Field> neighbours = new Vector<Field>();
+		
+		Field field;
+		
+		if ( ( field = this.getUpperField() ) != null )
+			neighbours.add( field );
+		if ( ( field = this.getLeftField() ) != null )
+			neighbours.add( field );
+		if ( ( field = this.getLowerField() ) != null )
+			neighbours.add( field );
+		if ( ( field = this.getRightField() ) != null )
+			neighbours.add( field );
+		
+		return neighbours;
+	}
+	
+	/**
 	 * Is the field revealed?
 	 * @return
 	 */
@@ -155,7 +233,7 @@ public final class Field {
 		return isWall;
 	}
 	
-	public void setWall(boolean wall) throws GameStateException {
+	public void setWall(boolean wall) throws GameStateException {	//TODO new validity!
 		if ( this.isDoor && !wall )	// validity
 			throw new GameStateException( "Attempt to make a door-field a non-wall field." );
 		
@@ -216,7 +294,15 @@ public final class Field {
 	
 	public void setTexture(Resource texture) {
 		this.texture = texture;
+		
+		this.map.fireOnFieldTextureChanges( this );	// fire event
 	}
+	
+	/**************************************************************************************
+	 * 
+	 * 										OTHER METHODS
+	 * 
+	 **************************************************************************************/
 	
 	public Element toXML() {
 		Element xml = new Element( FIELD );

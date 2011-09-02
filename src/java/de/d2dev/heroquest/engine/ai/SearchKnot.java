@@ -2,7 +2,8 @@ package de.d2dev.heroquest.engine.ai;
 
 import de.d2dev.heroquest.engine.ai.astar.Communicator;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
-import java.util.Stack;
+import de.d2dev.heroquest.engine.game.Field;
+import java.util.ArrayDeque;
 
 /**
  *
@@ -10,34 +11,29 @@ import java.util.Stack;
  */
 public class SearchKnot implements Knot {
 
-    private int x;
-    private int y;
+    private Field field;
     private int heuristic;
     private Communicator communicator;
 
-    public SearchKnot(int x, int y, int heuristic, Communicator communicator) {
-        this.x = x;
-        this.y = y;
+    public SearchKnot(Field field, int heuristic, Communicator communicator) {
+        this.field = field;
         this.heuristic = heuristic;
         this.communicator = communicator;
-    }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
     }
 
     @Override
-    public Stack<Knot> getSuccessors() {
-        return communicator.getSuccessors(x, y);
+    public ArrayDeque<Knot> getSuccessors() {
+        return communicator.getSuccessors(this);
     }
 
     @Override
     public int getHeuristic() {
         return heuristic;
+    }
+
+    public Field getField() {
+        return field;
     }
 
     @Override
@@ -49,10 +45,7 @@ public class SearchKnot implements Knot {
             return false;
         }
         final SearchKnot other = (SearchKnot) obj;
-        if (this.x != other.getX()) {
-            return false;
-        }
-        if (this.y != other.getY()) {
+        if (this.field != other.field && (this.field == null || !this.field.equals(other.field))) {
             return false;
         }
         return true;
@@ -61,11 +54,11 @@ public class SearchKnot implements Knot {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 97 * hash + this.x;
-        hash = 97 * hash + this.y;
+        hash = 43 * hash + (this.field != null ? this.field.hashCode() : 0);
         return hash;
     }
 
+    
     @Override
     public int getTransitionCosts(Knot b) {
         if (b == null) {

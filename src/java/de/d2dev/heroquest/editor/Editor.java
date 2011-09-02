@@ -7,14 +7,9 @@ import java.util.Properties;
 
 import javax.swing.UIManager;
 
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.jse.JseBaseLib;
-import org.luaj.vm2.lib.jse.JsePlatform;
-
 import de.d2dev.fourseasons.Application;
-import de.d2dev.fourseasons.script.lua.LuaResourceFinder;
-import de.d2dev.fourseasons.script.lua.LuaScript;
-import de.d2dev.fourseasons.script.lua.LuaScriptLoader;
+import de.d2dev.fourseasons.resource.TFileResourceFinder;
+import de.d2dev.fourseasons.script.ScriptEngine;
 
 import de.d2dev.heroquest.editor.gui.*;
 import de.d2dev.heroquest.editor.script.EditorLuaScriptDecomposer;
@@ -38,32 +33,16 @@ public class Editor {
 	
 	public String publicDataStoragePath;
 	
-	/**
-	 * {@code null} if not found.
-	 */
-	public String dropboxFolderPath = null;
-	
-	/**
-	 * {@code null} if not found.
-	 */
-	public String dropboxEditorFolder = null;
-	
-	/**
-	 * {@code null} if not found.
-	 */
-	public HqRessourceFile dropboxResources = null;
-	
-	/**
-	 * {@code null} if not found.
-	 */	
-	public TFile dropboxScriptFolder = null;
+	public Dropbox dropbox;
 	
 	public Properties properties = new Properties();
 	
 	public TFile scriptFolder;
 	public HqRessourceFile globalRessources;
 	
-	public EditorRessourceLocator resourceProvider;
+	public TFileResourceFinder resourceProvider = new TFileResourceFinder();
+	
+	public ScriptEngine scriptEngine;
 	
 	public Map map;
 	
@@ -92,33 +71,23 @@ public class Editor {
     	// global resources are in globalRessources.zip
     	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalResources.zip" );
     	
+    	this.resourceProvider.textureLocations.add( this.globalRessources.textures );
+    	
     	// script folder 'script'
     	this.scriptFolder = new TFile( this.publicDataStoragePath + "/script" );
     	
-    	// init dropbox data
-    	this.initDropbox();
+    	this.resourceProvider.luaScriptLocations.add( this.scriptFolder );
     	
-    	// our resource locator
-    	this.resourceProvider = new EditorRessourceLocator( this );
+    	// Dropbox setup
+    	this.dropbox = new Dropbox();
+    	this.dropbox.addAsResourceLocation( this.resourceProvider );
     	
-    	// try load map from script
-    	JseBaseLib.FINDER = new LuaResourceFinder( this.resourceProvider );
+    	// script engine setup
+    	scriptEngine = ScriptEngine.createDefaultScriptEngine( this.resourceProvider, new EditorLuaScriptDecomposer() );
     	
-    	try {
-    		EditorLuaScriptDecomposer decomposer = new EditorLuaScriptDecomposer();
-    		LuaValue _G = JsePlatform.standardGlobals();
-    		
-    		LuaScriptLoader loader = new LuaScriptLoader( _G, decomposer );
-    		
-    		loader.load( new TFile( this.dropboxFolderPath + "/script/bindings.lua" ) );
-    		loader.load( new TFile( this.dropboxFolderPath + "/script/map templates/map_creation.lua" ) );
-    		
-    		LuaScript script = (LuaScript) loader.load( new TFile( this.dropboxFolderPath + "/script/map templates/classical.lua" ) );
-    		assert script != null;
-    		
-    		script.getScript().call();
-    		
-    		LuaMapCreatorFunction function = (LuaMapCreatorFunction) decomposer.decompose( script.getScript() ).get( 0 );
+    	// load the 'classical' map
+    	try {    		
+    		LuaMapCreatorFunction function = (LuaMapCreatorFunction) scriptEngine.load( new TFile( this.dropbox.dropboxFolderPath + "/script/map templates/classical.lua" ) ).getFunctions().get(0);
     		
     		this.map = function.createMap();
     	} catch(Exception e) {
@@ -140,27 +109,7 @@ public class Editor {
 		this.renderer.render();
 	}
 	
-	public void initDropbox() throws Exception {
-    	// is there a dropbox storage location?	
-    	if ( (this.dropboxFolderPath = "C:/Users/Justus/Desktop/Dropbox") != null ) {
-    		this.dropboxFolderPath += "/HeroQuest/HeroQuest Editor";
-    		
-    		if ( !new File( this.dropboxFolderPath ).exists() ) {
-    			this.dropboxFolderPath = null;
-    			return;
-    		}
-    	}
-    	
-    	// dropbox resources
-    	if ( this.dropboxFolderPath != null ) {
-    		this.dropboxResources = new HqRessourceFile( this.dropboxFolderPath + "/" + "globalResources.zip" );
-    	}		
 
-    	// dropbox script folder 'script'
-    	if ( this.dropboxFolderPath != null ) {
-    		this.dropboxScriptFolder = new TFile( this.dropboxFolderPath + "/script" );
-    	}
-	}
 	
 	public void start() {
 		this.mainWindow.setVisible( true );

@@ -1,44 +1,105 @@
 package de.d2dev.heroquest.engine.game;
 
+import com.google.common.base.Preconditions;
+
 import de.d2dev.fourseasons.gamestate.GameStateException;
+import de.d2dev.fourseasons.gamestate.Gamestate;
+import de.d2dev.heroquest.engine.ai.AIController;
 
 /**
  * Superclass for Heroes and Monsters. Can stand on fields and move.
  * @author Sebastian Bordt
  *
  */
-public class Unit {
+public abstract class Unit {
 	
-	public enum Type {
+	/**
+	 * So far there are only heroes and monsters...
+	 * @author Sebastian Bordt
+	 *
+	 */
+	protected enum Type {
 		HERO,
 		MONSTER,
 	}
 	
-	/**
-	 * The direction in witch a unit views. Rather for the rendering
-	 * than for our game logic. {@code UP} is the default viewing direction
-	 * for units :-)
-	 * @author Sebastian Bordt
-	 *
+	/*
+	 * Game State Variables
 	 */
-	public enum ViewDirection {
-		UP,
-		DOWN,
-		LEFT,
-		RIGHT
+	
+	protected Map map;
+	
+	/**
+	 * The units type, e.g. hero or monster!
+	 */
+	protected Type type;
+	
+	/**
+	 * The units name, e.g. 'Barbarian' or 'Orc'
+	 */
+	protected String name;
+	
+	protected Field field;
+	
+	protected Direction2D viewDir = Direction2D.UP;
+	
+	/*
+	 * Running Game Variables
+	 */
+	protected RunningGameContext gameContext;
+
+	protected int remainingMoves = 0;
+
+	/**
+	 * If the unit is under ai control, this {@link AIController} determines its actions.
+	 * {@code null} if the unit is not controlled by an ai.
+	 */
+	protected AIController aiController;
+
+	protected Unit(Field field) throws GameStateException {
+		Preconditions.checkNotNull( field );	// the field must not be null
+		
+		this.map = field.getMap();
+		this.moveTo( field );
 	}
 	
-	private Type type;
+	/**************************************************************************************
+	 * 
+	 * 										GAME STATE
+	 * 
+	 **************************************************************************************/
 	
-	private Field field;
+	/**
+	 * The map the unit belongs to.
+	 * @return
+	 */
+	public Map getMap() {
+		return this.map;
+	}
 	
-	private ViewDirection viewDir;
-
-	public Unit(Field field, Type type) throws GameStateException {
-		this.setField( field );
-		
-		this.type = type;
-		this.viewDir = ViewDirection.UP;
+	/**
+	 * Is this unit a hero?
+	 * @return
+	 */
+	public boolean isHero() {
+		return this.type == Type.HERO;
+	}
+	
+	/**
+	 * Is this unit a monster?
+	 * @return
+	 */
+	public boolean isMonster() {
+		return this.type == Type.MONSTER;
+	}
+	
+	/**
+	 * The units name, further describing its type, e.g.
+	 * 'Barbarian' or 'Orc'.
+	 * @return
+	 */
+	public String getName() {
+		return this.name;
 	}
 	
 	/**
@@ -50,24 +111,168 @@ public class Unit {
 	}
 	
 	/**
-	 * Set the unit to stand on a specific field.
+	 * Move the unit to another field.
 	 */
-	public void setField(Field field) throws GameStateException {
-		if ( field.isBlocked() )	// validity
-			throw new GameStateException( "Attempt to place a unit on a blocked field." );
+	public void moveTo(Field field) throws GameStateException {
+		Gamestate.checkState( !field.isBlocked() , "Attempt to place a unit on a blocked field." );
 		
-		if ( this.field != null )
+		if ( this.field != null ) {	// this is not the case when the unit is first placed on the map
+			this.field.getMap().fireOnUnitLeavesField(field);
 			this.field.unit = null;
+		}
 		
 		this.field = field;
 		field.unit = this;
+		
+		this.field.getMap().fireOnUnitEntersField(field);
 	}
 	
-	public ViewDirection getViewDir() {
+	/**
+	 * Can the unit move one field up?
+	 * @return
+	 */
+	public boolean canMoveUp() {
+		// unit can't move up if there is no upper field or if the upper field is blocked
+		if ( this.field.getUpperField() == null || this.field.getUpperField().isBlocked() )
+			return false;
+			
+		return true;
+	}
+	
+	/**
+	 * Can the unit move one field to the left?
+	 * @return
+	 */
+	public boolean canMoveLeft() {
+		// unit can't move left if there is no left field or if the left field is blocked
+		if ( this.field.getLeftField() == null || this.field.getLeftField().isBlocked() )
+			return false;
+			
+		return true;
+	}
+	
+	/**
+	 * Can the unit move one field to the right?
+	 * @return
+	 */
+	public boolean canMoveRight() {
+		// unit can't move right if there is no right field or if the right field is blocked
+		if ( this.field.getRightField() == null || this.field.getRightField().isBlocked() )
+			return false;
+			
+		return true;		
+	}
+	
+	/**
+	 * Can the unit move one field down?
+	 * @return
+	 */
+	public boolean canMoveDown() {
+		// unit can't move down if there is no lower field or if the lower field is blocked
+		if ( this.field.getLowerField() == null || this.field.getLowerField().isBlocked() )
+			return false;
+			
+		return true;
+	}
+	
+	/**
+	 * Move the unit one field up.
+	 * @throws GameStateException
+	 */
+	public void moveUp() throws GameStateException {
+		Gamestate.checkState( this.canMoveUp(), "Unit can't move up." );
+		
+		this.moveTo( this.field.getUpperField() );
+	}
+	
+	/**
+	 * Move the unit one field to the left.
+	 * @throws GameStateException
+	 */
+	public void moveLeft() throws GameStateException {
+		Gamestate.checkState( this.canMoveLeft(), "Unit can't move left." );
+		
+		this.moveTo( this.field.getLeftField() );
+	}
+	
+	/**
+	 * Move the unit one field to the right.
+	 * @throws GameStateException
+	 */
+	public void moveRight() throws GameStateException {
+		Gamestate.checkState( this.canMoveRight(), "Unit can't move right." );
+		
+		this.moveTo( this.field.getRightField() );
+	}	
+	
+	/**
+	 * Move the unit one field down.
+	 * @throws GameStateException
+	 */
+	public void moveDown() throws GameStateException {
+		Gamestate.checkState( this.canMoveDown(), "Unit can't move dowm." );
+		
+		this.moveTo( this.field.getLowerField() );
+	}	
+	
+	/**
+	 * The direction the unit views into.
+	 * @return
+	 */
+	public Direction2D getViewDir() {
 		return viewDir;
 	}
 	
-	public Type getType() {
-		return this.type;
+	/**
+	 * Set the direction the unit views into.
+	 * @param dir
+	 */
+	public void setViewDir(Direction2D dir) {
+		this.viewDir = dir;
+	}
+	
+	/**************************************************************************************
+	 * 
+	 * 							      RUNNING GAMES STATE
+	 * 
+	 **************************************************************************************/
+
+	public RunningGameContext getGameContext() {
+		return gameContext;
+	}
+
+	public void setGameContext(RunningGameContext gameContext) {
+		this.gameContext = gameContext;
+	}
+	
+	public int getRemainingMoves() {
+		return this.remainingMoves;
+	}
+	
+	public void setRemainingMoves(int remainingMoves) {
+		this.remainingMoves = remainingMoves;
+	}
+
+	
+	/**************************************************************************************
+	 * 
+	 * 										OTHER METHODS
+	 * 
+	 **************************************************************************************/
+	
+	/**
+	 * 
+	 * @return {@code null} if there is none.
+	 */
+	public AIController getAIController() {
+		return this.aiController;
+	}
+	
+	/**
+	 * 
+	 * @param aiController {@code null} to remove ai control.
+	 */
+	public void setAiController(AIController aiController) {
+		this.aiController = aiController;
 	}
 }

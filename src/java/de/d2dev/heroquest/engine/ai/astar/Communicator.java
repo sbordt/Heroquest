@@ -4,14 +4,18 @@
  */
 package de.d2dev.heroquest.engine.ai.astar;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 /**
  *
  * @author Simon
  */
 public interface Communicator {
-    public Stack<Knot> getSuccessors(int x, int y);
-    public int getTransitionCosts(Knot a,Knot b);
 
+    public ArrayDeque<Knot> getSuccessors(Knot knot);
+
+    public int getTransitionCosts(Knot a, Knot b);
+
+    
+    
 }
