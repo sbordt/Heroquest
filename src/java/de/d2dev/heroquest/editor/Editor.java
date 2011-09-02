@@ -118,7 +118,12 @@ public class Editor {
     		
     		script.getScript().call();
     		
-    		LuaMapCreatorFunction function = (LuaMapCreatorFunction) decomposer.decompose( script.getScript() ).get( 0 );
+    		LuaScript level0 = (LuaScript) loader.load( new TFile( this.dropboxFolderPath + "/script/map templates/level0.lua" ) );
+    		assert level0 != null;
+    		
+    		level0.getScript().call();
+    		
+    		LuaMapCreatorFunction function = (LuaMapCreatorFunction) decomposer.decompose( level0.getScript() ).get( 0 );
     		
     		this.map = function.createMap();
     	} catch(Exception e) {

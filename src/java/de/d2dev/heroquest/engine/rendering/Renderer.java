@@ -23,6 +23,7 @@ public class Renderer implements MapListener {
 	
 	private static int GROUND = 0;
 	private static int WALLS = 1;
+	private static int DOORS = 2;
 	private static int UNITS = 100;
 	
 	
@@ -142,6 +143,14 @@ public class Renderer implements MapListener {
 			
 			this.walls.put( field, new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, WALLS,  wallTexture ) );
 			this.renderTarget.addQuad( this.walls.get( field ) );
+		}
+		
+		// doors
+		if ( field.isDoor() ) {
+			Resource doorTexture = TextureResource.createTextureResource("doors/closed/vertical.png");
+			
+			quad = new RenderQuad( field.getX(), field.getY() - 0.5f, 1.0f, 2f, DOORS, doorTexture ); 
+			this.renderTarget.addQuad( quad );
 		}
 	}
 	

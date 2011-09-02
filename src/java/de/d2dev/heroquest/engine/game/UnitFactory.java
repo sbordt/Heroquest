@@ -2,14 +2,9 @@ package de.d2dev.heroquest.engine.game;
 
 import de.d2dev.fourseasons.gamestate.GameStateException;
 import de.d2dev.heroquest.engine.game.Hero.HeroType;
+import de.d2dev.heroquest.engine.game.Monster.MonsterType;
 
 public class UnitFactory {
-	
-	private Map map;
-	
-	public UnitFactory(Map map) {
-		this.map = map;
-	}
 	
 	public Hero createBarbarian(Field field) throws GameStateException {
 		return new Hero( field, HeroType.BARBARIAN );
@@ -24,11 +19,11 @@ public class UnitFactory {
 	}
 	
 	public Hero createWizard(Field field) throws GameStateException {
-		return new Hero( field, HeroType.WIZZARD );
+		return new Hero( field, HeroType.WIZARD );
 	}
 	
 	public Monster createOrc(Field field) throws GameStateException {
-		return new Monster( field );
+		return new Monster( field, MonsterType.ORC );
 	}
 
 }

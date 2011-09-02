@@ -1,7 +1,5 @@
 package de.d2dev.heroquest.engine.game;
 
-import de.d2dev.heroquest.engine.game.action.GameAction;
-
 public class RunningGameContext {
 	
 	

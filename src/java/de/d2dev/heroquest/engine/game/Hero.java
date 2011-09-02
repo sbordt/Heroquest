@@ -8,7 +8,7 @@ public class Hero extends Unit {
 		BARBARIAN,
 		DWARF,
 		ALB,
-		WIZZARD,
+		WIZARD,
 	}
 	
 	protected HeroType heroType;
@@ -19,11 +19,27 @@ public class Hero extends Unit {
 		// This is a hero!
 		this.type = Type.HERO;
 		
+		// Set the heroes type and name
 		this.heroType = heroType;
 		
 		switch ( this.heroType ) {
 		case BARBARIAN:
+			this.name = "Barbarian";
+			break;
+		case DWARF:
+			this.name = "Dwarf";
+			break;
+		case ALB:
+			this.name = "Alb";
+			break;
+		case WIZARD:
+			this.name = "Wizard";
+			break;
 		}
 	}
 
+	public HeroType getHeroType() {
+		return heroType;
+	}
+	
 }

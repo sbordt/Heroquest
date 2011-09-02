@@ -3,8 +3,6 @@ package de.d2dev.heroquest.engine.game.action;
 import java.util.List;
 import java.util.Vector;
 
-import com.google.common.base.Preconditions;
-
 import de.d2dev.heroquest.engine.game.Direction2D;
 import de.d2dev.heroquest.engine.game.Unit;
 

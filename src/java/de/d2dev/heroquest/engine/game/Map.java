@@ -3,7 +3,6 @@ package de.d2dev.heroquest.engine.game;
 import de.d2dev.fourseasons.files.FileUtil;
 import de.d2dev.fourseasons.util.Observed;
 import de.d2dev.fourseasons.util.ListenerUtil;
-import de.d2dev.heroquest.engine.game.Unit.Type;
 
 import java.util.*;
 
@@ -32,9 +31,9 @@ public final class Map implements Observed<MapListener> {
 	
 	private Field[][] fields;
 
-	private List<Unit> units = new Vector<Unit>();
-	private List<Unit> heroes = new Vector<Unit>();
-	private List<Unit> monsters = new Vector<Unit>();
+//	private List<Unit> units = new Vector<Unit>();
+//	private List<Unit> heroes = new Vector<Unit>();
+//	private List<Unit> monsters = new Vector<Unit>();
 
 	/**
 	 * Construct a new empty map.

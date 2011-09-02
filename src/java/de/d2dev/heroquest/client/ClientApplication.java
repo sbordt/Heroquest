@@ -61,7 +61,7 @@ public class ClientApplication implements KeyListener {
     public void init() throws Exception {
         this.aiSystem = new AISystem(map);
 
-    	this.unitFactory = new UnitFactory( this.map );
+    	this.unitFactory = new UnitFactory();
     	
         this.hero = this.unitFactory.createBarbarian( this.map.getField(0, 0) );
         this.monster = this.unitFactory.createOrc( this.map.getField( this.map.getWidth()-1, this.map.getHeight()-1 ) );
@@ -166,8 +166,8 @@ public class ClientApplication implements KeyListener {
                 try {
                     if (this.hero.canMoveDown()) {
                         this.hero.moveDown();
-                        this.hero.setViewDir(Direction2D.DOWN);
                     }
+                    this.hero.setViewDir(Direction2D.DOWN);
                 } catch (GameStateException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -176,8 +176,8 @@ public class ClientApplication implements KeyListener {
                 try {
                     if (this.hero.canMoveUp()) {
                         this.hero.moveUp();
-                        this.hero.setViewDir(Direction2D.UP);
                     }
+                    this.hero.setViewDir(Direction2D.UP);
                 } catch (GameStateException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -186,8 +186,8 @@ public class ClientApplication implements KeyListener {
                 try {
                     if (this.hero.canMoveLeft()) {
                         this.hero.moveLeft();
-                        this.hero.setViewDir(Direction2D.LEFT);
                     }
+                    this.hero.setViewDir(Direction2D.LEFT);
                 } catch (GameStateException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -196,8 +196,8 @@ public class ClientApplication implements KeyListener {
                 try {
                     if (this.hero.canMoveRight()) {
                         this.hero.moveRight();
-                        this.hero.setViewDir(Direction2D.RIGHT);
                     }
+                    this.hero.setViewDir(Direction2D.RIGHT);
                 } catch (GameStateException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();

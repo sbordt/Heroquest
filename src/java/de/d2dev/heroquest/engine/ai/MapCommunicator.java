@@ -97,7 +97,7 @@ public class MapCommunicator implements Communicator {
         Field actual = map.getField(x, y);
 
         
-        for (Field f : actual.getNeighbours) {
+        for (Field f : actual.getNeighbours()) {
             if (!f.isBlocked()) {
                 speicher.add(getKnot(f.getX(),  f.getY()));
             } else if (f.getX() == goalX && f.getY() == goalY) {

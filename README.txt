@@ -1,1 +1,1 @@
-Hier entsteht HeroQuest!
+Hier entsteht HeroQuest - Monster gegen Helden!
