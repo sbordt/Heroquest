@@ -23,7 +23,7 @@ public class AISystem {
     } 
     
     public AIController creatAIController(Unit unit){
-        return null;
+        return new AIMonsterController(unit,map);
     }
     
 }

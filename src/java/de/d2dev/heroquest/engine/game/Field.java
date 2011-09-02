@@ -186,8 +186,7 @@ public final class Field {
 	public Field getRightField() {
 		// there is no right field if we are in the right column
 		if ( this.x == this.map.getWidth()-1 )
-			return null;
-		
+			return null;		
 		return this.map.getField( this.x +1, this.y );
 	}
 	

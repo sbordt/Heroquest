@@ -28,6 +28,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 public class ClientApplication implements KeyListener {
@@ -40,12 +42,9 @@ public class ClientApplication implements KeyListener {
     private Java2DRenderWindow window;
     private Unit hero;
     private Unit monster;
-    
     private AISystem aiSystem;
     private ExecutorService aiExecutor = Executors.newSingleThreadExecutor();
-    
     private boolean heroesRound = true;
-    
     private List<GameAction> actionsToPerform;
 
     public ClientApplication() {
@@ -57,12 +56,12 @@ public class ClientApplication implements KeyListener {
     }
 
     public void init() throws Exception {
-    	this.aiSystem = new AISystem( map );
-    	
+        this.aiSystem = new AISystem(map);
+
         this.hero = new Unit(this.map.getField(0, 0), Unit.Type.HERO);
         this.monster = new Unit(this.map.getField(this.map.getWidth() - 1, this.map.getHeight() - 1), Unit.Type.MONSTER);
-        
-        this.monster.setAiController( this.aiSystem.creatAIController( this.monster ) );        
+
+        this.monster.setAiController(this.aiSystem.creatAIController(this.monster));
 
         this.renderTarget = new QuadRenderModel(map.getWidth(), map.getHeight());
 
@@ -79,31 +78,22 @@ public class ClientApplication implements KeyListener {
 
     public void run() {
 
-        Field[][] field = this.map.getFields();
-
-//            for (int i = 0; i < field.length; i++) {
-//                
-//                for (int j = 0; j < field[i].length; j++) {
-//                    System.out.print(field[i][j].isBlocked() ? "# " : "0 ");               
-//                }
-//                System.out.println();
-//                
+//        Field[][] field = this.map.getFields();
+//
+//        MapCommunicator communicator = new MapCommunicator(this.map);
+//        Stack<Path<SearchKnot>> result = communicator.search(field.length - 1, field[0].length - 1, 0, 0, 1);
+//        System.out.println(result.size());
+//        for (Path<SearchKnot> path : result) {
+//            for (SearchKnot knot : path.getTrace()) {
+//                int x = knot.getX();
+//                int y = knot.getY();
+//                this.map.getField(x, y).setTexture(TextureResource.createTextureResource("error.jpg"));
+//                System.out.println("Texture.set");
 //            }
-
-        MapCommunicator communicator = new MapCommunicator(this.map);
-        Stack<Path<SearchKnot>> result = communicator.search(0, 1, field.length - 2, field[0].length - 1, 3);
-        System.out.println(result.size());
-        for (Path<SearchKnot> path : result) {
-            for (SearchKnot knot : path.getTrace()) {
-                int x = knot.getX();
-                int y = knot.getY();
-                this.map.getField(x, y).setTexture(TextureResource.createTextureResource("error.jpg"));
-                System.out.println("Texture.set");
-            }
-        }
-        System.out.println("Hallo");
-        this.renderer.render();
-        this.window.repaint();
+//        }
+//        System.out.println("Hallo");
+//        this.renderer.render();
+//        this.window.repaint();
     }
 
     public static void main(String[] args) throws Exception {
@@ -116,43 +106,61 @@ public class ClientApplication implements KeyListener {
     }
 
     public void monstersRound() {
-    	// monster now! initialization...
-    	if ( this.heroesRound == true ) {
-    		this.heroesRound = false;
-    	}
-    	
-    	this.actionsToPerform = this.monster.getAIController().getActions();
+        // monster now! initialization...
+        if (this.heroesRound == true) {
+            this.heroesRound = false;
+        }
+
+        this.actionsToPerform = this.monster.getAIController().getActions();
+
+        this.performMonsterActions();
     }
-    
+
     public void performMonsterActions() {
-    	if ( this.actionsToPerform.isEmpty() ) {
-    		this.heroesRound = true;
-    		return;
-    	}
-    	
-    	this.performAction( this.actionsToPerform.get(0) );
-    	this.actionsToPerform.remove(0);	
+        if (this.actionsToPerform.isEmpty()) {
+            this.heroesRound = true;
+            return;
+        }
+
+        this.performAction(this.actionsToPerform.get(0));
+        this.actionsToPerform.remove(0);
     }
-    
+
     public void performAction(GameAction action) {
-    	try {
-			action.excecute();
-		} catch (GameStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            action.excecute();
+            System.out.println("DA");
+        } catch (GameStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        this.renderer.render();
+        this.window.repaint();
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ClientApplication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                ClientApplication.this.performMonsterActions();
+            }
+        });
     }
-    
 
     @Override
     public void keyPressed(KeyEvent e) {
         System.out.println(e.getKeyChar());
-        
-        if ( this.heroesRound ) {
+
+        if (this.heroesRound) {
             if (e.getKeyChar() == 's') {	// walk down
                 try {
-                    if ( this.hero.canMoveDown() ) {
-                    	this.hero.moveDown();
+                    if (this.hero.canMoveDown()) {
+                        this.hero.moveDown();
                         this.hero.setViewDir(Direction2D.DOWN);
                     }
                 } catch (GameStateException e1) {
@@ -161,7 +169,7 @@ public class ClientApplication implements KeyListener {
                 }
             } else if (e.getKeyChar() == 'w') {	// walk up
                 try {
-                    if ( this.hero.canMoveUp() ) {
+                    if (this.hero.canMoveUp()) {
                         this.hero.moveUp();
                         this.hero.setViewDir(Direction2D.UP);
                     }
@@ -171,7 +179,7 @@ public class ClientApplication implements KeyListener {
                 }
             } else if (e.getKeyChar() == 'a') {	// walk left
                 try {
-                    if ( this.hero.canMoveLeft() ) {
+                    if (this.hero.canMoveLeft()) {
                         this.hero.moveLeft();
                         this.hero.setViewDir(Direction2D.LEFT);
                     }
@@ -181,7 +189,7 @@ public class ClientApplication implements KeyListener {
                 }
             } else if (e.getKeyChar() == 'd') {	// walk right
                 try {
-                    if ( this.hero.canMoveRight() ) {
+                    if (this.hero.canMoveRight()) {
                         this.hero.moveRight();
                         this.hero.setViewDir(Direction2D.RIGHT);
                     }
@@ -190,8 +198,28 @@ public class ClientApplication implements KeyListener {
                     e1.printStackTrace();
                 }
             } else if (e.getKeyChar() == 'm') {	// MONSTER!!!
-            	this.monstersRound();
-            }        	
+                this.monstersRound();
+            }
+        }
+        if (e.getKeyChar() == 'z') {
+            Field[][] field = this.map.getFields();
+
+            for (int y = 0; y < field[0].length; y++) {
+                for (int x = 0; x < field.length; x++) {
+                    System.out.print(field[x][y].isBlocked() ? "# " : ". ");
+                }
+                System.out.println();
+
+            }
+            
+//            for (Field[] col  : field) {
+//                for (Field f : col) {
+//                   System.out.print(f.isBlocked() ? "# " : ". "); 
+//                }
+//                System.out.println();
+//            }
+            
+
         }
 
         this.renderer.render();

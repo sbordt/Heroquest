@@ -10,6 +10,8 @@ import de.d2dev.heroquest.engine.ai.astar.Knot;
 import de.d2dev.heroquest.engine.ai.astar.Path;
 import de.d2dev.heroquest.engine.game.Field;
 import de.d2dev.heroquest.engine.game.Map;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -63,7 +65,7 @@ public class MapCommunicator implements Communicator {
         return result.pop().getCosts();
     }
 
-    public Stack<SearchKnot> getPathSearch(Field start, Field goal) {
+    public LinkedList<SearchKnot> getPathSearch(Field start, Field goal) {
         this.goalX = goal.getX();
         this.goalY = goal.getY();
         Stack<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
@@ -73,7 +75,7 @@ public class MapCommunicator implements Communicator {
         return result.pop().getTrace();
     }
 
-    public Stack<SearchKnot> getPathSearch(int startX, int startY, int goalX, int goalY) {
+    public LinkedList<SearchKnot> getPathSearch(int startX, int startY, int goalX, int goalY) {
         Stack<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
         if (result.isEmpty()) {
             return null;
@@ -91,30 +93,23 @@ public class MapCommunicator implements Communicator {
     @Override
     public Stack<Knot> getSuccessors(int x, int y) {
         Stack<Knot> speicher = new Stack<Knot>();
-        for (int i = x - 1; i <= x + 1; i++) {
-            for (int j = y - 1; j <= y + 1; j++) {
-                if (!((i == x - 1 && j == y - 1)
-                        || (i == x + 1 && j == y + 1)
-                        || (i == x - 1 && j == y + 1)
-                        || (i == x + 1 && j == y - 1))) {
 
-                    if (fieldExists(i, j)) {
-                        if (!map.getField(i, j).isBlocked()) {
-                            speicher.add(getKnot(i, j));
-                        } else if (i == goalX && j == goalY) {
-                            speicher.add(getKnot(i, j));
-                        }
-                    }
-                }
+        Field actual = map.getField(x, y);
+
+        
+        for (Field f : actual.getNeighbours) {
+            if (!f.isBlocked()) {
+                speicher.add(getKnot(f.getX(),  f.getY()));
+            } else if (f.getX() == goalX && f.getY() == goalY) {
+                speicher.add(getKnot(f.getX(),  f.getY()));
             }
         }
+
+
         return speicher;
     }
     //******************Private*************************   
 
-    private boolean fieldExists(int x, int y) {
-        return x >= 0 && x < map.getWidth() && y >= 0 && y < map.getHeight();
-    }
 
     private int getHeuristic(int x, int y) {
         return Math.abs(goalX - x) + Math.abs(goalY - y);
