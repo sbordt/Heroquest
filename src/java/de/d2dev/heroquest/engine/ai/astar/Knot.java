@@ -1,5 +1,5 @@
 package de.d2dev.heroquest.engine.ai.astar;
-import java.util.Stack;
+import java.util.LinkedList;
 
 
 /**
@@ -11,7 +11,7 @@ public interface Knot{
      * Gives back the Successors of a Knot
      * @return a Stack with the Successors
      */
-    public Stack<Knot> getSuccessors();
+    public LinkedList<Knot> getSuccessors();
     
     /**
      * Gives the estimated distance to the goal from this knot

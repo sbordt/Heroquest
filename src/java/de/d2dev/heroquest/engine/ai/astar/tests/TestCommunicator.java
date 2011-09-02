@@ -5,6 +5,7 @@ import de.d2dev.heroquest.engine.ai.astar.AStar;
 import de.d2dev.heroquest.engine.ai.astar.Communicator;
 import de.d2dev.heroquest.engine.ai.astar.Knot;
 import de.d2dev.heroquest.engine.ai.astar.Path;
+import java.util.LinkedList;
 import java.util.Stack;
 
 /*
@@ -15,7 +16,7 @@ import java.util.Stack;
  *
  * @author Simon + Toni
  */
-public class TestCommunicator implements Communicator {
+public class TestCommunicator {
 
     private int[][] field;
     private final int WALL = -1;
@@ -40,8 +41,8 @@ public class TestCommunicator implements Communicator {
     }
 
     @Override
-    public Stack<Knot> getSuccessors(int x, int y) {
-        Stack<Knot> speicher = new Stack<Knot>();
+    public LinkedList<Knot> getSuccessors(int x, int y) {
+        LinkedList<Knot> speicher = new LinkedList<Knot>();
         for (int i = x - 1; i <= x + 1; i++) {
             for (int j = y - 1; j <= y + 1; j++) {
                 if (!((i == x - 1 && j == y - 1)

@@ -1,5 +1,6 @@
 package de.d2dev.heroquest.engine.ai.astar;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -94,6 +95,7 @@ public class Path<T extends Knot> implements Comparable<Path<T>> {
     }
 
     public LinkedList<T> getTrace() {
+//        Collections.reverse(trace);
         return trace;
     }
 

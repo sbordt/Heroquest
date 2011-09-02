@@ -25,7 +25,7 @@ public class AIMonsterController implements AIController {
     private MapCommunicator communicator;
 
     public AIMonsterController(Unit unit, Map map) {
-        
+
         this.unit = unit;
         this.map = map;
         this.targets = new PriorityQueue<Target>();
@@ -35,39 +35,49 @@ public class AIMonsterController implements AIController {
     @Override
     public List<GameAction> getActions() {
         for (Unit heroe : map.getHeroes()) {
-            this.communicator.getPathSearch(unit.getField(), heroe.getField());
-            targets.add(
-                    new Target(
-                    this.communicator.getPathSearch(unit.getField(), heroe.getField()),
-                    heroe));
+            LinkedList<SearchKnot> search = this.communicator.getPathSearch( unit.getField(),heroe.getField() );
+            
+            if (search != null) {
+                targets.add(
+                        new Target(search, heroe));
+            }
         }
+        if (!targets.isEmpty()) {
+            LinkedList<SearchKnot> actionPath = targets.poll().getPathToMonster();
+            return traversePath2Action(actionPath);
+        }
+        
+        return new LinkedList<GameAction>();
+        
+    }
 
-        LinkedList<SearchKnot> actionPath = targets.poll().getPathToMonster();
+    private List<GameAction> traversePath2Action(LinkedList<SearchKnot> actionPath) {
+        actionPath.removeLast();
+        SearchKnot start = actionPath.getFirst();
+        int oldX = start.getField().getX();
+        int oldY = start.getField().getY();
         ActionBuilder actionBuilder = new ActionBuilder(unit);
-        SearchKnot start = actionPath.pop();
-        int oldX = start.getX();
-        int oldY = start.getY();
         for (SearchKnot knot : actionPath) {
-            int x = knot.getX();
-            int y = knot.getY();
+            int x = knot.getField().getX();
+            int y = knot.getField().getY();
             int xDirection = (x - oldX + 1) * 2;
             int yDirection = (y - oldY - 1) * 3;
             int action = xDirection + yDirection;
             switch (action) {
                 case 1:
-                    System.out.println("AIController: Down");
+                    System.out.println("AIController: Right");
                     actionBuilder.addMove(Direction2D.RIGHT);
                     break;
                 case 2:
-                    System.out.println("AIController: Right");
+                    System.out.println("AIController: Down");
                     actionBuilder.addMove(Direction2D.DOWN);
                     break;
                 case -3:
-                    System.out.println("AIController: Up");
+                    System.out.println("AIController: Left");
                     actionBuilder.addMove(Direction2D.LEFT);
                     break;
                 case -4:
-                    System.out.println("AIController: Left");
+                    System.out.println("AIController: Up");
                     actionBuilder.addMove(Direction2D.UP);
                     break;
             }
@@ -75,7 +85,7 @@ public class AIMonsterController implements AIController {
             oldY = y;
 
         }
-
         return actionBuilder.getActions();
+
     }
 }
