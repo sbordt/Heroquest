@@ -22,6 +22,7 @@ public class Hero extends Unit {
 		this.heroType = heroType;
 		
 		switch ( this.heroType ) {
+		case BARBARIAN:
 		}
 	}
 

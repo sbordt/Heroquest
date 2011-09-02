@@ -61,8 +61,10 @@ public class ClientApplication implements KeyListener {
     public void init() throws Exception {
         this.aiSystem = new AISystem(map);
 
-        this.hero = this.map.getUnitFactory().createBarbarian( this.map.getField(0, 0) );
-        this.monster = this.map.getUnitFactory().createOrc( this.map.getField( this.map.getWidth()-1, this.map.getHeight()-1 ) );
+    	this.unitFactory = new UnitFactory( this.map );
+    	
+        this.hero = this.unitFactory.createBarbarian( this.map.getField(0, 0) );
+        this.monster = this.unitFactory.createOrc( this.map.getField( this.map.getWidth()-1, this.map.getHeight()-1 ) );
 
         this.monster.setAiController(this.aiSystem.creatAIController(this.monster));
 

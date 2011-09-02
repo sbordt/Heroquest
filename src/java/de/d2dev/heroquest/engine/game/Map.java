@@ -31,8 +31,6 @@ public final class Map implements Observed<MapListener> {
 	private int height;
 	
 	private Field[][] fields;
-	
-	private UnitFactory unitFactory;
 
 	private List<Unit> units = new Vector<Unit>();
 	private List<Unit> heroes = new Vector<Unit>();
@@ -57,8 +55,6 @@ public final class Map implements Observed<MapListener> {
 				this.fields[x][y] = new Field( this, x, y );
 			}
 		}
-		
-		this.unitFactory = new UnitFactory( this );
 	}
 	
 	/**
@@ -95,8 +91,6 @@ public final class Map implements Observed<MapListener> {
 				}
 			}
 		}
-		
-		this.unitFactory = new UnitFactory( this );
 	}
 	
 	/**************************************************************************************
@@ -198,10 +192,6 @@ public final class Map implements Observed<MapListener> {
 		for (MapListener l : this.listeners) {
 			l.onFieldTextureChanges(field);
 		}
-	}
-	
-	public UnitFactory getUnitFactory() {
-		return unitFactory;
 	}
 	
 	/**
