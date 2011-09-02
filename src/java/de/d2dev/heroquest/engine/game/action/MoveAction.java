@@ -12,30 +12,36 @@ import de.d2dev.heroquest.engine.game.Unit;
  *
  * @author Simon
  */
-public class MoveAction implements GameAction {
+public class MoveAction extends GameActionAdapter {
 
-    Unit unit;
+	/**
+	 * Direction to move into.
+	 */
     Direction2D direction;
-
-    public MoveAction(Unit unit, Direction2D direction) {
-        this.unit = unit;
-        this.direction = direction;
-    }
     
-    @Override
+    public MoveAction(Unit unit, Direction2D direction) {
+		super(unit.getGameContext(), unit);
+		this.direction = direction;
+	}
+
+	@Override
     public void excecute() throws GameStateException {
     	switch ( this.direction ) {
     	case UP:
     		this.unit.moveUp();
+    		this.unit.setViewDir( Direction2D.UP );
     		break;
     	case LEFT:
     		this.unit.moveLeft();
+    		this.unit.setViewDir( Direction2D.LEFT );
     		break;
     	case RIGHT:
     		this.unit.moveRight();
+    		this.unit.setViewDir( Direction2D.RIGHT );
     		break;
     	case DOWN:
     		this.unit.moveDown();
+    		this.unit.setViewDir( Direction2D.DOWN );
     		break;
     	}
     }

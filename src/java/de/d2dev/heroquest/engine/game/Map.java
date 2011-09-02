@@ -32,33 +32,11 @@ public final class Map implements Observed<MapListener> {
 	
 	private Field[][] fields;
 	
+	private UnitFactory unitFactory;
+
 	private List<Unit> units = new Vector<Unit>();
 	private List<Unit> heroes = new Vector<Unit>();
 	private List<Unit> monsters = new Vector<Unit>();
-	
-	/**
-	 * The upper left field of the four fields at
-	 * witch the heroes start the game!
-	 */
-	private Field startingField;
-	
-	void fireOnUnitEntersField(Field field) {
-		for (MapListener l : this.listeners) {
-			l.onUnitEntersField(field);
-		}
-	}
-	
-	void fireOnUnitLeavesField(Field field) {
-		for (MapListener l : this.listeners) {
-			l.onUnitLeavesField(field);
-		}
-	}
-	
-	void fireOnFieldTextureChanges(Field field) {
-		for (MapListener l : this.listeners) {
-			l.onFieldTextureChanges(field);
-		}
-	}
 
 	/**
 	 * Construct a new empty map.
@@ -80,7 +58,7 @@ public final class Map implements Observed<MapListener> {
 			}
 		}
 		
-		this.startingField = this.fields[0][0];
+		this.unitFactory = new UnitFactory( this );
 	}
 	
 	/**
@@ -117,17 +95,15 @@ public final class Map implements Observed<MapListener> {
 				}
 			}
 		}
+		
+		this.unitFactory = new UnitFactory( this );
 	}
 	
-	@Override
-	public void addListener(MapListener l) {
-		this.listeners.addListener(l);
-	}
-
-	@Override
-	public void removeListener(MapListener l) {
-		this.listeners.removeListener(l);
-	}
+	/**************************************************************************************
+	 * 
+	 * 										GAME STATE
+	 * 
+	 **************************************************************************************/
 	
 	public int getWidth() {
 		return width;
@@ -166,7 +142,7 @@ public final class Map implements Observed<MapListener> {
     	
     	for (Field[] fields : this.fields) {
 			for(Field field : fields) {
-				if ( field.hasUnit() && field.getUnit().getType() == Type.HERO) {
+				if ( field.hasUnit() && field.getUnit().isHero()) {
 					heroes.add( field.getUnit() );
 				}
 			}
@@ -181,7 +157,7 @@ public final class Map implements Observed<MapListener> {
     	
     	for (Field[] fields : this.fields) {
 			for(Field field : fields) {
-				if ( field.hasUnit() && field.getUnit().getType() == Type.MONSTER ) {
+				if ( field.hasUnit() && field.getUnit().isMonster() ) {
 					monsters.add( field.getUnit() );
 				}
 			}
@@ -189,9 +165,43 @@ public final class Map implements Observed<MapListener> {
     	
     	return monsters;
     }
+    
+	/**************************************************************************************
+	 * 
+	 * 										OTHER METHODS
+	 * 
+	 **************************************************************************************/
+    
+	@Override
+	public void addListener(MapListener l) {
+		this.listeners.addListener(l);
+	}
+
+	@Override
+	public void removeListener(MapListener l) {
+		this.listeners.removeListener(l);
+	}
 	
-	public Field getStartingField() {
-		return startingField;
+	void fireOnUnitEntersField(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onUnitEntersField(field);
+		}
+	}
+	
+	void fireOnUnitLeavesField(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onUnitLeavesField(field);
+		}
+	}
+	
+	void fireOnFieldTextureChanges(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onFieldTextureChanges(field);
+		}
+	}
+	
+	public UnitFactory getUnitFactory() {
+		return unitFactory;
 	}
 	
 	/**

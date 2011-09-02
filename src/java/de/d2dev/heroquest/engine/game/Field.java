@@ -1,5 +1,8 @@
 package de.d2dev.heroquest.engine.game;
 
+import java.util.List;
+import java.util.Vector;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import de.d2dev.fourseasons.files.FileUtil;
@@ -189,6 +192,30 @@ public final class Field {
 			return null;
 		
 		return this.map.getField( this.x +1, this.y );
+	}
+	
+	/**
+	 * Get a {@code List} containing the fields direct neighbours,
+	 * that are the (at most) 4 fields directly next to the field.
+	 * There might be fewer than 4 direct neighbours, e.g. in case of the 
+	 * maps upper left corner.
+	 * @return
+	 */
+	public List<Field> getNeigbours() {
+		List<Field> neighbours = new Vector<Field>();
+		
+		Field field;
+		
+		if ( ( field = this.getUpperField() ) != null )
+			neighbours.add( field );
+		if ( ( field = this.getLeftField() ) != null )
+			neighbours.add( field );
+		if ( ( field = this.getLowerField() ) != null )
+			neighbours.add( field );
+		if ( ( field = this.getRightField() ) != null )
+			neighbours.add( field );
+		
+		return neighbours;
 	}
 	
 	/**

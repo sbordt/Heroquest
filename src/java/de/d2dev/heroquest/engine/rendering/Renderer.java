@@ -150,10 +150,10 @@ public class Renderer implements MapListener {
 		
 		String pictureName = "error.jpg";
 		
-		if ( unit.getType() == Unit.Type.HERO ) {
+		if ( unit.isHero() ) {
 			pictureName = "units/heroes/barbarian/barbarian.jpg";
 		}
-		else if ( unit.getType() == Unit.Type.MONSTER ) {
+		else if ( unit.isMonster() ) {
 			pictureName = "units/monsters/orc/orc.jpg";
 		}
 		
