@@ -143,7 +143,7 @@ public class ClientApplication implements KeyListener {
         this.renderer.render();
         this.window.repaint();
         try {
-            Thread.sleep(200);
+            Thread.sleep(10);
         } catch (InterruptedException ex) {
             Logger.getLogger(ClientApplication.class.getName()).log(Level.SEVERE, null, ex);
         }

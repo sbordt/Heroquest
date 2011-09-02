@@ -1,6 +1,7 @@
 package de.d2dev.heroquest.engine.ai.astar;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Stack;
@@ -47,7 +48,7 @@ public class AStar<T extends Knot> {
         }
         T top = a.getTop();
         closedList.put(top, a.getCosts());
-        for (T successor : (Stack<T>)top.getSuccessors()) {
+        for (T successor : (LinkedList<T>)top.getSuccessors()) {
             if (closedList.get(successor) == null || closedList.get(successor) > a.getCosts()) {
                 Path<T> tmp = new Path<T>(a);
                 tmp.addKnot(successor);
@@ -64,15 +65,16 @@ public class AStar<T extends Knot> {
      * @param solutionCount Number of solutions you want to get
      * @return Stack with optimal solutions
      */
-    public Stack<Path<T>> search(T start, int solutionCount) {
+    public LinkedList<Path<T>> search(T start, int solutionCount) {
         
         
-        Stack<Path<T>> result = new Stack<Path<T>>();
+        LinkedList<Path<T>> result = new LinkedList<Path<T>>();
         Path<T> next = new Path<T>(start);
         agenda.add(next);
         
         while (!agenda.isEmpty()) {
             T top = next.getTop();
+            System.out.println("Agenda: " + agenda.size());
             if (isGoal(top)) {
                 result.add(next);
                 next = agenda.remove();
@@ -86,6 +88,7 @@ public class AStar<T extends Knot> {
             }
             expand(next);
         }
+        
       
         return result;
     }

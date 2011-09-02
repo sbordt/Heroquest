@@ -22,12 +22,12 @@ public class MapCommunicator implements Communicator {
 
     private Map map;
     private int goalX, goalY;
-    private AStar<SearchKnot> astar;
+
 
 //********************Public*****************************   
     public MapCommunicator(Map map) {
         this.map = map;
-        this.astar = new AStar<SearchKnot>();
+        
     }
 
     public void setGoal(int goalX, int goalY) {
@@ -35,20 +35,20 @@ public class MapCommunicator implements Communicator {
         this.goalY = goalY;
     }
 
-    public SearchKnot getKnot(int x, int y) {
-        return new SearchKnot(x, y, getHeuristic(x, y), this);
+    public SearchKnot getKnot(Field field) {
+        return new SearchKnot(field, getHeuristic(field), this);
     }
 
 //*****************search Methods***********************************
-    public Stack<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount) {
-
+    public LinkedList<Path<SearchKnot>> search(int startX, int startY, int goalX, int goalY, int solutionCount) {
+        AStar<SearchKnot> astar = new AStar<SearchKnot>();
         this.goalX = goalX;
         this.goalY = goalY;
-        return astar.search(getKnot(startX, startY), solutionCount);
+        return astar.search(getKnot(map.getField(startX, startY)), solutionCount);
     }
 
     public int getCostSearch(int startX, int startY, int goalX, int goalY) {
-        Stack<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
+        LinkedList<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
         if (result.isEmpty()) {
             return -1;
         }
@@ -58,7 +58,7 @@ public class MapCommunicator implements Communicator {
     public int getCostSearch(Field start, Field goal) {
         this.goalX = goal.getX();
         this.goalY = goal.getY();
-        Stack<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
+        LinkedList<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
         if (result.isEmpty()) {
             return -1;
         }
@@ -68,7 +68,7 @@ public class MapCommunicator implements Communicator {
     public LinkedList<SearchKnot> getPathSearch(Field start, Field goal) {
         this.goalX = goal.getX();
         this.goalY = goal.getY();
-        Stack<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
+        LinkedList<Path<SearchKnot>> result = search(start.getX(), start.getY(), goalX, goalY, 1);
         if (result.isEmpty()) {
             return null;
         }
@@ -76,11 +76,11 @@ public class MapCommunicator implements Communicator {
     }
 
     public LinkedList<SearchKnot> getPathSearch(int startX, int startY, int goalX, int goalY) {
-        Stack<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
+        LinkedList<Path<SearchKnot>> result = search(startX, startY, goalX, goalY, 1);
         if (result.isEmpty()) {
             return null;
         }
-
+        System.out.println("Weg vielleicht gefunden");
         return result.pop().getTrace();
     }
 
@@ -91,17 +91,14 @@ public class MapCommunicator implements Communicator {
     }
 
     @Override
-    public Stack<Knot> getSuccessors(int x, int y) {
-        Stack<Knot> speicher = new Stack<Knot>();
+    public LinkedList<Knot> getSuccessors(Field actual) {
+        LinkedList<Knot> speicher = new LinkedList<Knot>();
 
-        Field actual = map.getField(x, y);
-
-        
         for (Field f : actual.getNeighbours()) {
             if (!f.isBlocked()) {
-                speicher.add(getKnot(f.getX(),  f.getY()));
+                speicher.add(getKnot(f));
             } else if (f.getX() == goalX && f.getY() == goalY) {
-                speicher.add(getKnot(f.getX(),  f.getY()));
+                speicher.add(getKnot(f));
             }
         }
 
@@ -111,7 +108,7 @@ public class MapCommunicator implements Communicator {
     //******************Private*************************   
 
 
-    private int getHeuristic(int x, int y) {
-        return Math.abs(goalX - x) + Math.abs(goalY - y);
+    private int getHeuristic(Field field) {
+        return Math.abs(goalX - field.getX()) + Math.abs(goalY - field.getY());
     }
 }

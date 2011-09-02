@@ -4,7 +4,8 @@
  */
 package de.d2dev.heroquest.engine.ai.astar;
 
-import java.util.Stack;
+import de.d2dev.heroquest.engine.game.Field;
+import java.util.LinkedList;
 
 /**
  *
@@ -12,7 +13,7 @@ import java.util.Stack;
  */
 public interface Communicator {
 
-    public Stack<Knot> getSuccessors(int x, int y);
+    public LinkedList<Knot> getSuccessors(Field field);
 
     public int getTransitionCosts(Knot a, Knot b);
 
