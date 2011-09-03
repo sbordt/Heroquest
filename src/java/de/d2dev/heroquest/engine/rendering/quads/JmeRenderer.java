@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.controls.*;
 import com.jme3.material.Material;
 import com.jme3.scene.Geometry;
@@ -64,7 +65,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         	Quad quad = new Quad(map.getQuads().get(i).getWidth(),map.getQuads().get(i).getHeight());
             Geometry geom = new Geometry("Quad", quad);
             // Das Quad wird im Geometry bewegt
-            geom.move(map.getQuads().get(i).getX(), map.getQuads().get(i).getY(), map.getQuads().get(i).getZLayer());
+            geom.move(map.getQuads().get(i).getX(), transY(map.getQuads().get(i).getY()), map.getQuads().get(i).getZLayer());
             // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
             Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
             Texture texture = assetManager.loadTexture( map.getQuads().get(i).getTexture().getName() );
@@ -91,8 +92,13 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
        inputManager.addMapping("down", new KeyTrigger(KeyInput.KEY_DOWN));
        inputManager.addMapping("zoomOut", new KeyTrigger(KeyInput.KEY_O));
        inputManager.addMapping("zoomIn", new KeyTrigger(KeyInput.KEY_I));
+       inputManager.addMapping("dragMoveX", new MouseAxisTrigger(MouseInput.AXIS_X, true));
+       inputManager.addMapping("dragMoveX", new MouseAxisTrigger(MouseInput.AXIS_X, false));
+       inputManager.addMapping("dragMoveY", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
+       inputManager.addMapping("dragMoveY", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+       inputManager.addMapping("rightMouseButton", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
        
-       inputManager.addListener(userListener, new String[]{"left", "right", "up", "down", "zoomOut", "zoomIn"});
+       inputManager.addListener(userListener, new String[]{"left", "right", "up", "down", "zoomOut", "zoomIn", "dragMoveX", "dragMoveY", "rightMouseButton"});
     }
     
     
@@ -140,7 +146,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
     	Quad jmeQuad = new Quad(quad.getWidth(),quad.getHeight());
         Geometry geom = new Geometry("Quad", jmeQuad);
         // Das Quad wird im Geometry bewegt
-        geom.move(quad.getX(), quad.getY(), quad.getZLayer());
+        geom.move(quad.getX(), transY(quad.getY()), quad.getZLayer());
         // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         Texture texture = assetManager.loadTexture( quad.getTexture().getName() );
@@ -159,7 +165,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 	}
 	@Override
 	public void onQuadMoved(RenderQuad quad) {
-		geometrics.get(quad).move(quad.getX(), quad.getY(), quad.getZLayer());
+		geometrics.get(quad).move(quad.getX(), transY(quad.getY()), quad.getZLayer());
 	}
 	
 	@Override
@@ -203,6 +209,10 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 	public void onResize(int width, int height) {
 		
 	}	
+	
+	private float transY (float y){
+		return this.quadRenderModel.getHeight()-(y+1);
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////// Getter & Setter /////////////////////////////////////////////////////

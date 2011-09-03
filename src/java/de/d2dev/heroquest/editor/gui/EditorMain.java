@@ -208,6 +208,7 @@ public class EditorMain extends javax.swing.JFrame {
     		this.jmeRenderWindow.add(panel);
     		this.jmeRenderWindow.pack();
     		this.jmeRenderWindow.setVisible(true);
+    		this.jmeRenderWindow.setSize(640, 480);
     	}
     }//GEN-LAST:event_jMonkeyRenderWindowMenuItemActionPerformed
 
