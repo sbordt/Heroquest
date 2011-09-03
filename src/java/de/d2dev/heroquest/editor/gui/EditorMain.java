@@ -16,8 +16,6 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-import com.jme3.app.SimpleApplication;
-
 import de.d2dev.fourseasons.swing.SwingUtil;
 import de.d2dev.heroquest.client.ClientApplication;
 import de.d2dev.heroquest.editor.Editor;
@@ -181,7 +179,7 @@ public class EditorMain extends javax.swing.JFrame {
 
     private void java2DRenderWindowMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_java2DRenderWindowMenuItemActionPerformed
     	if ( this.java2DRenderWindow == null ) {
-    		this.java2DRenderWindow = new Java2DRenderWindow( this.editor.renderer.getRederTarget(), this.editor.resourceProvider );
+    		this.java2DRenderWindow = new Java2DRenderWindow( this.editor.renderer.getRederTarget(), this.editor.resources.resourceFinder );
     		
     		// take window bounds from properties file
     		this.java2DRenderWindow.setBounds( Integer.valueOf( this.editor.properties.getProperty( Editor.JAVA_2D_WINDOW_X, "0" ) ),
@@ -199,7 +197,7 @@ public class EditorMain extends javax.swing.JFrame {
     		this.jmeRenderWindow = new JFrame ("JME-Renderer");
     		this.jmeRenderWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     		
-    		this.jmeRenderer = new JmeRenderer (this.editor.renderer.getRederTarget(), this.editor.resourceProvider);
+    		this.jmeRenderer = new JmeRenderer (this.editor.renderer.getRederTarget(), this.editor.resources.resourceFinder);
     		
     		JmeRenderer jmeRenderer = this.jmeRenderer;
     		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing<JmeRenderer> (this.jmeRenderWindow, jmeRenderer));
@@ -213,7 +211,7 @@ public class EditorMain extends javax.swing.JFrame {
     	
     	this.editor.map = new Map( dialog.width, dialog.height );
     	
-    	this.editor.renderer = new Renderer( this.editor.map, this.editor.renderTarget, this.editor.resourceProvider );
+    	this.editor.renderer = new Renderer( this.editor.map, this.editor.renderTarget, this.editor.resources.resourceFinder );
     	this.editor.renderer.render();
     	
     	// update render windows
@@ -270,7 +268,7 @@ public class EditorMain extends javax.swing.JFrame {
 	    	
 	    	HqMapFile.createHqMapFile( tmpFile.getAbsolutePath(), this.editor.map ) ;
 	    	
-	    	ClientApplication app = new ClientApplication( new HqMapFile( tmpFile.getAbsolutePath() ), this.editor.resourceProvider );
+	    	ClientApplication app = new ClientApplication( new HqMapFile( tmpFile.getAbsolutePath() ), this.editor.resources.resourceFinder );
 	    	app.init();
 	    	app.run();
     	} catch (Exception e) {

@@ -244,7 +244,7 @@ public final class Field {
 			
 			this.isWall = true;
 		} else {	// attempt to remove a wall
-			Gamestate.checkState( this.door != null, "Attempt to make a door-field a non-wall field." );
+			Gamestate.checkState( this.door == null, "Attempt to make a door-field a non-wall field." );
 				
 			this.isWall = false;
 		}

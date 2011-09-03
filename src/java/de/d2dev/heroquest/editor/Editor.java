@@ -7,15 +7,12 @@ import java.util.Properties;
 
 import javax.swing.UIManager;
 
-import de.d2dev.fourseasons.Application;
-import de.d2dev.fourseasons.resource.TFileResourceFinder;
 import de.d2dev.fourseasons.script.ScriptEngine;
 
 import de.d2dev.heroquest.editor.gui.*;
 import de.d2dev.heroquest.editor.script.EditorLuaScriptDecomposer;
 import de.d2dev.heroquest.editor.script.LuaMapCreatorFunction;
 import de.d2dev.heroquest.engine.files.Files;
-import de.d2dev.heroquest.engine.files.HqRessourceFile;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
@@ -31,17 +28,9 @@ public class Editor {
 	public static String JAVA_2D_WINDOW_WIDTH = "java2DWndWidth";
 	public static String JAVA_2D_WINDOW_HEIGHT = "java2DWndHeight";
 	
-	public String publicDataStoragePath;
-	
-	public Dropbox dropbox;
-	
 	public Properties properties = new Properties();
 	
-	public TFile textureFolder;
-	public TFile scriptFolder;
-	public HqRessourceFile globalRessources;
-	
-	public TFileResourceFinder resourceProvider = new TFileResourceFinder();
+	public EditorResources resources;
 	
 	public ScriptEngine scriptEngine;
 	
@@ -59,43 +48,22 @@ public class Editor {
     	// register custom container file formats
     	Files.registerFileFormats();		
     	
-    	// get our public data storage location
-    	this.publicDataStoragePath = Application.getPublicStoragePath("HeroQuest Editor");
+    	// Aquire resources
+    	this.resources = new EditorResources();
     	
     	// properties file contains gui related and other editor settings
-    	File properties_file = new File ( this.publicDataStoragePath + "/" + "settings.xml" );
+    	File properties_file = new File ( this.resources.publicDataStoragePath + "/" + "settings.xml" );
     	
     	if ( properties_file.exists() ) {
     		this.properties.loadFromXML( new FileInputStream( properties_file ) );
     	}
     	
-    	// global resources are in globalResources.zip
-    	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalResources.zip" );
-    	
-    	this.resourceProvider.textureLocations.add( this.globalRessources.textures );
-    	
-    	// textures folder 'textures'
-    	this.textureFolder = new TFile( this.publicDataStoragePath + "/textures" );
-    	
-    	if ( this.textureFolder.exists() ) {
-    		this.resourceProvider.textureLocations.add( this.textureFolder );
-    	}
-    	
-    	// script folder 'script'
-    	this.scriptFolder = new TFile( this.publicDataStoragePath + "/script" );
-    	
-    	this.resourceProvider.luaScriptLocations.add( this.scriptFolder );
-    	
-    	// Dropbox setup
-    	this.dropbox = new Dropbox();
-    	this.dropbox.addAsResourceLocation( this.resourceProvider );
-    	
     	// script engine setup
-    	scriptEngine = ScriptEngine.createDefaultScriptEngine( this.resourceProvider, new EditorLuaScriptDecomposer() );
+    	scriptEngine = ScriptEngine.createDefaultScriptEngine( this.resources.resourceFinder, new EditorLuaScriptDecomposer() );
     	
     	// load the 'classical' map
     	try {    		
-    		LuaMapCreatorFunction function = (LuaMapCreatorFunction) scriptEngine.load( new TFile( this.dropbox.dropboxFolderPath + "/script/map templates/classical.lua" ) ).getFunctions().get(0);
+    		LuaMapCreatorFunction function = (LuaMapCreatorFunction) scriptEngine.load( new TFile( this.resources.dropbox.dropboxFolderPath + "/script/map templates/level0.lua" ) ).getFunctions().get(0);
     		
     		this.map = function.createMap();
     	} catch(Exception e) {
@@ -113,7 +81,7 @@ public class Editor {
     	// init renderer
     	this.renderTarget = new QuadRenderModel( this.map.getWidth(), this.map.getHeight() );
     	
-		this.renderer = new Renderer( this.map, this.renderTarget, this.resourceProvider );
+		this.renderer = new Renderer( this.map, this.renderTarget, this.resources.resourceFinder );
 		this.renderer.render();
 	}
 	
@@ -136,7 +104,7 @@ public class Editor {
 			this.properties.setProperty( JAVA_2D_WINDOW_HEIGHT, Integer.toString( this.mainWindow.java2DRenderWindow.getHeight() ) );
 		}
 
-		this.properties.storeToXML( new FileOutputStream( this.publicDataStoragePath + "/" + "settings.xml" ), "" );
+		this.properties.storeToXML( new FileOutputStream( this.resources.publicDataStoragePath + "/" + "settings.xml" ), "" );
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -152,7 +120,6 @@ public class Editor {
     	
     	// start the editor
     	Editor editor = new Editor();
-    	editor.publicDataStoragePath = Application.getPublicStoragePath("HeroQuest Editor");
     	editor.initialize();
     	editor.start();
 	}

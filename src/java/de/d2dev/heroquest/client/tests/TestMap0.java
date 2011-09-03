@@ -11,14 +11,8 @@ public class TestMap0 extends TestMap {
 
 	public static void main(String[] args) throws Exception {
 		TestMap0 test = new TestMap0();
-                
-                System.out.println( new TFile( test.dropbox.dropboxFolderPath + "/script/map templates/level0.lua" ));
 		
-                for( TFile f : test.resourceFinder.luaScriptLocations ) {
-                    System.out.println( f.getAbsolutePath() );
-                }
-                
-		ClientApplication app = new ClientApplication( new TFile( test.dropbox.dropboxFolderPath + "/script/map templates/level0.lua" ), test.resourceFinder );
+		ClientApplication app = new ClientApplication( new TFile( test.resources.dropbox.dropboxFolderPath + "/script/map templates/level0.lua" ), test.resources.resourceFinder );
 		app.init();
 		
 		app.addTestMonsters(3);
