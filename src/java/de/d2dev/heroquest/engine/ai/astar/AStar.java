@@ -1,12 +1,9 @@
 package de.d2dev.heroquest.engine.ai.astar;
 
-
 import java.util.HashMap;
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.PriorityQueue;
-
-
 
 /**
  *
@@ -16,14 +13,17 @@ public class AStar<T extends Knot> {
 
     private PriorityQueue<Path<T>> agenda;
     private Map<T, Integer> closedList;
+    private Path<T> next;
 
     /**
      * Constructs the Data with a start T
      * @param start T where the Algorithm starts searching
      */
-    public AStar() {
+    public AStar(T start) {
         this.closedList = new HashMap<T, Integer>();
         this.agenda = new PriorityQueue<Path<T>>();
+        this.next = new Path<T>(start);
+        agenda.add(next);
     }
 
     /**
@@ -48,7 +48,7 @@ public class AStar<T extends Knot> {
         }
         T top = a.getTop();
         closedList.put(top, a.getCosts());
-        for (T successor : (ArrayDeque<T>)top.getSuccessors()) {
+        for (T successor : (ArrayDeque<T>) top.getSuccessors()) {
             if (closedList.get(successor) == null || closedList.get(successor) > a.getCosts()) {
                 Path<T> tmp = new Path<T>(a);
                 tmp.addKnot(successor);
@@ -58,38 +58,56 @@ public class AStar<T extends Knot> {
 
         }
     }
-    
-    /**
-     * Core Algorithm
-     * @param start Start Point
-     * @param solutionCount Number of solutions you want to get
-     * @return Stack with optimal solutions
-     */
-    public ArrayDeque<Path<T>> search(T start, int solutionCount) {
-        
-        
-        ArrayDeque<Path<T>> result = new ArrayDeque<Path<T>>();
-        Path<T> next = new Path<T>(start);
-        agenda.add(next);
-        
-        while (!agenda.isEmpty()) {
-            T top = next.getTop();
-//            System.out.println("Agenda: " + agenda.size());
-            if (isGoal(top)) {
-                result.add(next);
-                next = agenda.remove();
-                solutionCount--;
-                if (solutionCount == 0) {
-                    break;
-                }
-            } else {
-                next = agenda.remove();
 
-            }
+    public Path<T> getNextPath() {
+
+        T top = next.getTop();
+        while (!isGoal(top) && !agenda.isEmpty()) {            
             expand(next);
+            top = next.getTop();
+            next = agenda.remove();
         }
-        
-      
-        return result;
+        if(agenda.isEmpty()){
+            return null;
+        }
+        return next;
     }
+    
+   
+    
+    
 }
+/**
+ * Core Algorithm
+ * @param start Start Point
+ * @param solutionCount Number of solutions you want to get
+ * @return Stack with optimal solutions
+ */
+//    public ArrayDeque<Path<T>> search(T start, int solutionCount) {
+//        
+//        
+//        ArrayDeque<Path<T>> result = new ArrayDeque<Path<T>>();
+//        Path<T> next = new Path<T>(start);
+//        agenda.add(next);
+//        
+//        while (!agenda.isEmpty()) {
+//            T top = next.getTop();
+////            System.out.println("Agenda: " + agenda.size());
+//            if (isGoal(top)) {
+//                result.add(next);
+//                next = agenda.remove();
+//                solutionCount--;
+//                if (solutionCount == 0) {
+//                    break;
+//                }
+//            } else {
+//                next = agenda.remove();
+//
+//            }
+//            expand(next);
+//        }
+//        
+//      
+//        return result;
+//    }
+

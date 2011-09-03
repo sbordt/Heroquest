@@ -4,9 +4,9 @@
  */
 package de.d2dev.heroquest.engine.ai;
 
+import de.d2dev.heroquest.engine.game.Field;
 import de.d2dev.heroquest.engine.game.Unit;
 import java.util.ArrayDeque;
-
 
 /**
  *
@@ -14,10 +14,11 @@ import java.util.ArrayDeque;
  */
 public class Target implements Comparable<Target> {
 
-    private ArrayDeque<SearchKnot> pathToMonster;
+    private ArrayDeque<Field> pathToMonster;
     private Unit unit;
+    private int estimateCost;
 
-    public Target(ArrayDeque<SearchKnot> pathToMonster, Unit unit) {
+    public Target(Unit unit, ArrayDeque<Field> pathToMonster, int estimateCost) {
         if (pathToMonster == null) {
             throw new RuntimeException("TargetConstructor: pathToMonster == Null");
         }
@@ -26,18 +27,25 @@ public class Target implements Comparable<Target> {
         }
         this.pathToMonster = pathToMonster;
         this.unit = unit;
+        this.estimateCost = pathToMonster.size() + estimateCost;
     }
 
+    public int getEstimateCost() {
+        return estimateCost;
+    }
+
+    
+    
     public Unit getUnit() {
         return unit;
     }
 
-    public ArrayDeque<SearchKnot> getPathToMonster() {
+    public ArrayDeque<Field> getPathToMonster() {
         return pathToMonster;
     }
 
     @Override
     public int compareTo(Target o) {
-        return pathToMonster.size() - o.getPathToMonster().size();
+        return estimateCost - o.getEstimateCost();
     }
 }
