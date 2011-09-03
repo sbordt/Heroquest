@@ -5,6 +5,10 @@ public interface MapListener {
 	public void onUnitEntersField(Field field);
 	public void onUnitLeavesField(Field field);
 	
+	public void onDoorOpened(Door door);
+	
+	//public void onRoomRevealed(Room room);
+	
 	public void onFieldTextureChanges(Field field);
 
 }

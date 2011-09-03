@@ -1,16 +1,13 @@
 package de.d2dev.heroquest.client.tests;
 
-import de.d2dev.fourseasons.resource.TFileResourceFinder;
-import de.d2dev.heroquest.editor.Dropbox;
+import de.d2dev.heroquest.editor.EditorResources;
 
 public class TestMap {	
 	
-	public Dropbox dropbox;
-	public TFileResourceFinder resourceFinder = new TFileResourceFinder();
+	EditorResources resources;
 	
 	public TestMap() throws Exception {
-		// dropbox setup
-		this.dropbox = new Dropbox();
-		this.dropbox.addAsResourceLocation( resourceFinder );
+		// use the editors resources
+		this.resources = new EditorResources();
 	}
 }
