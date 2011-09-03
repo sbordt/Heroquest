@@ -68,33 +68,44 @@ public class MapCommunicator implements Communicator {
             return null;
         }
         ArrayDeque<Field> path = transformPathInField(result);
-        int i = 0;
-        for (Field field : path) {
-            if (field.hasUnit()) {
-                System.out.println(i + " " + field.getUnit().getName());
-            } else {
-                System.out.println(i + " " + field.isBlocked());
-            }
-            i++;
-        }
+//        int i = 0;
+//        for (Field field : path) {
+//            if (field.hasUnit()) {
+//                System.out.println(i + " " + field.getUnit().getName());
+//            } else {
+//                System.out.println(i + " " + field.isBlocked());
+//            }
+//            i++;
+//        }
         return path;
 
     }
 
     public ArrayDeque<Field> getBlockedPath(Field start, Field goal) {
-        findBlocked = true;
-        ArrayDeque<Field> path = getPath(start, goal);
-        findBlocked = false;
-        int i = 0;
-        for (Field field : path) {
-            if (field.hasUnit()) {
-                System.out.println(i + " " + field.getUnit().getName());
-            } else {
-                System.out.println(i + " " + field.isBlocked());
-            }
-            i++;
+        this.findBlocked = true;
+        //Setting up the goal for heuristic
+        this.goalX = goal.getX();
+        this.goalY = goal.getY();
+        //Resetting Astar with new Startposition
+        newStart(start);
+        //Find first way
+        Path<SearchKnot> result = astar.getNextPath();
+        if (result == null) {
+            return null;
         }
+        ArrayDeque<Field> path = transformPathInField(result);
+//        int i = 0;
+//        for (Field field : path) {
+//            if (field.hasUnit()) {
+//                System.out.println(i + " " + field.getUnit().getName());
+//            } else {
+//                System.out.println(i + " " + field.isBlocked());
+//            }
+//            i++;
+//        }
+        this.findBlocked = false;
         return path;
+
     }
 
 //***********InterFace Communicator*******************
@@ -110,7 +121,7 @@ public class MapCommunicator implements Communicator {
         for (Field f : ((SearchKnot) actual).getField().getNeighbours()) {
             if (!f.isBlocked()) {
                 speicher.add(getKnot(f));
-            } else if ((f.getX() == goalX && f.getY() == goalY) || (f.hasUnit() && findBlocked) ) {
+            } else if ((f.getX() == goalX && f.getY() == goalY) || (f.hasUnit() && findBlocked)) {
                 speicher.add(getKnot(f));
             }
 

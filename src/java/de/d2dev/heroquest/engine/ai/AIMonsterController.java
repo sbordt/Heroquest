@@ -4,6 +4,7 @@
  */
 package de.d2dev.heroquest.engine.ai;
 
+import de.d2dev.fourseasons.resource.types.TextureResource;
 import de.d2dev.heroquest.engine.game.Direction2D;
 import de.d2dev.heroquest.engine.game.Field;
 import de.d2dev.heroquest.engine.game.Map;
@@ -62,6 +63,7 @@ public class AIMonsterController implements AIController {
         List<Unit> heroes = map.getHeroes();
         while (!heroes.isEmpty()) {
             Unit nextUnit = heroes.get(0);
+
             ArrayDeque<Field> path = communicator.getPath(this.unit.getField(), nextUnit.getField());
             if (path != null) {
                 Target nextTarget = new Target(nextUnit, path, 0);
@@ -82,20 +84,23 @@ public class AIMonsterController implements AIController {
     }
 
     private Target deblockUnit(Unit blockedUnit, int costs) {
+        System.out.println("Starting deblock: " + blockedUnit.getName());
+        System.out.println("Start: " + this.unit.getName());
+        System.out.println("Goal: " + blockedUnit.getName());
         ArrayDeque<Field> blockedPath = communicator.getBlockedPath(this.unit.getField(), blockedUnit.getField());
-//        int i = 0;
-//        for (Field field : blockedPath) {
+        int i = 0;
+        for (Field field : blockedPath) {
 //            if (field.hasUnit()) {
-//                System.out.println(i+" " + field.getUnit().getName());
-//            }else{
+//                System.out.println(i + " " + field.getUnit().getName());
+//            } else {
 //                System.out.println(i + " " + field.isBlocked());
 //            }
-//            i++;
-//        }
-        System.out.println("Starting deblock: " + blockedUnit.getName());
+            field.setTexture(TextureResource.createTextureResource("error.jpg"));
+            i++;
+        }
+
         while (!blockedPath.isEmpty()) {
             Field last = blockedPath.removeLast();
-            System.out.println("Removed field" + costs);
             if (last.hasUnit()) {
                 Unit nextUnit = last.getUnit();
                 System.out.println("Unit found on path " + nextUnit.getName());
