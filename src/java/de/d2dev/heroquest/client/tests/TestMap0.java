@@ -12,7 +12,7 @@ public class TestMap0 extends TestMap {
 	public static void main(String[] args) throws Exception {
 		TestMap0 test = new TestMap0();
 		
-		ClientApplication app = new ClientApplication( new TFile( test.dropbox.dropboxFolderPath + "/script/map templates/level0.lua" ), test.resourceFinder );
+		ClientApplication app = new ClientApplication( new TFile( test.resources.dropbox.dropboxFolderPath + "/script/map templates/level0.lua" ), test.resources.resourceFinder );
 		app.init();
 		
 		app.addTestMonsters(8);
