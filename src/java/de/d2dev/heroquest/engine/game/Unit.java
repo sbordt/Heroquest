@@ -231,6 +231,23 @@ public abstract class Unit {
 		this.viewDir = dir;
 	}
 	
+	/**
+	 * Get the next field in the units viewing direction.
+	 * @return {@code null} in case it does not exist - the unit views out of the map.
+	 */
+	public Field getViewField() {
+		switch (this.viewDir) {
+		case DOWN:
+			return this.field.getLowerField();
+		case LEFT:
+			return this.field.getLeftField();
+		case RIGHT:
+			return this.field.getRightField();
+		default:	// UP
+			return this.field.getUpperField();
+		}
+	}
+	
 	/**************************************************************************************
 	 * 
 	 * 							      RUNNING GAMES STATE

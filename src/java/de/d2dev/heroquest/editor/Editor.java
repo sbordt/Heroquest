@@ -37,6 +37,7 @@ public class Editor {
 	
 	public Properties properties = new Properties();
 	
+	public TFile textureFolder;
 	public TFile scriptFolder;
 	public HqRessourceFile globalRessources;
 	
@@ -68,10 +69,17 @@ public class Editor {
     		this.properties.loadFromXML( new FileInputStream( properties_file ) );
     	}
     	
-    	// global resources are in globalRessources.zip
+    	// global resources are in globalResources.zip
     	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalResources.zip" );
     	
     	this.resourceProvider.textureLocations.add( this.globalRessources.textures );
+    	
+    	// textures folder 'textures'
+    	this.textureFolder = new TFile( this.publicDataStoragePath + "/textures" );
+    	
+    	if ( this.textureFolder.exists() ) {
+    		this.resourceProvider.textureLocations.add( this.textureFolder );
+    	}
     	
     	// script folder 'script'
     	this.scriptFolder = new TFile( this.publicDataStoragePath + "/script" );

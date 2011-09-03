@@ -87,30 +87,26 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 	@Override
 	public void onResize(int width, int height) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onAddQuad(RenderQuad quad) {
-		System.out.println("Add");
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onRemoveQuad(RenderQuad quad) {
-		System.out.println("remove");
-		
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onQuadMoved(RenderQuad quad) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onQuadTextureChanged(RenderQuad quad) {
 		// TODO Auto-generated method stub
-		
 	}
 	
 	private void renderQuad(Graphics2D g, RenderQuad quad) {
