@@ -10,6 +10,7 @@ public class TestMap {
 	
 	public String publicDataStoragePath;
 
+	public TFile textureFolder;
 	public TFile scriptFolder;
 	public HqRessourceFile globalRessources;
 	
@@ -25,6 +26,13 @@ public class TestMap {
     	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalResources.zip" );
     	
     	this.resourceFinder.textureLocations.add( this.globalRessources.textures );
+    	
+    	// textures folder 'textures'
+    	this.textureFolder = new TFile( this.publicDataStoragePath + "/textures" );
+    	
+    	if ( this.textureFolder.exists() ) {
+    		this.resourceFinder.textureLocations.add( this.textureFolder );
+    	}
     	
     	// script folder 'script'
     	this.scriptFolder = new TFile( this.publicDataStoragePath + "/script" );

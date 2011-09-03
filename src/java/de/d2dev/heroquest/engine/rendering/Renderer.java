@@ -5,10 +5,12 @@ import java.util.HashMap;
 import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.resource.types.TextureResource;
+import de.d2dev.heroquest.engine.game.Door;
 import de.d2dev.heroquest.engine.game.Field;
 import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.MapListener;
+import de.d2dev.heroquest.engine.game.Monster;
 import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.rendering.quads.RenderQuad;
@@ -26,6 +28,7 @@ public class Renderer implements MapListener {
 	private static int WALLS = 1;
 	private static int DOORS = 2;
 	private static int UNITS = 100;
+	private static int DOOR_ARCS = 200;
 	
 	
 	private Map map;
@@ -40,6 +43,9 @@ public class Renderer implements MapListener {
 	private HashMap<Field, RenderQuad> fieldTextures = new HashMap<Field, RenderQuad>();
 	
 	private HashMap<Field, RenderQuad> walls = new HashMap<Field, RenderQuad>();
+	
+	private HashMap<Door, RenderQuad> doors = new HashMap<Door, RenderQuad>();
+	private HashMap<Door, RenderQuad> door_arcs = new HashMap<Door, RenderQuad>();
 	
 	private HashMap<Unit, RenderQuad> units = new HashMap<Unit, RenderQuad>();
 	
@@ -88,21 +94,7 @@ public class Renderer implements MapListener {
 		return map;
 	}
 
-	@Override
-	public void onUnitEntersField(Field field) {
-		this.renderUnits();
-	}
 
-	@Override
-	public void onUnitLeavesField(Field field) {
-		this.renderUnits();
-	}
-	
-
-	@Override
-	public void onFieldTextureChanges(Field field) {
-		this.renderField( field );
-	}
 	
 	private void renderUnits() {
 		// remove all currently rendered units
@@ -111,7 +103,7 @@ public class Renderer implements MapListener {
 		}
 		
 		this.units.clear();
-		
+				
 		// render units
 		for (Field[] row : map.getFields()) {	// dummy to get all units
 			for (Field field : row) {
@@ -147,18 +139,74 @@ public class Renderer implements MapListener {
 		}
 		
 		// doors
-		if ( field.isDoor() ) {
-			Resource vertTexture = TextureResource.createTextureResource("doors/closed/vertical.png");
-			Resource horTexture = TextureResource.createTextureResource("doors/closed/horizontal.png");
-			
+		Door door = field.getDoor();
+		
+		if ( door != null ) {
+			this.renderDoor( door );
+		}
+	}
+	
+	/**
+	 * Render a door.
+	 * @param door
+	 */
+	public void renderDoor(Door door) {
+		// remove previous door render quad
+		RenderQuad quad;
+		RenderQuad arc_quad;
+		
+		if ( (quad = this.doors.get( door ) ) != null ) {
+			this.renderTarget.removeQuad( quad );
+			this.doors.remove( door );
+		}
+		
+		// remove previous door arc quad		
+		if ( (arc_quad = this.door_arcs.get( door ) ) != null ) {
+			this.renderTarget.removeQuad( arc_quad );
+			this.door_arcs.remove( door );
+		}
+		
+		// render the door!
+		Field field = door.getField();
+		arc_quad = null;
+		
+		Resource vertOpenTex = TextureResource.createTextureResource("doors/open/vertical.png");
+		Resource vertOpenArcTex = TextureResource.createTextureResource("doors/open/vertical_arc.png");
+		Resource horOpenTex = TextureResource.createTextureResource("doors/open/horizontal.png");
+		Resource horOpenArcTex = TextureResource.createTextureResource("doors/open/horizontal_arc.png");
+		
+		Resource vertClosedTex = TextureResource.createTextureResource("doors/closed/vertical.png");
+		Resource horClosedTex = TextureResource.createTextureResource("doors/closed/horizontal.png");
+		
+		// open?
+		if ( door.isOpen() ) {
 			// vertical?
 			if ( field.getUpperField().isWall() ) {
-				quad = new RenderQuad( field.getX(), field.getY() - 0.5f, 1.0f, 2f, DOORS, vertTexture ); 
-			} else {
-				quad = new RenderQuad( field.getX() -0.5f, field.getY(), 2, 1, DOORS, horTexture ); 
-			}
+				quad = new RenderQuad( field.getX(), field.getY() - 0.5f, 1.0f, 2f, DOORS, vertOpenTex ); 
 				
-			this.renderTarget.addQuad( quad );
+				arc_quad = new RenderQuad( field.getX(), field.getY(), 1, 1, DOOR_ARCS, vertOpenArcTex ); 
+			} else {
+				quad = new RenderQuad( field.getX() -0.5f, field.getY(), 2, 1, DOORS, horOpenTex ); 
+				
+				arc_quad = new RenderQuad( field.getX(), field.getY(), 1, 1, DOOR_ARCS, horOpenArcTex ); 
+			}	
+		} 
+		// closed
+		else {
+			// vertical?
+			if ( field.getUpperField().isWall() ) {
+				quad = new RenderQuad( field.getX(), field.getY() - 0.5f, 1.0f, 2f, DOORS, vertClosedTex ); 
+			} else {
+				quad = new RenderQuad( field.getX() -0.5f, field.getY(), 2, 1, DOORS, horClosedTex ); 
+			}				
+		}
+			
+		this.renderTarget.addQuad( quad );
+		this.doors.put( door, quad );
+		
+		if ( arc_quad != null ) {
+			this.renderTarget.addQuad( arc_quad );
+			this.door_arcs.put( door, arc_quad );			
 		}
 	}
 	
@@ -184,7 +232,32 @@ public class Renderer implements MapListener {
 			}
 		}
 		else if ( unit.isMonster() ) {
-			pictureName = "units/monsters/orc/orc.jpg";
+			switch( ((Monster) unit).getMonsterType() ) {
+			case CHAOS_WARRIOR:
+				pictureName = "units/monsters/chaos warrior.jpg";
+				break;
+			case FIMIR:
+				pictureName = "units/monsters/fimir.jpg";
+				break;
+			case GARGOYLE:
+				pictureName = "units/monsters/gargoyle.jpg";
+				break;
+			case GOBLIN:
+				pictureName = "units/monsters/goblin.jpg";
+				break;
+			case MUMMY:
+				pictureName = "units/monsters/mummy.jpg";
+				break;
+			case ORC:
+				pictureName = "units/monsters/orc.jpg";
+				break;
+			case SKELETON:
+				pictureName = "units/monsters/skeleton.jpg";
+				break;
+			case ZOMBIE:
+				pictureName = "units/monsters/zombie.jpg";
+				break;
+			}
 		}
 		
 		// view direction specific picture!
@@ -206,5 +279,28 @@ public class Renderer implements MapListener {
 		}
 		
 		return new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, UNITS,  TextureResource.createTextureResource(pictureName), turn );
+	}
+	
+	/*
+	 * React on map events to update the render model!
+	 */
+	@Override
+	public void onUnitEntersField(Field field) {
+		this.renderUnits();
+	}
+
+	@Override
+	public void onUnitLeavesField(Field field) {
+		this.renderUnits();
+	}
+	
+	@Override
+	public void onDoorOpened(Door door) {
+		this.renderDoor(door);
+	}
+	
+	@Override
+	public void onFieldTextureChanges(Field field) {
+		this.renderField( field );
 	}
 }

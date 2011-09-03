@@ -206,6 +206,12 @@ public final class Map implements Observed<MapListener> {
 		}
 	}
 	
+	void fireOnDoorOpened(Door door) {
+		for (MapListener l : this.listeners) {
+			l.onDoorOpened(door);
+		}
+	}
+	
 	void fireOnFieldTextureChanges(Field field) {
 		for (MapListener l : this.listeners) {
 			l.onFieldTextureChanges(field);

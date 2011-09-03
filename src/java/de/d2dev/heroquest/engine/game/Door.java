@@ -36,7 +36,16 @@ public class Door {
 		return !this.isOpen;
 	}
 	
+	/**
+	 * Opens the door. Doors can be opened exactly one and then they stay open.
+	 */
 	public void open() {
-		// TODO method
+		// a door is to be opened only once!
+		if ( !this.isOpen ) {
+			// open the door and fire the event
+			this.isOpen = true;
+			
+			this.field.getMap().fireOnDoorOpened( this );
+		}
 	}
 }

@@ -16,6 +16,7 @@ import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Hero.HeroType;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.Monster;
+import de.d2dev.heroquest.engine.game.Monster.MonsterType;
 import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.game.UnitFactory;
 import de.d2dev.heroquest.engine.game.action.GameAction;
@@ -91,16 +92,18 @@ public class ClientApplication implements KeyListener {
     }
     
     public void addTestMonsters(int numMonsters) {
+    	MonsterType[] monsterTypes = { MonsterType.GOBLIN, MonsterType.ORC, MonsterType.FIMIR, MonsterType.SKELETON,
+    			MonsterType.ZOMBIE, MonsterType.MUMMY, MonsterType.CHAOS_WARRIOR, MonsterType.GARGOYLE };
+    	
     	if ( numMonsters <= 0 )
     		return;
     	
-    	if ( numMonsters > 10 )
-    		numMonsters = 10;
+    	if ( numMonsters > 8 )
+    		numMonsters = 8;
     	
     	for (int i=0; i<numMonsters; i++) {
     		try {
-				Monster monster = this.unitFactory.createOrc( this.map.getField( 34, 10 + i ) );
-				monster.setAiController( this.aiSystem.creatAIController(monster) );
+    			this.unitFactory.createMonster( this.map.getField( 34, 10 + i), monsterTypes[i], this.aiSystem );
 			} catch (GameStateException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -336,6 +339,38 @@ public class ClientApplication implements KeyListener {
 					this.activeHero.moveRight();
 				}
 				this.activeHero.setViewDir(Direction2D.RIGHT);
+			}
+			
+			/*
+			 * Turn selected hero
+			 */
+			else if (e.getKeyCode() == KeyEvent.VK_UP) { // action
+				this.activeHero.setViewDir(Direction2D.UP);
+			}
+			else if (e.getKeyCode() == KeyEvent.VK_LEFT) { // action
+				this.activeHero.setViewDir(Direction2D.LEFT);
+			}
+			else if (e.getKeyCode() == KeyEvent.VK_DOWN) { // action
+				this.activeHero.setViewDir(Direction2D.DOWN);
+			}
+			else if (e.getKeyCode() == KeyEvent.VK_RIGHT) { // action
+				this.activeHero.setViewDir(Direction2D.RIGHT);
+			}
+			
+			/**
+			 * Action!
+			 */
+			else if (e.getKeyCode() == KeyEvent.VK_ENTER) { // action
+				Field actionField = this.activeHero.getViewField();
+				
+				if ( actionField == null )
+					return;
+
+				// open doors
+				if ( actionField.isDoor() && actionField.getDoor().isClosed() ) {
+					actionField.getDoor().open();
+					return;
+				}
 			}
 					
 			/*
