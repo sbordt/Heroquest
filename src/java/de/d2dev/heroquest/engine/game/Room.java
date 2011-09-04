@@ -10,7 +10,8 @@ import de.d2dev.fourseasons.gamestate.Gamestate;
  * A room is essentially an abstraction for a number of fields that should be revealed when a
  * door is opened. So our rooms consist of a given number of fields and doors. <br>
  * There is no such thing as 'rooms must be rectangular' even 'rooms must be surrounded by walls', 
- * but each field can only belong to at most one room. Fields that don't belong to any room are passage fields.<br>
+ * but each field can only belong to at most one room. By convention, wall fields do not belong to rooms. 
+ * No-wall fields that don't belong to a room are passage fields.<br>
  * A door is said to belong to a room if and only if either its field belongs to the room or one of the two fields
  * from where a door can be opened (depending on horizontal/vertical doors).
  * @author Sebastian Bordt
@@ -18,12 +19,20 @@ import de.d2dev.fourseasons.gamestate.Gamestate;
  */
 public class Room {
 	
+	// TODO wall field room -> exception
+	
+	
 	private Map map;
 	
 	/**
 	 * The rooms fields. Visible to the package because {@link Field}s add/remove themselves.
 	 */
 	List<Field> fields = new ArrayList<Field>();
+	
+	/**
+	 * Whether the room has been revealed. Initially {@code false}.
+	 */
+	private boolean revealed = false;
 	
 	/**
 	 * Only visible to the package as rooms are created by {@link Map#addRoom()}.
@@ -70,6 +79,32 @@ public class Room {
 	 */
 	public List<Door> getDoors() {
 		return null;	// TODO
+	}
+	
+	/**************************************************************************************
+	 * 
+	 * 									   GAME METHODS
+	 * 
+	 **************************************************************************************/
+	
+	/**
+	 * Reveal the room, i.e. reveal all fields that belong to the room. 
+	 * Each room can be revealed exactly once.
+	 */
+	public void reveal() {
+		// nothing to do
+		if ( this.revealed )
+			return;
+		
+		// reveal each field that belongs to the room
+		for (Field field : this.fields) {
+			field.reveal();
+		}
+		
+		// the room has been revealed - fire room revealed event
+		this.revealed = true;
+		
+		this.map.fireOnRoomRevealed( this );	
 	}
 
 }

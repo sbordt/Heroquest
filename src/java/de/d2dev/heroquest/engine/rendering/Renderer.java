@@ -11,6 +11,7 @@ import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.MapListener;
 import de.d2dev.heroquest.engine.game.Monster;
+import de.d2dev.heroquest.engine.game.Room;
 import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.rendering.quads.RenderQuad;
@@ -359,6 +360,16 @@ public class Renderer implements MapListener {
 	}
 	
 	@Override
+	public void onFieldRevealed(Field field) {
+		this.renderField(field);
+	}
+	
+	@Override
+	public void onRoomRevealed(Room room) {
+		// nothing to do we react on the individual fields
+	}
+	
+	@Override
 	public void onDoorOpened(Door door) {
 		this.renderDoor(door);
 	}
@@ -367,4 +378,8 @@ public class Renderer implements MapListener {
 	public void onFieldTextureChanges(Field field) {
 		this.renderField( field );
 	}
+
+
+
+
 }

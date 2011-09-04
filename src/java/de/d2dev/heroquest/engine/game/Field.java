@@ -195,6 +195,7 @@ public final class Field {
 		// there is no right field if we are in the right column
 		if ( this.x == this.map.getWidth()-1 )
 			return null;		
+			
 		return this.map.getField( this.x +1, this.y );
 	}
 	
@@ -380,6 +381,26 @@ public final class Field {
 		this.texture = texture;
 		
 		this.map.fireOnFieldTextureChanges( this );	// fire event
+	}
+	
+	/**************************************************************************************
+	 * 
+	 * 									   GAME METHODS
+	 * 
+	 **************************************************************************************/
+	
+	/**
+	 * Reveal the field. Each field can be revealed exactly once.
+	 */
+	public void reveal() {
+		// nothing to do
+		if ( this.revealed )
+			return;
+		
+		// reveal the field an fire event
+		this.revealed = true;
+		
+		this.map.fireOnFieldRevealed( this );		
 	}
 	
 	/**************************************************************************************

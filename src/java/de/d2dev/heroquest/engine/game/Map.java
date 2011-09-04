@@ -238,9 +238,21 @@ public final class Map implements Observed<MapListener> {
 		}
 	}
 	
+	void fireOnFieldRevealed(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onFieldRevealed(field);
+		}
+	}
+	
 	void fireOnDoorOpened(Door door) {
 		for (MapListener l : this.listeners) {
 			l.onDoorOpened(door);
+		}
+	}
+	
+	void fireOnRoomRevealed(Room room) {
+		for (MapListener l : this.listeners) {
+			l.onRoomRevealed(room);
 		}
 	}
 	
