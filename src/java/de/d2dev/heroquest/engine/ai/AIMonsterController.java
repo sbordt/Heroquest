@@ -25,18 +25,17 @@ public class AIMonsterController implements AIController {
     private Unit unit;
     private Map map;
     private PriorityQueue<Target> targets;
-    private PriorityQueue<Field> freeFields;
-    private PriorityQueue<Target> unitFields;
-    private MapCommunicator communicator;
+    private FindPath findPath;
+    private FindBlockedPath findBlockedPath;
+    private double agression = 1;
 
     public AIMonsterController(Unit unit, Map map) {
 
         this.unit = unit;
         this.map = map;
         this.targets = new PriorityQueue<Target>();
-        this.freeFields = new PriorityQueue<Field>();
-        this.unitFields = new PriorityQueue<Target>();
-        this.communicator = new MapCommunicator(this.map);
+        this.findPath = new FindPath(this.map);
+        this.findBlockedPath = new FindBlockedPath(map);
     }
 
 //*************************Interface AIController*******************************
@@ -64,9 +63,13 @@ public class AIMonsterController implements AIController {
         while (!heroes.isEmpty()) {
             Unit nextUnit = heroes.get(0);
 
-            ArrayDeque<Field> path = communicator.getPath(this.unit.getField(), nextUnit.getField());
+            ArrayDeque<Field> path = findPath.getPath(this.unit.getField(), nextUnit.getField());
             if (path != null) {
                 Target nextTarget = new Target(nextUnit, path, 0);
+                if (findBlockedPath.getPath(this.unit.getField(), nextUnit.getField()).size() < (path.size() + 1 * agression)) {                    
+                    Target deblocked = deblockUnit(nextUnit, 1);
+                    targets.add(deblocked);
+                }                             
                 targets.add(nextTarget);
             } else {
                 System.out.println("findWay: trying to deblock: " + nextUnit.getName());
@@ -87,24 +90,24 @@ public class AIMonsterController implements AIController {
         System.out.println("Starting deblock: " + blockedUnit.getName());
         System.out.println("Start: " + this.unit.getName());
         System.out.println("Goal: " + blockedUnit.getName());
-        ArrayDeque<Field> blockedPath = communicator.getBlockedPath(this.unit.getField(), blockedUnit.getField());
-        int i = 0;
-        for (Field field : blockedPath) {
-//            if (field.hasUnit()) {
-//                System.out.println(i + " " + field.getUnit().getName());
-//            } else {
-//                System.out.println(i + " " + field.isBlocked());
-//            }
-            field.setTexture(TextureResource.createTextureResource("error.jpg"));
-            i++;
-        }
+        ArrayDeque<Field> blockedPath = findBlockedPath.getPath(this.unit.getField(), blockedUnit.getField());
+//        int i = 0;
+//        for (Field field : blockedPath) {
+////            if (field.hasUnit()) {
+////                System.out.println(i + " " + field.getUnit().getName());
+////            } else {
+////                System.out.println(i + " " + field.isBlocked());
+////            }
+//            field.setTexture(TextureResource.createTextureResource("error.jpg"));
+//            i++;
+//        }
 
         while (!blockedPath.isEmpty()) {
             Field last = blockedPath.removeLast();
             if (last.hasUnit()) {
                 Unit nextUnit = last.getUnit();
                 System.out.println("Unit found on path " + nextUnit.getName());
-                ArrayDeque<Field> unblockedPath = communicator.getPath(this.unit.getField(), last);
+                ArrayDeque<Field> unblockedPath = findPath.getPath(this.unit.getField(), last);
                 if (unblockedPath != null) {
                     System.out.println("Returns the unblocked path " + costs);
                     return new Target(nextUnit, unblockedPath, 0);
