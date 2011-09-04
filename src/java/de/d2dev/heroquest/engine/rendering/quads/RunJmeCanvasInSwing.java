@@ -16,6 +16,7 @@ public class RunJmeCanvasInSwing<A extends SimpleApplication & JmeResizeableApp>
 	private JFrame frame = null;
 	private JPanel panel = null;
 	private A jmeApp = null;
+	private JmeCanvasContext canvasContext;
 	private ComponentListener componentListener = new ComponentListener (){
 
 		@Override
@@ -34,14 +35,13 @@ public class RunJmeCanvasInSwing<A extends SimpleApplication & JmeResizeableApp>
 		@Override
 		public void componentResized(ComponentEvent arg0) {
 			jmeApp.onResize(panel.getWidth(), panel.getHeight());
-			AppSettings settings = new AppSettings(true);
-			settings.setWidth(panel.getWidth());
-			settings.setHeight(panel.getHeight());
-			jmeApp.setSettings(settings);
-			JmeCanvasContext canvasContext = (JmeCanvasContext) jmeApp.getContext();
+			canvasContext.getCanvas().setSize(panel.getWidth(), panel.getHeight());
 			Dimension dim = new Dimension(panel.getWidth(), panel.getHeight());
 			canvasContext.getCanvas().setPreferredSize(dim);
-			System.out.println("resized: width: " + panel.getWidth()+ " height: " + panel.getHeight());			
+			jmeApp.restart();
+			System.out.println("resized panel: width: " + panel.getWidth()+ " height: " + panel.getHeight());
+			System.out.println("resized panel: x: " + panel.getX()+ " y: " + panel.getY());
+			System.out.println("context: width: " + jmeApp.getContext().getSettings().getWidth()+ " height: " + jmeApp.getContext().getSettings().getHeight());
 		}
 
 		@Override
@@ -53,32 +53,36 @@ public class RunJmeCanvasInSwing<A extends SimpleApplication & JmeResizeableApp>
 	public RunJmeCanvasInSwing (final JFrame frame, final A jmeApp){
 		this.frame = frame;
 		this.jmeApp = jmeApp;
-		frame.addComponentListener(componentListener);
-		
-		
-		
+		this.panel = new JPanel();
+		frame.add(panel);
+		this.panel.addComponentListener(componentListener);
+	}
+	
+	public RunJmeCanvasInSwing (final JPanel panel, final A jmeApp){
+		this.panel = panel;
+		this.jmeApp = jmeApp;
+		this.panel.addComponentListener(componentListener);
 	}
 	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		jmeApp.setPauseOnLostFocus(false);
 		AppSettings settings = new AppSettings(true);
 		settings.setWidth(640);
 		settings.setHeight(480);
 		jmeApp.setSettings(settings);
 		jmeApp.createCanvas();
-		JmeCanvasContext canvasContext = (JmeCanvasContext) jmeApp.getContext();
+		canvasContext = (JmeCanvasContext) jmeApp.getContext();
 		Dimension dim = new Dimension(640, 480);
 		canvasContext.getCanvas().setPreferredSize(dim);
 		
-		if ((panel == null) && (frame != null)){
-			panel = new JPanel();
+		if (frame != null){
 			panel.add(canvasContext.getCanvas());
-			frame.add(panel);
 			frame.pack();
 			frame.setVisible(true);
 		}
-		else if (panel != null){
+		else{
 			panel.add(canvasContext.getCanvas());
 		}
 		

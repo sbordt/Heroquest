@@ -11,6 +11,7 @@ import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.MapListener;
 import de.d2dev.heroquest.engine.game.Monster;
+import de.d2dev.heroquest.engine.game.Room;
 import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.rendering.quads.RenderQuad;
@@ -18,19 +19,30 @@ import de.d2dev.heroquest.engine.rendering.quads.RenderQuad.TextureTurn;
 
 /**
  * This class renders a heroquest map. The render source is the given {@link Map}, the
- * target a {@link QuadRenderModel}.
+ * target a {@link QuadRenderModel}. Fancy class, very essential for the rendering :-)
  * @author Sebastian Bordt
  *
  */
 public class Renderer implements MapListener {
 	
+	/*
+	 * z-Layers for our RenderQuads
+	 */
 	private static int GROUND = 0;
 	private static int WALLS = 1;
 	private static int DOORS = 2;
 	private static int UNITS = 100;
 	private static int DOOR_ARCS = 200;
+	private static int FOG_OF_WAR = 1000;
 	
+	/*
+	 * Render options and their default values
+	 */
+	private boolean fogOfWar = true;
 	
+	/*
+	 * Render data
+	 */
 	private Map map;
 	
 	private QuadRenderModel renderTarget;
@@ -49,6 +61,8 @@ public class Renderer implements MapListener {
 	
 	private HashMap<Unit, RenderQuad> units = new HashMap<Unit, RenderQuad>();
 	
+	private HashMap<Field, RenderQuad> fogOfWarQuads = new HashMap<Field, RenderQuad>();
+	
 	private WallTextureCreator wallTextureCreator;
 	
 	public Renderer(Map map, QuadRenderModel renderTarget, ResourceLocator resourceFinder) {
@@ -59,6 +73,41 @@ public class Renderer implements MapListener {
 		this.wallTextureCreator = new WallTextureCreator( map, resourceFinder, TextureResource.createTextureResource( "fields/brown.jpg" ) );
 	}
 	
+		
+	/*
+	 * Render options getter/setter
+	 */
+
+	public boolean isFogOfWar() {
+		return fogOfWar;
+	}
+
+	public void setFogOfWar(boolean fogOfWar) {
+		this.fogOfWar = fogOfWar;
+		
+		// TODO update rendering
+	}	
+	
+	public QuadRenderModel getRederTarget() {
+		return renderTarget;
+	}
+
+	public void setRenderTarget(QuadRenderModel renderTarget) {
+		renderTarget.resize( map.getWidth(), map.getHeight() );	// put the render target to the proper size
+		renderTarget.clear();
+		
+		this.renderTarget = renderTarget;
+		this.firstTime = true;
+	}
+	
+	public Map getMap() {
+		return map;
+	}
+	
+	
+	/**
+	 * Render the map!
+	 */
 	public void render() {
 		// first time? then setup
 		if ( this.firstTime ) {
@@ -77,25 +126,11 @@ public class Renderer implements MapListener {
 		// units
 		this.renderUnits();
 	}
-
-	public QuadRenderModel getRederTarget() {
-		return renderTarget;
-	}
 	
-	public void setRenderTarget(QuadRenderModel renderTarget) {
-		renderTarget.resize( map.getWidth(), map.getHeight() );	// put the render target to the proper size
-		renderTarget.clear();
-		
-		this.renderTarget = renderTarget;
-		this.firstTime = true;
-	}
-	
-	public Map getMap() {
-		return map;
-	}
 
-
-	
+	/*
+	 * Private methods that perform the rendering!
+	 */	
 	private void renderUnits() {
 		// remove all currently rendered units
 		for ( RenderQuad quad : this.units.values() ) {
@@ -144,13 +179,43 @@ public class Renderer implements MapListener {
 		if ( door != null ) {
 			this.renderDoor( door );
 		}
+		
+		// fog of war
+		this.renderFogOfWar( field );
+	}
+	
+	/**
+	 * 
+	 * @param field
+	 */
+	private void renderFogOfWar(Field field) {
+		// remove previous quad
+		RenderQuad quad;
+		
+		if ( (quad = this.fogOfWarQuads.get( field ) ) != null ) {
+			this.renderTarget.removeQuad( quad );
+			this.fogOfWarQuads.remove( field );
+		}
+		
+		// render fog of war quad
+		if ( !this.fogOfWar )
+			return;
+		
+		Resource fogTexture = TextureResource.createTextureResource("fog of war/fog.png");
+		
+		if ( field.belongsToRoom() && !field.isRevealed() ) {			
+			quad = new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, FOG_OF_WAR,  fogTexture );
+			
+			this.fogOfWarQuads.put( field, quad );
+			this.renderTarget.addQuad( quad );
+		}
 	}
 	
 	/**
 	 * Render a door.
 	 * @param door
 	 */
-	public void renderDoor(Door door) {
+	private void renderDoor(Door door) {
 		// remove previous door render quad
 		RenderQuad quad;
 		RenderQuad arc_quad;
@@ -295,6 +360,16 @@ public class Renderer implements MapListener {
 	}
 	
 	@Override
+	public void onFieldRevealed(Field field) {
+		this.renderField(field);
+	}
+	
+	@Override
+	public void onRoomRevealed(Room room) {
+		// nothing to do we react on the individual fields
+	}
+	
+	@Override
 	public void onDoorOpened(Door door) {
 		this.renderDoor(door);
 	}
@@ -303,4 +378,8 @@ public class Renderer implements MapListener {
 	public void onFieldTextureChanges(Field field) {
 		this.renderField( field );
 	}
+
+
+
+
 }

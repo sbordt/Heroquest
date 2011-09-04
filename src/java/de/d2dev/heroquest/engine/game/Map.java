@@ -35,6 +35,7 @@ public final class Map implements Observed<MapListener> {
 //	private List<Unit> units = new Vector<Unit>();
 //	private List<Unit> heroes = new Vector<Unit>();
 //	private List<Unit> monsters = new Vector<Unit>();
+	private List<Room> rooms = new ArrayList<Room>();
 
 	/**
 	 * Construct a new empty map.
@@ -115,8 +116,31 @@ public final class Map implements Observed<MapListener> {
 		return fields;
 	}
 	
+	/**
+	 * Add a new room to the map.
+	 * @return The newly created room.
+	 */
+	public Room addRoom() {
+		Room room = new Room( this );
+		this.rooms.add( room );
+		
+		return room;
+	}
+	
+	/**
+	 * Get all rooms.
+	 * @return
+	 */
+	public List<Room> getRooms() {
+		return Collections.unmodifiableList( rooms );	
+	}
+	
+	/**
+	 * Get all units.
+	 * @return
+	 */
 	public List<Unit> getUnits() {
-        // TODO better
+        // TODO more efficient
     	Vector<Unit> units = new Vector<Unit>();
     	
     	for (Field[] fields : this.fields) {
@@ -130,8 +154,12 @@ public final class Map implements Observed<MapListener> {
     	return units;
 	}
         
+	/**
+	 * Get all heroes.
+	 * @return
+	 */
     public List<Unit> getHeroes() {
-        // TODO better
+        // TODO more efficient
     	Vector<Unit> heroes = new Vector<Unit>();
     	
     	for (Field[] fields : this.fields) {
@@ -163,6 +191,10 @@ public final class Map implements Observed<MapListener> {
     	return null;
     }
     
+    /**
+     * Get all monsters.
+     * @return
+     */
     public List<Monster> getMonsters() {
         // TODO better
     	Vector<Monster> monsters = new Vector<Monster>();
@@ -206,9 +238,21 @@ public final class Map implements Observed<MapListener> {
 		}
 	}
 	
+	void fireOnFieldRevealed(Field field) {
+		for (MapListener l : this.listeners) {
+			l.onFieldRevealed(field);
+		}
+	}
+	
 	void fireOnDoorOpened(Door door) {
 		for (MapListener l : this.listeners) {
 			l.onDoorOpened(door);
+		}
+	}
+	
+	void fireOnRoomRevealed(Room room) {
+		for (MapListener l : this.listeners) {
+			l.onRoomRevealed(room);
 		}
 	}
 	

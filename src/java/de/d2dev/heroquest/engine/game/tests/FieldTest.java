@@ -47,7 +47,7 @@ public class FieldTest {
 	}
 
 	@Test
-	public void testDoors() throws Exception {
+	public void testDoor() throws Exception {
 		assertNull( map.getField(1, 2).getDoor() );
 		
 		map.getField(1, 2).setDoor(true);
@@ -63,4 +63,10 @@ public class FieldTest {
 		assertFalse( door.isClosed() );		
 	}
 
+	@Test
+	public void testRoom() throws Exception {
+		for (int i=0; i<map.getWidth(); i++)
+			for (int j=0; j<map.getHeight(); j++)
+				assertNull( map.getField(i, j).getRoom() );
+	}	
 }
