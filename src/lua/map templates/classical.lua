@@ -42,6 +42,8 @@ function createMap ()
 	horizontal_texture( map, 24, 16, 4, "fields/yellow/yellow.jpg"  );
 	horizontal_texture( map, 25, 17, 3, "fields/yellow/yellow.jpg"  );
 	
+	auto_detect_room( map, 25, 15 ); 
+	
 	return map;
 end
 

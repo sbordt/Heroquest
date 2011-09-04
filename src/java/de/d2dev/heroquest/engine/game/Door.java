@@ -1,5 +1,7 @@
 package de.d2dev.heroquest.engine.game;
 
+import java.util.List;
+
 public class Door {
 	
 	private Field field;
@@ -34,6 +36,14 @@ public class Door {
 	
 	public boolean isClosed() {
 		return !this.isOpen;
+	}
+	
+	/**
+	 * The number of rooms to be revealed when this door is opened.
+	 * @return
+	 */
+	public List<Room> getRooms() {
+		return null;	// TODO
 	}
 	
 	/**

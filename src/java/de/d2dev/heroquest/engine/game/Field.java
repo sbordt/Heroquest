@@ -74,6 +74,11 @@ public final class Field {
 	private Door door = null;
 	
 	/**
+	 * The {@link Room} the field belongs to, or {@code null} if it does not belong to any room. 
+	 */
+	private Room room = null;
+	
+	/**
 	 * A unit that might be standing on the field. Visible to the package because 
 	 * the unit has the {@code setField} method.
 	 */
@@ -283,6 +288,45 @@ public final class Field {
 			this.door = new Door( this );
 		} else {	// attempt to remove a door
 			this.door = null;
+		}
+	}	
+
+	
+	/**
+	 * The {@link Room} the field belongs to, or {@code null} if it does not belong to any room. 
+	 * @return
+	 */
+	public Room getRoom() {
+		return room;
+	}
+	
+	/**
+	 * Does the field belong to a room?
+	 * @return
+	 */
+	public boolean belongsToRoom() {
+		return room != null;
+	}
+	
+	/**
+	 * Set the fields room, or {@code null} to remove any room and make it a passage.
+	 * @param room
+	 */
+	public void setRoom(Room room) {
+		// nothing to do
+		if ( this.room == room )
+			return;
+		
+		// remove field from previous room
+		if ( this.room != null ) {
+			this.room.fields.remove( this );
+		}
+		
+		this.room = room;
+		
+		// add field to new room
+		if ( room != null ) {
+			room.fields.add( this );
 		}
 	}
 
