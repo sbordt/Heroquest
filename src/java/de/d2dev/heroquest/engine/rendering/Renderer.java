@@ -3,11 +3,14 @@ package de.d2dev.heroquest.engine.rendering;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
+
 import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.resource.types.TextureResource;
 import de.d2dev.heroquest.engine.game.Door;
 import de.d2dev.heroquest.engine.game.Field;
+import de.d2dev.heroquest.engine.game.Field.WallType;
 import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.MapListener;
@@ -66,6 +69,15 @@ public class Renderer implements MapListener {
 	
 	private HashMap<Field, RenderQuad> fogOfWarQuads = new HashMap<Field, RenderQuad>();
 	private Resource fogTexture = TextureResource.createTextureResource("fog of war/fog.png");
+	
+	/*
+	 * Textures
+	 */
+	Resource fullWallTexture = TextureResource.createTextureResource( "walls/wall.png" );
+	Resource horizontalWallTexture = TextureResource.createTextureResource( "walls/horizontal.png" );
+	Resource horizontal_And_Top_WallTexture = TextureResource.createTextureResource( "walls/horizontal_and_top.png" );
+	Resource crossWallTexture = TextureResource.createTextureResource( "walls/cross.png" );
+	Resource edgeWallTexture = TextureResource.createTextureResource( "walls/edge.png" );
 	
 	public Renderer(Map map, QuadRenderModel renderTarget, ResourceLocator resourceFinder, boolean fogOfWar) {
 		this.fogOfWar = fogOfWar;
@@ -182,11 +194,7 @@ public class Renderer implements MapListener {
 		
 		// walls
 		if ( field.isWall() ) {
-			// Resource wallTexture = this.wallTextureCreator.createWallTexture( field );
-			Resource wallTexture = TextureResource.createTextureResource( "walls/wall.png" );
-			
-			this.walls.put( field, new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, WALLS,  wallTexture ) );
-			this.renderTarget.addQuad( this.walls.get( field ) );
+			this.renderWall( field );
 		}
 		
 		// doors
@@ -198,6 +206,77 @@ public class Renderer implements MapListener {
 		
 		// fog of war
 		this.renderFogOfWar( field );
+	}
+	
+	private void renderWall(Field field) {
+		Preconditions.checkArgument( field.isWall() );
+		
+		WallType wallType = field.getWallType();
+		
+		Resource wallTexture = fullWallTexture;
+		TextureTurn turn = TextureTurn.NORMAL;
+		
+		switch (wallType) {
+		case CROSS:
+			wallTexture = crossWallTexture;
+			break;
+		case DOCKING_LEFT:
+			// not yet
+			break;
+		case DOCKING_LOWER:
+			// not yet
+			break;
+		case DOCKING_RIGHT:
+			// not yet
+			break;
+		case DOCKING_UPPER:
+			// not yet
+			break;
+		case EDGE_LOWER_LEFT:
+			wallTexture = edgeWallTexture;
+			turn = TextureTurn.TURN_LEFT_270_DEGREE;
+			break;
+		case EDGE_LOWER_RIGHT:
+			wallTexture = edgeWallTexture;
+			break;
+		case EDGE_UPPER_LEFT:
+			wallTexture = edgeWallTexture;
+			turn = TextureTurn.TURN_LEFT_180_DEGREE;
+			break;
+		case EDGE_UPPER_RIGHT:
+			wallTexture = edgeWallTexture;
+			turn = TextureTurn.TURN_LEFT_90_DEGREE;
+			break;
+		case FULL:
+			// nothing to do
+			break;
+		case HORIZONTAL:
+			wallTexture = this.horizontalWallTexture;
+			break;
+		case HORIZONTAL_AND_BOTTOM:
+			wallTexture = horizontal_And_Top_WallTexture;
+			turn = TextureTurn.TURN_LEFT_180_DEGREE;
+			break;
+		case HORIZONTAL_AND_TOP:
+			wallTexture = horizontal_And_Top_WallTexture;
+			break;
+		case VERTICAL:
+			wallTexture = this.horizontalWallTexture;
+			turn = TextureTurn.TURN_LEFT_90_DEGREE;
+			break;
+		case VERTICAL_AND_LEFT:
+			wallTexture = horizontal_And_Top_WallTexture;
+			turn = TextureTurn.TURN_LEFT_90_DEGREE;
+			break;
+		case VERTICAL_AND_RIGHT:
+			wallTexture = horizontal_And_Top_WallTexture;
+			turn = TextureTurn.TURN_LEFT_270_DEGREE;
+			break;
+		
+		}
+
+		this.walls.put( field, new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, WALLS,  wallTexture, turn ) );
+		this.renderTarget.addQuad( this.walls.get( field ) );
 	}
 	
 	private void renderTextureOverlay(TextureOverlay overlay) {

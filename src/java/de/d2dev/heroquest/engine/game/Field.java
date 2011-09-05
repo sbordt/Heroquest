@@ -3,6 +3,8 @@ package de.d2dev.heroquest.engine.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import de.d2dev.fourseasons.files.FileUtil;
@@ -33,6 +35,39 @@ import de.d2dev.fourseasons.resource.types.TextureResource;
  *
  */
 public final class Field {
+	
+	/**
+	 * Enumeration for the different types of walls. We mean not the
+	 * wall field itself but how it is connected to other walls.
+	 * @author Sebastian Bordt
+	 *
+	 */
+	public enum WallType {
+		FULL,
+		
+		DOCKING_LEFT,
+		DOCKING_RIGHT,
+		DOCKING_UPPER,
+		DOCKING_LOWER,
+		
+		HORIZONTAL,
+		HORIZONTAL_AND_BOTTOM,
+		HORIZONTAL_AND_TOP,
+		VERTICAL,
+		VERTICAL_AND_LEFT,
+		VERTICAL_AND_RIGHT,
+		EDGE_LOWER_LEFT,
+		EDGE_LOWER_RIGHT,
+		EDGE_UPPER_LEFT,
+		EDGE_UPPER_RIGHT,
+		CROSS,
+		
+		
+		
+
+		
+		
+	}
 	
 	private static final String FIELD = "field";
 	private static final String X = "x";
@@ -258,6 +293,79 @@ public final class Field {
 	 */
 	public boolean isWall() {
 		return isWall;
+	}
+	
+	public WallType getWallType() {
+		Preconditions.checkArgument( isWall );
+
+		// field does not touch the maps borders - 11 cases! lot's of code but does it and errors are easy to find
+		if ( x != 0 && x != map.getWidth() -1 && y != 0 && y != map.getHeight() -1 ) {
+			Field upperField = map.getField( x, y-1 );
+			//Field upperLeftField = map.getField( x-1, y-1 );
+			//Field upperRightField = map.getField( x+1, y-1 );
+			Field lowerField = map.getField( x, y+1 );
+			//Field lowerLeftField = map.getField( x-1, y+1 );
+			//Field lowerRightField = map.getField( x+1, y+1 );
+			Field leftField = map.getField( x-1, y );
+			Field rightField = map.getField( x+1, y );
+			
+			// horizontal wall
+			if ( !upperField.isWall() && !lowerField.isWall() && leftField.isWall() && rightField.isWall() ) {
+				return WallType.HORIZONTAL;
+			}
+			
+			// horizontal and bottom
+			else if ( !upperField.isWall() && lowerField.isWall() && leftField.isWall() && rightField.isWall() ) {
+				return WallType.HORIZONTAL_AND_BOTTOM;
+			}
+			
+			// horizontal and top
+			else if ( upperField.isWall() && !lowerField.isWall() && leftField.isWall() && rightField.isWall() ) {		
+				return WallType.HORIZONTAL_AND_TOP;
+			}	
+			
+			// vertical wall
+			else if ( upperField.isWall() && lowerField.isWall() && !leftField.isWall() && !rightField.isWall() ) { 
+				return WallType.VERTICAL;
+			}
+			
+			// vertical and left
+			else if ( upperField.isWall() && lowerField.isWall() && leftField.isWall() && !rightField.isWall() ) { 
+				return WallType.VERTICAL_AND_LEFT;
+			}
+			
+			// vertical and right
+			else if ( upperField.isWall() && lowerField.isWall() && !leftField.isWall() && rightField.isWall() ) { 
+				return WallType.VERTICAL_AND_RIGHT;
+			}
+			
+			// lower left edge
+			else if ( !upperField.isWall() && lowerField.isWall() && leftField.isWall() && !rightField.isWall() ) { 
+				return WallType.EDGE_LOWER_LEFT;
+			}
+			
+			// lower right edge
+			else if ( !upperField.isWall() && lowerField.isWall() && !leftField.isWall() && rightField.isWall() ) { 
+				return WallType.EDGE_LOWER_RIGHT;
+			}
+			
+			// upper left edge
+			else if ( upperField.isWall() && !lowerField.isWall() && leftField.isWall() && !rightField.isWall() ) { 
+				return WallType.EDGE_UPPER_LEFT;
+			}
+			
+			// upper right edge
+			else if ( upperField.isWall() && !lowerField.isWall() && !leftField.isWall() && rightField.isWall() ) { 
+				return WallType.EDGE_UPPER_RIGHT;
+			}
+			
+			// cross
+			else if ( upperField.isWall() && lowerField.isWall() && leftField.isWall() && rightField.isWall() ) { 
+				return WallType.CROSS;
+			}
+		}
+		
+		return WallType.FULL;
 	}
 	
 	/**

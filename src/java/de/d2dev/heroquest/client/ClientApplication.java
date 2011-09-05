@@ -4,9 +4,13 @@ package de.d2dev.heroquest.client;
 import de.d2dev.fourseasons.gamestate.GameStateException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.IOException;
 
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.script.ScriptEngine;
+import de.d2dev.heroquest.editor.EditorSettings;
 import de.d2dev.heroquest.editor.script.EditorLuaScriptDecomposer;
 import de.d2dev.heroquest.editor.script.LuaMapCreatorFunction;
 import de.d2dev.heroquest.engine.ai.AISystem;
@@ -24,7 +28,6 @@ import de.d2dev.heroquest.engine.game.UnitFactory;
 import de.d2dev.heroquest.engine.game.action.GameAction;
 import de.d2dev.heroquest.engine.game.action.MoveAction;
 import de.d2dev.heroquest.engine.rendering.Renderer;
-import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderWindow;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.sound.JmeSoundPlayer;
 import de.schlichtherle.truezip.file.TFile;
@@ -37,9 +40,11 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.BasicConfigurator;
 
-public class ClientApplication implements KeyListener {
+public class ClientApplication implements KeyListener, WindowListener {
 
 //    private String settingsPath = "";
+	private EditorSettings settings;
+	
     private boolean fogOfWar;
 	
     private ScriptEngine scriptEngine;    
@@ -50,7 +55,7 @@ public class ClientApplication implements KeyListener {
     private ResourceLocator resourceFinder;
     private Renderer renderer;
     private QuadRenderModel renderTarget;
-    private Java2DRenderWindow window;
+    private ClientWindow window;
     
     private JmeSoundPlayer soundPlayer;
     
@@ -71,10 +76,12 @@ public class ClientApplication implements KeyListener {
 	 * 
 	 **************************************************************************************/    
 
-    public ClientApplication(TFile mapCreatorScript, ResourceLocator resourceFinder, boolean fogOfWar) throws Exception {
+    public ClientApplication(TFile mapCreatorScript, ResourceLocator resourceFinder, EditorSettings settings, boolean fogOfWar) throws Exception {
     	this.initResourceFinder(resourceFinder);
     	
     	this.fogOfWar = fogOfWar;
+    	
+    	this.settings = settings;
     	
     	// load the map creator script  		
     	LuaMapCreatorFunction function = (LuaMapCreatorFunction) scriptEngine.load( mapCreatorScript ).getFunctions().get(0);
@@ -158,41 +165,39 @@ public class ClientApplication implements KeyListener {
 		}
     }
 
-    public void run() {
-
-//        Field[][] field = this.map.getFields();
-//
-//        MapCommunicator communicator = new MapCommunicator(this.map);
-//        Stack<Path<SearchKnot>> result = communicator.search(field.length - 1, field[0].length - 1, 0, 0, 1);
-//        System.out.println(result.size());
-//        for (Path<SearchKnot> path : result) {
-//            for (SearchKnot knot : path.getTrace()) {
-//                int x = knot.getX();
-//                int y = knot.getY();
-//                this.map.getField(x, y).setTexture(TextureResource.createTextureResource("error.jpg"));
-//                System.out.println("Texture.set");
-//            }
-//        }
-//        System.out.println("Hallo");
-//        this.renderer.render();
-//        this.window.repaint();
-    	
+    public void run() {    	
         this.renderTarget = new QuadRenderModel(map.getWidth(), map.getHeight());
 
         this.renderer = new Renderer(map, renderTarget, this.resourceFinder, this.fogOfWar);
         this.map.addListener(renderer);
         this.renderer.render();
 
-        this.window = new Java2DRenderWindow(this.renderer.getRederTarget(), this.resourceFinder);
+        this.window = new ClientWindow(this.settings, this.renderer.getRederTarget(), this.resourceFinder);
         this.window.setTitle("HeroQuest");
         this.window.setVisible(true);
 
         this.window.addKeyListener(this);
+        this.window.addWindowListener(this);
     }
 
     public void heroesRound() {
     }
-
+    
+	/**************************************************************************************
+	 * 
+	 * 						  		        SHUTDOWN
+	 * 
+	 **************************************************************************************/    
+    
+	@Override
+	public void windowClosing(WindowEvent arg0) {
+		try {
+			this.settings.save();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
     
 	/**************************************************************************************
 	 * 
@@ -439,4 +444,42 @@ public class ClientApplication implements KeyListener {
     public void keyTyped(KeyEvent arg0) {
         // just override
     }
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

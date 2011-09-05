@@ -183,10 +183,10 @@ public class EditorMain extends javax.swing.JFrame {
     		this.java2DRenderWindow = new Java2DRenderWindow( this.editor.renderer.getRederTarget(), this.editor.resources.resourceFinder );
     		
     		// take window bounds from properties file
-    		this.java2DRenderWindow.setBounds( Integer.valueOf( this.editor.properties.getProperty( Editor.JAVA_2D_WINDOW_X, "0" ) ),
-    										   Integer.valueOf( this.editor.properties.getProperty( Editor.JAVA_2D_WINDOW_Y, "0" ) ), 
-    										   Integer.valueOf( this.editor.properties.getProperty( Editor.JAVA_2D_WINDOW_WIDTH, "500" ) ), 
-    										   Integer.valueOf( this.editor.properties.getProperty( Editor.JAVA_2D_WINDOW_HEIGHT, "500" ) ) );
+    		this.java2DRenderWindow.setBounds( Integer.valueOf( this.editor.settings.properties.getProperty( Editor.JAVA_2D_WINDOW_X, "0" ) ),
+    										   Integer.valueOf( this.editor.settings.properties.getProperty( Editor.JAVA_2D_WINDOW_Y, "0" ) ), 
+    										   Integer.valueOf( this.editor.settings.properties.getProperty( Editor.JAVA_2D_WINDOW_WIDTH, "500" ) ), 
+    										   Integer.valueOf( this.editor.settings.properties.getProperty( Editor.JAVA_2D_WINDOW_HEIGHT, "500" ) ) );
     	}
     	
     	this.java2DRenderWindow.setVisible(true);

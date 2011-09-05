@@ -87,6 +87,13 @@ public class RunJmeCanvasInSwing<A extends SimpleApplication & JmeResizeableApp>
 		}
 		
 		jmeApp.startCanvas();
+		
+		// von batti hinzugefügt damit beim starten im panel am anfang gleich ein bild gezeichnet wird
+		jmeApp.onResize(panel.getWidth(), panel.getHeight());
+		canvasContext.getCanvas().setSize(panel.getWidth(), panel.getHeight());
+		dim = new Dimension(panel.getWidth(), panel.getHeight());
+		canvasContext.getCanvas().setPreferredSize(dim);
+		jmeApp.restart();
 	}
 
 }

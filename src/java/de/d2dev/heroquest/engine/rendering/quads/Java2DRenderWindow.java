@@ -14,7 +14,7 @@ package de.d2dev.heroquest.engine.rendering.quads;
 import de.d2dev.fourseasons.resource.ResourceLocator;
 
 /**
- *
+ * Simple single window containing a {@link Java2DRenderPanel}.
  * @author Sebastian Bordt
  */
 public class Java2DRenderWindow extends javax.swing.JFrame {

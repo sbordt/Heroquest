@@ -1,12 +1,6 @@
 package de.d2dev.heroquest.editor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.Properties;
-
-import javax.swing.UIManager;
-
+import de.d2dev.fourseasons.Application;
 import de.d2dev.fourseasons.script.ScriptEngine;
 
 import de.d2dev.heroquest.editor.gui.*;
@@ -20,7 +14,7 @@ import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.schlichtherle.truezip.file.TFile;
 
 public class Editor {
-	
+		
 	public static String MAIN_WINDOW_X = "mainWndX";
 	public static String MAIN_WINDOW_Y = "mainWndY";
 	public static String JAVA_2D_WINDOW_X = "java2DWndX";
@@ -28,9 +22,9 @@ public class Editor {
 	public static String JAVA_2D_WINDOW_WIDTH = "java2DWndWidth";
 	public static String JAVA_2D_WINDOW_HEIGHT = "java2DWndHeight";
 	
-	public Properties properties = new Properties();
-	
 	public EditorResources resources;
+	
+	public EditorSettings settings;
 	
 	public ScriptEngine scriptEngine;
 	
@@ -47,16 +41,12 @@ public class Editor {
 	public void initialize() throws Exception {		
     	// register custom container file formats
     	Files.registerFileFormats();		
-    	
+    
     	// Aquire resources
     	this.resources = new EditorResources();
     	
-    	// properties file contains gui related and other editor settings
-    	File properties_file = new File ( this.resources.publicDataStoragePath + "/" + "settings.xml" );
-    	
-    	if ( properties_file.exists() ) {
-    		this.properties.loadFromXML( new FileInputStream( properties_file ) );
-    	}
+    	// Load settings - settings contains gui related and other editor settings
+    	this.settings = new EditorSettings( new TFile ( this.resources.publicDataStoragePath, "settings.xml" ) );
     	
     	// script engine setup
     	scriptEngine = ScriptEngine.createDefaultScriptEngine( this.resources.resourceFinder, new EditorLuaScriptDecomposer() );
@@ -75,8 +65,8 @@ public class Editor {
     	// main window
     	this.mainWindow = new EditorMain( this );
     	
-    	this.mainWindow.setLocation( Integer.valueOf( this.properties.getProperty( MAIN_WINDOW_X, "0" ) ),
-    								 Integer.valueOf( this.properties.getProperty( MAIN_WINDOW_Y, "0" ) ) );
+    	this.mainWindow.setLocation( Integer.valueOf( this.settings.properties.getProperty( MAIN_WINDOW_X, "0" ) ),
+    								 Integer.valueOf( this.settings.properties.getProperty( MAIN_WINDOW_Y, "0" ) ) );
     	
     	// init renderer
     	this.renderTarget = new QuadRenderModel( this.map.getWidth(), this.map.getHeight() );
@@ -93,30 +83,22 @@ public class Editor {
 	
 	public void close() throws Exception {
 		// save properties to file
-		this.properties.setProperty( MAIN_WINDOW_X, Integer.toString( this.mainWindow.getX() ) );
-		this.properties.setProperty( MAIN_WINDOW_Y, Integer.toString( this.mainWindow.getY() ) );
+		this.settings.properties.setProperty( MAIN_WINDOW_X, Integer.toString( this.mainWindow.getX() ) );
+		this.settings.properties.setProperty( MAIN_WINDOW_Y, Integer.toString( this.mainWindow.getY() ) );
 		
 		if ( this.mainWindow.java2DRenderWindow != null ) {
-			this.properties.setProperty( JAVA_2D_WINDOW_X, Integer.toString( this.mainWindow.java2DRenderWindow.getX() ) );
-			this.properties.setProperty( JAVA_2D_WINDOW_Y, Integer.toString( this.mainWindow.java2DRenderWindow.getY() ) );
+			this.settings.properties.setProperty( JAVA_2D_WINDOW_X, Integer.toString( this.mainWindow.java2DRenderWindow.getX() ) );
+			this.settings.properties.setProperty( JAVA_2D_WINDOW_Y, Integer.toString( this.mainWindow.java2DRenderWindow.getY() ) );
 			
-			this.properties.setProperty( JAVA_2D_WINDOW_WIDTH, Integer.toString( this.mainWindow.java2DRenderWindow.getWidth() ) );
-			this.properties.setProperty( JAVA_2D_WINDOW_HEIGHT, Integer.toString( this.mainWindow.java2DRenderWindow.getHeight() ) );
+			this.settings.properties.setProperty( JAVA_2D_WINDOW_WIDTH, Integer.toString( this.mainWindow.java2DRenderWindow.getWidth() ) );
+			this.settings.properties.setProperty( JAVA_2D_WINDOW_HEIGHT, Integer.toString( this.mainWindow.java2DRenderWindow.getHeight() ) );
 		}
-
-		this.properties.storeToXML( new FileOutputStream( this.resources.publicDataStoragePath + "/" + "settings.xml" ), "" );
+		
+		this.settings.save();
 	}
 	
 	public static void main(String[] args) throws Exception {
-    	try  
-    	{  
-    	  //Tell the UIManager to use the platform look and feel  
-    	  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());  
-    	}  
-    	catch(Exception e)  
-    	{  
-    	  //Do nothing  
-    	} 
+		Application.useNativeLookAndFeal();
     	
     	// start the editor
     	Editor editor = new Editor();
