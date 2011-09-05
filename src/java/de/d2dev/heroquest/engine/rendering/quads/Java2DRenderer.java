@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
+import java.util.HashMap;
 
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.resource.types.BufferedImageStorage;
@@ -17,6 +18,10 @@ import de.d2dev.fourseasons.resource.types.BufferedImageStorage;
 public class Java2DRenderer extends AbstractQuadRenderer {
 	
 	private BufferedImageStorage imageStorage;
+	
+	private HashMap<BufferedImage, BufferedImage> turnedBy90Degree = new HashMap<BufferedImage, BufferedImage>();
+	private HashMap<BufferedImage, BufferedImage> turnedBy180Degree = new HashMap<BufferedImage, BufferedImage>();
+	private HashMap<BufferedImage, BufferedImage> turnedBy270Degree = new HashMap<BufferedImage, BufferedImage>();
 	
 	private int ppUnit;
 	
@@ -111,29 +116,98 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 		// load the texture
 		BufferedImage img = this.imageStorage.provideTexture( quad.getTexture() );
 		
-		// Scaling for the resolution, rotation for the turn and translation for the position
-		AffineTransform transform = new AffineTransform();
-
-		transform.translate( quad.getX() * this.ppUnit, quad.getY() * this.ppUnit );
+		// turn the texture
+		BufferedImage turned_img = img;
 		
 		switch( quad.getTextureTurn() ) {
 		case NORMAL:	// no rotation needed
 			break;
 		case TURN_LEFT_90_DEGREE:
-			transform.rotate(Math.PI * 1.5, img.getWidth() / 2.0, img.getHeight() / 2.0);
+			if ( (turned_img = this.turnedBy90Degree.get( img ) ) == null ) {
+				turned_img = this.turnBy90Degree( img );
+				this.turnedBy90Degree.put( img, turned_img );
+			}
 			break;
-		case TURN_LEFT_180_DEGREE:
-			transform.rotate(Math.PI, img.getWidth() / 2.0, img.getHeight() / 2.0);
+		case TURN_LEFT_180_DEGREE:	
+			if ( (turned_img = this.turnedBy180Degree.get( img ) ) == null ) {
+				turned_img = this.turnBy180Degree( img );
+				this.turnedBy180Degree.put( img, turned_img );
+			}
 			break;
 		case TURN_LEFT_270_DEGREE:
-			transform.rotate(Math.PI / 2.0, img.getWidth() / 2.0, img.getHeight() / 2.0);
+			if ( (turned_img = this.turnedBy270Degree.get( img ) ) == null ) {
+				turned_img = this.turnBy270Degree( img );
+				this.turnedBy270Degree.put( img, turned_img );
+			}
 			break;
-		}
+		}	
 		
-		transform.scale( quad.getWidth() * this.ppUnit /  ((float) img.getWidth()), quad.getHeight() * this.ppUnit /  ((float) img.getHeight()) );
+		// Scaling for the resolution and translation for the position
+		AffineTransform transform = new AffineTransform();
 		
+		transform.translate( quad.getX() * this.ppUnit, quad.getY() * this.ppUnit );
+		transform.scale( quad.getWidth() * this.ppUnit /  ((float) turned_img.getWidth()), quad.getHeight() * this.ppUnit /  ((float) turned_img.getHeight()) );
+
 		// draw!
-		g.drawImage( img, transform, null);
+		g.drawImage( turned_img, transform, null);
 	}
 	
+	/**
+	 * 
+	 * @param img
+	 * @return A new {@code BufferedImage} that contains the original image turned by 90 degree.
+	 */
+	private BufferedImage turnBy90Degree(BufferedImage img) {
+		BufferedImage turned_img = new BufferedImage( img.getHeight(), img.getWidth(), BufferedImage.TYPE_INT_ARGB );
+		Graphics2D g = turned_img.createGraphics();
+		
+		g.translate( 0, img.getWidth() );
+		g.rotate( Math.PI * 1.5 );
+				
+		g.drawImage( img, new AffineTransform(), null );
+		
+		return turned_img;
+	}
+	
+	/**
+	 * 
+	 * @param img
+	 * @return A new {@code BufferedImage} that contains the original image turned by 180 degree.
+	 */
+	private BufferedImage turnBy180Degree(BufferedImage img) {
+		BufferedImage turned_img = new BufferedImage( img.getHeight(), img.getWidth(), BufferedImage.TYPE_INT_ARGB );
+		Graphics2D g = turned_img.createGraphics();
+		
+		g.setColor(Color.WHITE);
+		
+		g.fillRect(0, 0, turned_img.getWidth(), turned_img.getHeight());
+		
+		g.translate( img.getHeight(), img.getWidth() );
+		g.rotate( Math.PI );
+		
+		g.drawImage( img, new AffineTransform(), null );
+		
+		return turned_img;
+	}
+
+	/**
+	 * 
+	 * @param img
+	 * @return A new {@code BufferedImage} that contains the original image turned by 270 degree.
+	 */
+	private BufferedImage turnBy270Degree(BufferedImage img) {
+		BufferedImage turned_img = new BufferedImage( img.getHeight(), img.getWidth(), BufferedImage.TYPE_INT_ARGB );
+		Graphics2D g = turned_img.createGraphics();
+		
+		g.setColor(Color.WHITE);
+		
+		g.fillRect(0, 0, turned_img.getWidth(), turned_img.getHeight());
+		
+		g.translate( img.getHeight(), 0 );
+		g.rotate( Math.PI / 2.0 );
+		
+		g.drawImage( img, new AffineTransform(), null );
+		
+		return turned_img;
+	}
 }

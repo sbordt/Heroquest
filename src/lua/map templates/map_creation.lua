@@ -74,3 +74,25 @@ function room(map, x, y, width, height, texture)
 	
 	auto_detect_room( map, x+1, y+1 );
 end
+
+-- Create a simple room 
+-- turn 0, 1, 2, 3 <=> normal, 90, 180, 270 
+function add_texture_overlay(map, x, y, width, height, texture, turn)
+	overlay = map:addTextureOverlay();
+	
+	overlay:setX( x );
+	overlay:setY( y );
+	overlay:setWidth( width );
+	overlay:setHeight( height );
+	overlay:getTexture():setName( texture );
+	
+	if turn == 0 then
+		overlay:setTurnToNormal();
+	elseif turn == 1 then
+		overlay:setTurnTo90Degree();
+	elseif turn == 2 then
+		overlay:setTurnTo180Degree();
+	elseif turn == 3 then
+		overlay:setTurnTo270Degree();		
+	end
+end

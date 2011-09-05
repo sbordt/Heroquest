@@ -4,7 +4,7 @@ import de.d2dev.heroquest.editor.EditorResources;
 
 public class TestMap {	
 	
-	EditorResources resources;
+	public EditorResources resources;
 	
 	public TestMap() throws Exception {
 		// use the editors resources

@@ -13,6 +13,7 @@ import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.MapListener;
 import de.d2dev.heroquest.engine.game.Monster;
 import de.d2dev.heroquest.engine.game.Room;
+import de.d2dev.heroquest.engine.game.TextureOverlay;
 import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.rendering.quads.RenderQuad;
@@ -30,8 +31,9 @@ public class Renderer implements MapListener {
 	 * z-Layers for our RenderQuads
 	 */
 	private static int GROUND = 0;
-	private static int WALLS = 1;
-	private static int DOORS = 2;
+	private static int OVERLAYS = 1;
+	private static int WALLS = 2;
+	private static int DOORS = 3;
 	private static int UNITS = 100;
 	private static int DOOR_ARCS = 200;
 	private static int FOG_OF_WAR = 1000;
@@ -65,7 +67,9 @@ public class Renderer implements MapListener {
 	private HashMap<Field, RenderQuad> fogOfWarQuads = new HashMap<Field, RenderQuad>();
 	private Resource fogTexture = TextureResource.createTextureResource("fog of war/fog.png");
 	
-	public Renderer(Map map, QuadRenderModel renderTarget, ResourceLocator resourceFinder) {
+	public Renderer(Map map, QuadRenderModel renderTarget, ResourceLocator resourceFinder, boolean fogOfWar) {
+		this.fogOfWar = fogOfWar;
+		
 		this.map = map;
 
 		this.setRenderTarget(renderTarget);
@@ -124,7 +128,12 @@ public class Renderer implements MapListener {
 				for (Field field : row) {
 					this.renderField( field );
 				}
-			}	
+			}
+			
+			// overlays never change - render them all
+			for (TextureOverlay overlay : map.getTextureOverlays()) {
+				this.renderTextureOverlay( overlay ); 
+			}
 			
 			this.firstTime = false;
 		}
@@ -189,6 +198,10 @@ public class Renderer implements MapListener {
 		
 		// fog of war
 		this.renderFogOfWar( field );
+	}
+	
+	private void renderTextureOverlay(TextureOverlay overlay) {
+		this.renderTarget.addQuad( new RenderQuad( overlay.getX(), overlay.getY(), overlay.getWidth(), overlay.getHeight(), OVERLAYS,  overlay.getTexture(), overlay.getTurn() ) );
 	}
 	
 	/**

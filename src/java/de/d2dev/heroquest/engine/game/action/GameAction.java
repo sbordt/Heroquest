@@ -5,7 +5,7 @@
 package de.d2dev.heroquest.engine.game.action;
 
 import de.d2dev.fourseasons.gamestate.GameStateException;
-import de.d2dev.heroquest.engine.game.RunningGameContext;
+import de.d2dev.heroquest.engine.game.GameContext;
 import de.d2dev.heroquest.engine.game.Unit;
 
 /**
@@ -14,7 +14,7 @@ import de.d2dev.heroquest.engine.game.Unit;
  */
 public interface GameAction {
 
-	public RunningGameContext getGameContext();
+	public GameContext getGameContext();
 	
 	public Unit getActingUnit();
     

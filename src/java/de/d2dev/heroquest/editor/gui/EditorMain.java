@@ -217,7 +217,7 @@ public class EditorMain extends javax.swing.JFrame {
     	
     	this.editor.map = new Map( dialog.width, dialog.height );
     	
-    	this.editor.renderer = new Renderer( this.editor.map, this.editor.renderTarget, this.editor.resources.resourceFinder );
+    	this.editor.renderer = new Renderer( this.editor.map, this.editor.renderTarget, this.editor.resources.resourceFinder, false );
     	this.editor.renderer.render();
     	
     	// update render windows

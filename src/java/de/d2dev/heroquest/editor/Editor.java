@@ -81,7 +81,7 @@ public class Editor {
     	// init renderer
     	this.renderTarget = new QuadRenderModel( this.map.getWidth(), this.map.getHeight() );
     	
-		this.renderer = new Renderer( this.map, this.renderTarget, this.resources.resourceFinder );
+		this.renderer = new Renderer( this.map, this.renderTarget, this.resources.resourceFinder, false );
 		this.renderer.render();
 	}
 	

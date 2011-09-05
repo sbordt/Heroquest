@@ -46,7 +46,7 @@ public abstract class Unit {
 	/*
 	 * Running Game Variables
 	 */
-	protected RunningGameContext gameContext;
+	protected GameContext gameContext;
 
 	protected int remainingMoves = 0;
 	
@@ -262,11 +262,11 @@ public abstract class Unit {
 	 * 
 	 **************************************************************************************/
 
-	public RunningGameContext getGameContext() {
+	public GameContext getGameContext() {
 		return gameContext;
 	}
 
-	public void setGameContext(RunningGameContext gameContext) {
+	public void setGameContext(GameContext gameContext) {
 		this.gameContext = gameContext;
 	}
 	

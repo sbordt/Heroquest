@@ -1,5 +1,6 @@
 package de.d2dev.heroquest.client;
 
+
 import de.d2dev.fourseasons.gamestate.GameStateException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -13,6 +14,7 @@ import de.d2dev.heroquest.engine.files.HqMapFile;
 import de.d2dev.heroquest.engine.game.ClassicalGameUtil;
 import de.d2dev.heroquest.engine.game.Direction2D;
 import de.d2dev.heroquest.engine.game.Field;
+import de.d2dev.heroquest.engine.game.GameContext;
 import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Hero.HeroType;
 import de.d2dev.heroquest.engine.game.Map;
@@ -20,9 +22,11 @@ import de.d2dev.heroquest.engine.game.Monster;
 import de.d2dev.heroquest.engine.game.Monster.MonsterType;
 import de.d2dev.heroquest.engine.game.UnitFactory;
 import de.d2dev.heroquest.engine.game.action.GameAction;
+import de.d2dev.heroquest.engine.game.action.MoveAction;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderWindow;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
+import de.d2dev.heroquest.engine.sound.JmeSoundPlayer;
 import de.schlichtherle.truezip.file.TFile;
 
 import java.util.*;
@@ -36,14 +40,19 @@ import org.apache.log4j.BasicConfigurator;
 public class ClientApplication implements KeyListener {
 
 //    private String settingsPath = "";
-    
+    private boolean fogOfWar;
+	
     private ScriptEngine scriptEngine;    
     
+    private GameContext game;
     private Map map;
+    
     private ResourceLocator resourceFinder;
     private Renderer renderer;
     private QuadRenderModel renderTarget;
     private Java2DRenderWindow window;
+    
+    private JmeSoundPlayer soundPlayer;
     
     private UnitFactory unitFactory;
     
@@ -62,8 +71,10 @@ public class ClientApplication implements KeyListener {
 	 * 
 	 **************************************************************************************/    
 
-    public ClientApplication(TFile mapCreatorScript, ResourceLocator resourceFinder) throws Exception {
+    public ClientApplication(TFile mapCreatorScript, ResourceLocator resourceFinder, boolean fogOfWar) throws Exception {
     	this.initResourceFinder(resourceFinder);
+    	
+    	this.fogOfWar = fogOfWar;
     	
     	// load the map creator script  		
     	LuaMapCreatorFunction function = (LuaMapCreatorFunction) scriptEngine.load( mapCreatorScript ).getFunctions().get(0);
@@ -83,13 +94,19 @@ public class ClientApplication implements KeyListener {
     	// set the given resource finder
     	this.resourceFinder = resourceFinder;
     	
+    	// log4j
+    	BasicConfigurator.configure();
+    	    	
     	// script engine setup
     	scriptEngine = ScriptEngine.createDefaultScriptEngine( this.resourceFinder, new EditorLuaScriptDecomposer() );
     }
     
     public void init() throws Exception {
-    	// log4j
-    	BasicConfigurator.configure();
+    	this.game = new GameContext( map );
+    	
+    	// sound player setup
+    	this.soundPlayer = new JmeSoundPlayer( this.resourceFinder );
+    	this.game.addListener( soundPlayer );
     	
         this.aiSystem = new AISystem(map);
 
@@ -162,7 +179,7 @@ public class ClientApplication implements KeyListener {
     	
         this.renderTarget = new QuadRenderModel(map.getWidth(), map.getHeight());
 
-        this.renderer = new Renderer(map, renderTarget, this.resourceFinder);
+        this.renderer = new Renderer(map, renderTarget, this.resourceFinder, this.fogOfWar);
         this.map.addListener(renderer);
         this.renderer.render();
 
@@ -231,7 +248,7 @@ public class ClientApplication implements KeyListener {
     public void performAction(GameAction action) {
     	// perform the action
         try {
-            action.excecute();
+        	this.game.execute( action );
         } catch (GameStateException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -312,36 +329,28 @@ public class ClientApplication implements KeyListener {
 			else if (e.getKeyChar() == 's') { // walk down
 
 				if (this.activeHero.canMoveDown()) {
-					this.activeHero.moveDown();
-				}
-				this.activeHero.setViewDir(Direction2D.DOWN);
-
-			} 
-			else if (e.getKeyChar() == 's') { // walk down
-
-				if (this.activeHero.canMoveDown()) {
-					this.activeHero.moveDown();
+					this.game.execute( new MoveAction( this.activeHero, Direction2D.DOWN ) );
 				}
 				this.activeHero.setViewDir(Direction2D.DOWN);
 
 			} 
 			else if (e.getKeyChar() == 'w') { // walk up
 				if (this.activeHero.canMoveUp()) {
-					this.activeHero.moveUp();
+					this.game.execute( new MoveAction( this.activeHero, Direction2D.UP ) );
 				}
 				this.activeHero.setViewDir(Direction2D.UP);
 
 			} 
 			else if (e.getKeyChar() == 'a') { // walk left
 				if (this.activeHero.canMoveLeft()) {
-					this.activeHero.moveLeft();
+					this.game.execute( new MoveAction( this.activeHero, Direction2D.LEFT ) );
 				}
 				this.activeHero.setViewDir(Direction2D.LEFT);
 
 			} 
 			else if (e.getKeyChar() == 'd') { // walk right
 				if (this.activeHero.canMoveRight()) {
-					this.activeHero.moveRight();
+					this.game.execute( new MoveAction( this.activeHero, Direction2D.RIGHT ) );
 				}
 				this.activeHero.setViewDir(Direction2D.RIGHT);
 			}

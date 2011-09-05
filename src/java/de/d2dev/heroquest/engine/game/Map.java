@@ -38,6 +38,9 @@ public final class Map implements Observed<MapListener> {
 //	private List<Unit> heroes = new Vector<Unit>();
 //	private List<Unit> monsters = new Vector<Unit>();
 	private List<Room> rooms = new ArrayList<Room>();
+	
+//	private List<MapObject> objects = new ArrayList<MapObject>();
+	private List<TextureOverlay> textureOverlays = new ArrayList<TextureOverlay>(); 
 
 	/**
 	 * Construct a new empty map.
@@ -142,6 +145,17 @@ public final class Map implements Observed<MapListener> {
 	}
 	
 	/**
+	 * Add a new texture overlay to the map.
+	 * @return The newly created texture overlay.
+	 */
+	public TextureOverlay addTextureOverlay() {
+		TextureOverlay overlay = new TextureOverlay();
+		this.textureOverlays.add( overlay );
+		
+		return overlay;
+	}
+	
+	/**
 	 * Get all rooms.
 	 * @return
 	 */
@@ -149,6 +163,14 @@ public final class Map implements Observed<MapListener> {
 		return Collections.unmodifiableList( rooms );	
 	}
 	
+	/**
+	 * Get all texture overlays.
+	 * @return
+	 */
+	public List<TextureOverlay> getTextureOverlays() {
+		return Collections.unmodifiableList( textureOverlays );
+	}
+
 	/**
 	 * Get all units.
 	 * @return

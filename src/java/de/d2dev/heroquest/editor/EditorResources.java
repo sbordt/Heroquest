@@ -16,7 +16,9 @@ public class EditorResources {
 	public String publicDataStoragePath;
 	
 	public TFile textureFolder;
-	public HqRessourceFile globalRessources;
+	public TFile soundFolder;
+	
+	public HqRessourceFile globalRessources = null;
 	
 	public Dropbox dropbox;
 	
@@ -33,10 +35,20 @@ public class EditorResources {
     		this.resourceFinder.textureLocations.add( this.textureFolder );
     	}
     	
-    	// global resources are in globalResources.zip
-    	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalResources.zip" );
+    	// sound folder 'sounds'
+    	this.soundFolder = new TFile( this.publicDataStoragePath + "/sounds" );
     	
-    	this.resourceFinder.textureLocations.add( this.globalRessources.textures );
+    	if ( this.soundFolder.exists() ) {
+    		this.resourceFinder.audioLocations.add( this.soundFolder );
+    	}
+    	
+    	// global resources are in globalResources.zip
+    	if ( new TFile( this.publicDataStoragePath + "/" + "globalResources.zip" ).exists() ) {
+        	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalResources.zip" );
+        	
+        	this.resourceFinder.audioLocations.add( this.globalRessources.sounds );
+        	this.resourceFinder.textureLocations.add( this.globalRessources.textures );    		
+    	}
     	
     	// Dropbox setup
     	this.dropbox = new Dropbox();
