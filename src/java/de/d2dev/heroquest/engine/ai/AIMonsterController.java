@@ -18,15 +18,13 @@ import java.util.PriorityQueue;
 
 /**
  *
- * @author Simon + Toni
+ * @author Simon
  */
 public class AIMonsterController implements AIController {
 
     private Unit unit;
     private Map map;
     private PriorityQueue<Target> targets;
-    private FindPath findPath;
-    private FindBlockedPath findBlockedPath;
     private double agression = 1;
 
     public AIMonsterController(Unit unit, Map map) {
@@ -34,93 +32,46 @@ public class AIMonsterController implements AIController {
         this.unit = unit;
         this.map = map;
         this.targets = new PriorityQueue<Target>();
-        this.findPath = new FindPath(this.map);
-        this.findBlockedPath = new FindBlockedPath(map);
     }
 
 //*************************Interface AIController*******************************
     @Override
     public List<GameAction> getActions() {
+        System.out.println("Monster wurde aufgerufen: "+ unit.getName());
         //Fill the priority queue with heroes
         findWay();
         //Get Path to next Target
         if (!targets.isEmpty()) {
             ArrayDeque<Field> actionPath = targets.remove().getPathToMonster();
-            // After action, all targets in PriorityQueue become obsolete
-            targets.clear();
             //Turn it into an action sequence
             return traversePath2Action(actionPath);
         }
-        targets.clear();
+        System.out.println("No way found: " + unit.getName());
         //If no Path found return an empty list
         return new ArrayList<GameAction>();
 
     }
 
 //************************Private Methods***************************************
+   /**
+     * Fills the PriorityQueue with all the heroes and their shortest 
+     * unblocked Path
+     */
     private void findWay() {
+        targets.clear();
         List<Unit> heroes = map.getHeroes();
+        System.out.println("Heroes on map: "+heroes.size());
         while (!heroes.isEmpty()) {
+            //Starting with first heroe
             Unit nextUnit = heroes.get(0);
-
-            ArrayDeque<Field> path = findPath.getPath(this.unit.getField(), nextUnit.getField());
-            if (path != null) {
-                Target nextTarget = new Target(nextUnit, path, 0);
-                if (findBlockedPath.getPath(this.unit.getField(), nextUnit.getField()).size() < (path.size() + 1 * agression)) {                    
-                    Target deblocked = deblockUnit(nextUnit, 1);
-                    targets.add(deblocked);
-                }                             
-                targets.add(nextTarget);
-            } else {
-                System.out.println("findWay: trying to deblock: " + nextUnit.getName());
-                Target deblocked = deblockUnit(nextUnit, 1);
-                if (deblocked != null) {
-                    targets.add(deblocked);
-                } else {
-                    System.out.println("Deblocking not successful");
-                }
-            }
-
+            //Get shortest unblocked Path
+            Target target = AIUtility.getTarget(this.map, this.unit, nextUnit, agression);
+            targets.add(target);
             heroes.remove(0);
-            System.out.println("Heroe wurde entfernt");
         }
+        
     }
 
-    private Target deblockUnit(Unit blockedUnit, int costs) {
-        System.out.println("Starting deblock: " + blockedUnit.getName());
-        System.out.println("Start: " + this.unit.getName());
-        System.out.println("Goal: " + blockedUnit.getName());
-        ArrayDeque<Field> blockedPath = findBlockedPath.getPath(this.unit.getField(), blockedUnit.getField());
-//        int i = 0;
-//        for (Field field : blockedPath) {
-////            if (field.hasUnit()) {
-////                System.out.println(i + " " + field.getUnit().getName());
-////            } else {
-////                System.out.println(i + " " + field.isBlocked());
-////            }
-//            field.setTexture(TextureResource.createTextureResource("error.jpg"));
-//            i++;
-//        }
-
-        while (!blockedPath.isEmpty()) {
-            Field last = blockedPath.removeLast();
-            if (last.hasUnit()) {
-                Unit nextUnit = last.getUnit();
-                System.out.println("Unit found on path " + nextUnit.getName());
-                ArrayDeque<Field> unblockedPath = findPath.getPath(this.unit.getField(), last);
-                if (unblockedPath != null) {
-                    System.out.println("Returns the unblocked path " + costs);
-                    return new Target(nextUnit, unblockedPath, 0);
-
-                } else {
-                    System.out.println("Deblock: Path is null: " + costs);
-                    return deblockUnit(nextUnit, costs + 1);
-                }
-            }
-            costs++;
-        }
-        return null;
-    }
 
     private List<GameAction> traversePath2Action(ArrayDeque<Field> actionPath) {
 
@@ -138,19 +89,15 @@ public class AIMonsterController implements AIController {
             if (!field.isBlocked()) {
                 switch (action) {
                     case 1:
-//                        System.out.println("AIController: Right");
                         actionBuilder.addMove(Direction2D.RIGHT);
                         break;
                     case 2:
-//                        System.out.println("AIController: Down");
                         actionBuilder.addMove(Direction2D.DOWN);
                         break;
                     case -3:
-//                        System.out.println("AIController: Left");
                         actionBuilder.addMove(Direction2D.LEFT);
                         break;
                     case -4:
-//                        System.out.println("AIController: Up");
                         actionBuilder.addMove(Direction2D.UP);
                         break;
                 }
