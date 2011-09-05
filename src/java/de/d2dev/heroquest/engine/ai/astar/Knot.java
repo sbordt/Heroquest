@@ -19,6 +19,9 @@ public interface Knot{
      */
     public int getHeuristic();
     
+    public int getCosts();
+    
+    public void setCosts(int costs);
     
     /**
      * Returns the costs to get from this knot to a knot b

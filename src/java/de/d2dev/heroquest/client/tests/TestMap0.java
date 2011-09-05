@@ -15,8 +15,8 @@ public class TestMap0 extends TestMap {
 		ClientApplication app = new ClientApplication( new TFile( test.resources.dropbox.dropboxFolderPath + "/script/map templates/level0.lua" ), test.resources.resourceFinder );
 		app.init();
 		
-		app.addTestMonsters(8);
-		app.addTestHeroes(4);
+		app.addTestMonsters(3);
+		app.addTestHeroes(1);
 		
 		app.run();
 	}

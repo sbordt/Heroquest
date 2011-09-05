@@ -14,14 +14,18 @@ public class SearchKnot implements Knot {
     private Field field;
     private int heuristic;
     private Communicator communicator;
+    private int costs;
 
     public SearchKnot(Field field, int heuristic, Communicator communicator) {
         this.field = field;
         this.heuristic = heuristic;
         this.communicator = communicator;
+        this.costs = -1;
 
     }
-
+    
+    
+    
     @Override
     public ArrayDeque<Knot> getSuccessors() {
         return communicator.getSuccessors(this);
@@ -61,9 +65,20 @@ public class SearchKnot implements Knot {
     
     @Override
     public int getTransitionCosts(Knot b) {
-        if (b == null) {
-            throw new NullPointerException("getTransitionCosts: Knot is null");
-        }
-        return communicator.getTransitionCosts(this,b);
+//        if (b == null) {
+//            throw new NullPointerException("getTransitionCosts: Knot is null");
+//        }
+//        return communicator.getTransitionCosts(this,b);
+        return 1;
+    }
+
+    @Override
+    public int getCosts() {
+        return costs;
+    }
+
+    @Override
+    public void setCosts(int costs) {
+        this.costs = costs;
     }
 }
