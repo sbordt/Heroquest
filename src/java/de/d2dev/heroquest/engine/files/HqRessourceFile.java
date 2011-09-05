@@ -7,6 +7,7 @@ import nu.xom.ParsingException;
 import de.d2dev.fourseasons.VersionNumber;
 import de.d2dev.fourseasons.files.AbstractContainerFile;
 import de.d2dev.fourseasons.files.MagicStringException;
+import de.d2dev.fourseasons.resource.TFileResourceFinder;
 
 import de.schlichtherle.truezip.file.TFile;
 
@@ -44,6 +45,15 @@ public class HqRessourceFile extends AbstractContainerFile {
 		// initialize resource folders
 		this.textures = new TFile( this.file.getAbsolutePath() + "/" + TEXTURES );
 		this.sounds = new TFile( this.file.getAbsolutePath() + "/" + SOUNDS );
+	}
+	
+	/**
+	 * Make a {@link TFileResourceFinder} find resources in the resource file.
+	 * @param locator
+	 */
+	public void addAsResourceLocation(TFileResourceFinder locator) {
+		locator.textureLocations.add( this.textures );
+		locator.audioLocations.add( this.sounds );
 	}
 
 	@Override

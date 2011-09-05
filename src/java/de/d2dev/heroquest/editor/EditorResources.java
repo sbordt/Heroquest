@@ -46,8 +46,7 @@ public class EditorResources {
     	if ( new TFile( this.publicDataStoragePath + "/" + "globalResources.zip" ).exists() ) {
         	this.globalRessources = new HqRessourceFile( this.publicDataStoragePath + "/" + "globalResources.zip" );
         	
-        	this.resourceFinder.audioLocations.add( this.globalRessources.sounds );
-        	this.resourceFinder.textureLocations.add( this.globalRessources.textures );    		
+        	this.globalRessources.addAsResourceLocation( resourceFinder );
     	}
     	
     	// Dropbox setup

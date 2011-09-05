@@ -55,8 +55,14 @@ public class Dropbox {
     	}				
 	}
 	
+	/**
+	 * Make a {@link TFileResourceFinder} find dropbox resources.
+	 * @param finder
+	 */
 	public void addAsResourceLocation(TFileResourceFinder finder) {
 		if ( this.dropboxFolderPath != null ) {
+			this.dropboxResources.addAsResourceLocation( finder );
+			
 			finder.textureLocations.add( this.dropboxResources.textures );
 			finder.luaScriptLocations.add( this.dropboxScriptFolder );
 		}
