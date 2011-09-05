@@ -49,6 +49,14 @@ public abstract class Unit {
 	protected RunningGameContext gameContext;
 
 	protected int remainingMoves = 0;
+	
+	/*
+	 * Classical fight system
+	 */
+	int bodyForce;
+	int intelligence;
+	int numAttackDices;
+	int numDefenseDices;
 
 	/**
 	 * If the unit is under ai control, this {@link AIController} determines its actions.
@@ -269,6 +277,35 @@ public abstract class Unit {
 	public void setRemainingMoves(int remainingMoves) {
 		this.remainingMoves = remainingMoves;
 	}
+	
+	/**************************************************************************************
+	 * 
+	 * 						      CLASSICAL FIGHT SYSTEM
+	 * 
+	 **************************************************************************************/
+	
+	public int getBodyForce() {
+		return bodyForce;
+	}
+
+	public int getIntelligence() {
+		return intelligence;
+	}
+
+	public int getNumAttackDices() {
+		return numAttackDices;
+	}
+
+	public int getNumDefenseDices() {
+		return numDefenseDices;
+	}
+	
+	
+	/**************************************************************************************
+	 * 
+	 * 						           GAME METHODS
+	 * 
+	 **************************************************************************************/
 
 	
 	/**************************************************************************************
@@ -284,7 +321,7 @@ public abstract class Unit {
 	public AIController getAIController() {
 		return this.aiController;
 	}
-	
+
 	/**
 	 * 
 	 * @param aiController {@code null} to remove ai control.

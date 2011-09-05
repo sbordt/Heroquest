@@ -10,6 +10,7 @@ import de.d2dev.heroquest.editor.script.EditorLuaScriptDecomposer;
 import de.d2dev.heroquest.editor.script.LuaMapCreatorFunction;
 import de.d2dev.heroquest.engine.ai.AISystem;
 import de.d2dev.heroquest.engine.files.HqMapFile;
+import de.d2dev.heroquest.engine.game.ClassicalGameUtil;
 import de.d2dev.heroquest.engine.game.Direction2D;
 import de.d2dev.heroquest.engine.game.Field;
 import de.d2dev.heroquest.engine.game.Hero;
@@ -17,7 +18,6 @@ import de.d2dev.heroquest.engine.game.Hero.HeroType;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.Monster;
 import de.d2dev.heroquest.engine.game.Monster.MonsterType;
-import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.game.UnitFactory;
 import de.d2dev.heroquest.engine.game.action.GameAction;
 import de.d2dev.heroquest.engine.rendering.Renderer;
@@ -30,6 +30,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+
+import org.apache.log4j.BasicConfigurator;
 
 public class ClientApplication implements KeyListener {
 
@@ -49,7 +51,7 @@ public class ClientApplication implements KeyListener {
         
     private boolean heroesRound = true;
     
-    private Unit activeHero = null;
+    private Hero activeHero = null;
     
     private List<Monster> monstersToGo;
     private List<GameAction> actionsToPerform;
@@ -86,6 +88,9 @@ public class ClientApplication implements KeyListener {
     }
     
     public void init() throws Exception {
+    	// log4j
+    	BasicConfigurator.configure();
+    	
         this.aiSystem = new AISystem(map);
 
     	this.unitFactory = new UnitFactory();
@@ -120,7 +125,7 @@ public class ClientApplication implements KeyListener {
     	
     	try {
     		this.unitFactory.createBarbarian( this.map.getField(0, 0) );
-    		this.activeHero = this.map.getHeroes().get(0);
+    		this.activeHero = (Hero) this.map.getHeroes().get(0);
     		
     		if ( numHeroes > 1)
     			this.unitFactory.createDwarf( this.map.getField(0, 1 ) );
@@ -371,6 +376,13 @@ public class ClientApplication implements KeyListener {
 					actionField.getDoor().open();
 					return;
 				}
+				
+				// attack monsters! (yea)
+				if ( actionField.hasUnit() && actionField.getUnit().isMonster() ) {
+					Monster monster = (Monster) actionField.getUnit();
+					
+					ClassicalGameUtil.heroAttackMonster( this.activeHero, monster );
+				}
 			}
 					
 			/*
@@ -411,11 +423,11 @@ public class ClientApplication implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent arg0) {
-        // TODO Auto-generated method stub
+        // just override
     }
 
     @Override
     public void keyTyped(KeyEvent arg0) {
-        // TODO Auto-generated method stub
+        // just override
     }
 }

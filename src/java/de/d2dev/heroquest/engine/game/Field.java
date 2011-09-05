@@ -1,7 +1,7 @@
 package de.d2dev.heroquest.engine.game;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -207,7 +207,7 @@ public final class Field {
 	 * @return
 	 */
 	public List<Field> getNeighbours() {
-		List<Field> neighbours = new Vector<Field>();
+		List<Field> neighbours = new ArrayList<Field>();
 		
 		Field field;
 		
@@ -221,6 +221,27 @@ public final class Field {
 			neighbours.add( field );
 		
 		return neighbours;
+	}
+	
+	/**
+	 * Get a {@code List} containing the fields surrounding fields,
+	 * that are the (at most) 8 fields surrounding the field.
+	 * There might be fewer than 8, e.g. in case of the 
+	 * maps upper left corner.
+	 * @return
+	 */
+	public List<Field> getSurroundingFields() {
+		List<Field> surrounders = new ArrayList<Field>();
+		
+		for (int i=-1; i<=1; i++) {
+			for (int j=-1; j<=1; j++) {
+				if ( (i != 0 || j != 0) && map.fieldExists( x-i, y-j ) ) {	// do not add the field itself and only add existing fields
+					surrounders.add( map.getField( x-i, y-j ) );
+				}
+			}
+		}	
+		
+		return surrounders;
 	}
 	
 	/**
@@ -307,6 +328,14 @@ public final class Field {
 	 */
 	public boolean belongsToRoom() {
 		return room != null;
+	}
+	
+	/**
+	 * Is this field a passage field?
+	 * @return
+	 */
+	public boolean isPassage() {
+		return !this.isWall && !this.belongsToRoom();
 	}
 	
 	/**

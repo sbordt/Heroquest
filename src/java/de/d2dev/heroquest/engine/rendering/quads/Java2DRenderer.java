@@ -4,11 +4,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
-import java.util.HashMap;
 
-import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.ResourceLocator;
-import de.d2dev.fourseasons.resource.types.TextureResource;
+import de.d2dev.fourseasons.resource.types.BufferedImageStorage;
 
 /**
  * This class renders a {@link QuadRenderModel} into a {@link java.awt.BufferedImage} (using {@code BufferedImage.TYPE_INT_ARGB}). 
@@ -18,7 +16,7 @@ import de.d2dev.fourseasons.resource.types.TextureResource;
  */
 public class Java2DRenderer extends AbstractQuadRenderer {
 	
-	private HashMap< String, BufferedImage > textures = new HashMap< String, BufferedImage >();
+	private BufferedImageStorage imageStorage;
 	
 	private int ppUnit;
 	
@@ -31,6 +29,9 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 			throw new IllegalArgumentException();
 		
 		this.ppUnit = ppUnit;
+		
+		// image storage creation
+		this.imageStorage = new BufferedImageStorage( p );
 		
 		// create the render target
 		this.target = new BufferedImage( this.model.getWidth() * this.ppUnit, this.model.getHeight() * this.ppUnit,  BufferedImage.TYPE_INT_ARGB );
@@ -57,10 +58,7 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 	}
 	
 	@Override
-	public void setRenderModel(QuadRenderModel m) {
-		// clear loaded texture
-		this.textures.clear();
-		
+	public void setRenderModel(QuadRenderModel m) {		
 		// change the underlying model
 		this.model = m;
 		
@@ -111,7 +109,7 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 	
 	private void renderQuad(Graphics2D g, RenderQuad quad) {
 		// load the texture
-		BufferedImage img = this.provideTexture( quad.getTexture() );
+		BufferedImage img = this.imageStorage.provideTexture( quad.getTexture() );
 		
 		// Scaling for the resolution, rotation for the turn and translation for the position
 		AffineTransform transform = new AffineTransform();
@@ -138,26 +136,4 @@ public class Java2DRenderer extends AbstractQuadRenderer {
 		g.drawImage( img, transform, null);
 	}
 	
-	private BufferedImage provideTexture(Resource texture) {
-		BufferedImage img;
-		
-		if ( (img = this.textures.get( texture.getName() )) == null ) {
-			try {
-				img = TextureResource.load( this.resourceProvider.getAbsoluteLocation( texture ) );
-				this.textures.put( texture.getName(), img );
-			} catch (Exception e) {
-				e.printStackTrace();
-				
-				// provide magenta picture to indicate the error
-				img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB );
-				Graphics2D graphics = img.createGraphics();
-
-				graphics.setColor( Color.MAGENTA );
-				graphics.fillRect( 0, 0, img.getWidth(), img.getHeight() );
-			}
-		}
-		
-		return img;
-	}
-
 }

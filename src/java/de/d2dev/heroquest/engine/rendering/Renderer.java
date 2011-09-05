@@ -1,6 +1,7 @@
 package de.d2dev.heroquest.engine.rendering;
 
 import java.util.HashMap;
+import java.util.List;
 
 import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.ResourceLocator;
@@ -62,17 +63,13 @@ public class Renderer implements MapListener {
 	private HashMap<Unit, RenderQuad> units = new HashMap<Unit, RenderQuad>();
 	
 	private HashMap<Field, RenderQuad> fogOfWarQuads = new HashMap<Field, RenderQuad>();
-	
-	private WallTextureCreator wallTextureCreator;
+	private Resource fogTexture = TextureResource.createTextureResource("fog of war/fog.png");
 	
 	public Renderer(Map map, QuadRenderModel renderTarget, ResourceLocator resourceFinder) {
 		this.map = map;
 
 		this.setRenderTarget(renderTarget);
-		
-		this.wallTextureCreator = new WallTextureCreator( map, resourceFinder, TextureResource.createTextureResource( "fields/brown.jpg" ) );
 	}
-	
 		
 	/*
 	 * Render options getter/setter
@@ -113,6 +110,15 @@ public class Renderer implements MapListener {
 		if ( this.firstTime ) {
 			this.fieldTextures.clear();
 			this.walls.clear();
+			
+			// reveal all passage fields
+			for (Field[] row : map.getFields()) {
+				for (Field field : row) {
+					if ( field.isPassage() ) {
+						field.reveal();
+					}
+				}
+			}	
 			
 			for (Field[] row : map.getFields()) {
 				for (Field field : row) {
@@ -167,7 +173,8 @@ public class Renderer implements MapListener {
 		
 		// walls
 		if ( field.isWall() ) {
-			Resource wallTexture = this.wallTextureCreator.createWallTexture( field );
+			// Resource wallTexture = this.wallTextureCreator.createWallTexture( field );
+			Resource wallTexture = TextureResource.createTextureResource( "walls/wall.png" );
 			
 			this.walls.put( field, new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, WALLS,  wallTexture ) );
 			this.renderTarget.addQuad( this.walls.get( field ) );
@@ -201,11 +208,25 @@ public class Renderer implements MapListener {
 		if ( !this.fogOfWar )
 			return;
 		
-		Resource fogTexture = TextureResource.createTextureResource("fog of war/fog.png");
-		
 		if ( field.belongsToRoom() && !field.isRevealed() ) {			
 			quad = new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, FOG_OF_WAR,  fogTexture );
 			
+			this.fogOfWarQuads.put( field, quad );
+			this.renderTarget.addQuad( quad );
+		}
+		
+		// hide wall fields if all surrounding non-wall fields have not been revealed yet
+		if ( field.isWall() ) {
+			List<Field> surrounders = field.getSurroundingFields();
+			
+			for (Field f : surrounders) {
+				if ( !f.isWall() && f.isRevealed() ) {
+					return;
+				}
+			}
+				
+			quad = new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, FOG_OF_WAR,  fogTexture );
+				
 			this.fogOfWarQuads.put( field, quad );
 			this.renderTarget.addQuad( quad );
 		}
@@ -362,6 +383,13 @@ public class Renderer implements MapListener {
 	@Override
 	public void onFieldRevealed(Field field) {
 		this.renderField(field);
+		
+		// update all surrounding wall fields!
+		for (Field f : field.getSurroundingFields()) {
+			if ( f.isWall() ) {
+				this.renderField( f );
+			}
+		}
 	}
 	
 	@Override

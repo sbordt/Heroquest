@@ -7,6 +7,8 @@ import de.d2dev.heroquest.engine.game.Hero.HeroType;
 
 import java.util.*;
 
+import com.google.common.base.Preconditions;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -108,7 +110,19 @@ public final class Map implements Observed<MapListener> {
 		return height;
 	}
 	
+	public boolean fieldExists(int x, int y) {
+		return x >= 0 &&  x < this.width && y >= 0 && y < this.height;
+	}
+	
+	/**
+	 * Get the field at the given position.
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	public Field getField(int x, int y) {
+		Preconditions.checkArgument( this.fieldExists(x, y), "Field at " + x + "/" +  y + " does not exist" );
+		
 		return this.fields[x][y];
 	}
 	
@@ -208,6 +222,17 @@ public final class Map implements Observed<MapListener> {
 		}
     	
     	return monsters;
+    }
+    
+    public void removeUnit(Unit unit) {
+    	Preconditions.checkArgument( unit.getMap() == this, "Unit does not belong to this map!" );
+    	
+    	Field field = unit.getField();
+    	
+    	field.unit = null;
+    	unit.field = null;
+    	
+    	this.fireOnUnitLeavesField( field );
     }
     
 	/**************************************************************************************
