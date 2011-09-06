@@ -211,7 +211,14 @@ public class Renderer implements MapListener {
 	private void renderWall(Field field) {
 		Preconditions.checkArgument( field.isWall() );
 		
-		WallType wallType = field.getWallType();
+		WallType wallType;
+		
+		if ( this.fogOfWar ) {
+			wallType = field.getRevealedWallType();
+		}	
+		else {
+			wallType = field.getWallType();
+		}
 		
 		Resource wallTexture = fullWallTexture;
 		TextureTurn turn = TextureTurn.NORMAL;

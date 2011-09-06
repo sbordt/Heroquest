@@ -38,7 +38,8 @@ public final class Field {
 	
 	/**
 	 * Enumeration for the different types of walls. We mean not the
-	 * wall field itself but how it is connected to other walls.
+	 * wall field itself but how it is connected to other walls
+	 * (i.e. we observe the fields 8 surrounding fields and check if they are walls).
 	 * @author Sebastian Bordt
 	 *
 	 */
@@ -61,11 +62,6 @@ public final class Field {
 		EDGE_UPPER_LEFT,
 		EDGE_UPPER_RIGHT,
 		CROSS,
-		
-		
-		
-
-		
 		
 	}
 	
@@ -295,77 +291,115 @@ public final class Field {
 		return isWall;
 	}
 	
+	/**
+	 * Get the fields wall type.
+	 * @return
+	 */
 	public WallType getWallType() {
 		Preconditions.checkArgument( isWall );
-
-		// field does not touch the maps borders - 11 cases! lot's of code but does it and errors are easy to find
-		if ( x != 0 && x != map.getWidth() -1 && y != 0 && y != map.getHeight() -1 ) {
-			Field upperField = map.getField( x, y-1 );
-			//Field upperLeftField = map.getField( x-1, y-1 );
-			//Field upperRightField = map.getField( x+1, y-1 );
-			Field lowerField = map.getField( x, y+1 );
-			//Field lowerLeftField = map.getField( x-1, y+1 );
-			//Field lowerRightField = map.getField( x+1, y+1 );
-			Field leftField = map.getField( x-1, y );
-			Field rightField = map.getField( x+1, y );
-			
-			// horizontal wall
-			if ( !upperField.isWall() && !lowerField.isWall() && leftField.isWall() && rightField.isWall() ) {
-				return WallType.HORIZONTAL;
-			}
-			
-			// horizontal and bottom
-			else if ( !upperField.isWall() && lowerField.isWall() && leftField.isWall() && rightField.isWall() ) {
-				return WallType.HORIZONTAL_AND_BOTTOM;
-			}
-			
-			// horizontal and top
-			else if ( upperField.isWall() && !lowerField.isWall() && leftField.isWall() && rightField.isWall() ) {		
-				return WallType.HORIZONTAL_AND_TOP;
-			}	
-			
-			// vertical wall
-			else if ( upperField.isWall() && lowerField.isWall() && !leftField.isWall() && !rightField.isWall() ) { 
-				return WallType.VERTICAL;
-			}
-			
-			// vertical and left
-			else if ( upperField.isWall() && lowerField.isWall() && leftField.isWall() && !rightField.isWall() ) { 
-				return WallType.VERTICAL_AND_LEFT;
-			}
-			
-			// vertical and right
-			else if ( upperField.isWall() && lowerField.isWall() && !leftField.isWall() && rightField.isWall() ) { 
-				return WallType.VERTICAL_AND_RIGHT;
-			}
-			
-			// lower left edge
-			else if ( !upperField.isWall() && lowerField.isWall() && leftField.isWall() && !rightField.isWall() ) { 
-				return WallType.EDGE_LOWER_LEFT;
-			}
-			
-			// lower right edge
-			else if ( !upperField.isWall() && lowerField.isWall() && !leftField.isWall() && rightField.isWall() ) { 
-				return WallType.EDGE_LOWER_RIGHT;
-			}
-			
-			// upper left edge
-			else if ( upperField.isWall() && !lowerField.isWall() && leftField.isWall() && !rightField.isWall() ) { 
-				return WallType.EDGE_UPPER_LEFT;
-			}
-			
-			// upper right edge
-			else if ( upperField.isWall() && !lowerField.isWall() && !leftField.isWall() && rightField.isWall() ) { 
-				return WallType.EDGE_UPPER_RIGHT;
-			}
-			
-			// cross
-			else if ( upperField.isWall() && lowerField.isWall() && leftField.isWall() && rightField.isWall() ) { 
-				return WallType.CROSS;
-			}
+		
+		return getWallTypeBySurroundingFields( map.fieldExists(x, y-1) ? map.getField(x, y-1).isWall() : false, 
+											   map.fieldExists(x-1, y-1) ? map.getField(x-1, y-1).isWall() : false, 
+											   map.fieldExists(x+1, y-1) ? map.getField(x+1, y-1).isWall() : false, 
+											   map.fieldExists(x, y+1) ? map.getField(x, y+1).isWall() : false,
+											   map.fieldExists(x-1, y+1) ? map.getField(x-1, y+1).isWall() : false, 
+											   map.fieldExists(x+1, y+1) ? map.getField(x+1, y+1).isWall() : false,
+											   map.fieldExists(x-1, y) ? map.getField(x-1, y).isWall() : false,															   
+											   map.fieldExists(x+1, y) ? map.getField(x+1, y).isWall() : false );																		  
+	}
+	
+	/**
+	 * Get the fields revealed wall type. Contrary to {@link getWallType}, which returns the fields wall 
+	 * type by regarding all surrounding fields, this method will only regard fields which have already been
+	 * revealed. Thus we can render a wall regarding how much the player knows about the map!
+	 * @return
+	 */
+	public WallType getRevealedWallType() {
+		Preconditions.checkArgument( isWall );
+		
+		return getWallTypeBySurroundingFields( map.fieldExists(x, y-1) ? map.getField(x, y-1).isWall() && map.getField(x, y-1).isRevealed() : false, 
+				   map.fieldExists(x-1, y-1) ? map.getField(x-1, y-1).isWall() && map.getField(x-1, y-1).isRevealed()  : false, 
+				   map.fieldExists(x+1, y-1) ? map.getField(x+1, y-1).isWall() && map.getField(x+1, y-1).isRevealed()  : false, 
+				   map.fieldExists(x, y+1) ? map.getField(x, y+1).isWall() && map.getField(x, y+1).isRevealed()  : false,
+				   map.fieldExists(x-1, y+1) ? map.getField(x-1, y+1).isWall() && map.getField(x-1, y+1).isRevealed()  : false, 
+				   map.fieldExists(x+1, y+1) ? map.getField(x+1, y+1).isWall() && map.getField(x+1, y+1).isRevealed()  : false,
+				   map.fieldExists(x-1, y) ? map.getField(x-1, y).isWall() && map.getField(x-1, y).isRevealed()  : false,															   
+				   map.fieldExists(x+1, y) ? map.getField(x+1, y).isWall() && map.getField(x+1, y).isRevealed()  : false );
+	}
+	
+	/**
+	 * Internal helper for {@link getWallType} and {@link getRevealedWallType}. Returns a fields wall type given the information whether
+	 * the fields surrounding fields are walls.
+	 * @param upperIsWall
+	 * @param upperLeftIsWall
+	 * @param upperRightIsWall
+	 * @param lowerIsWall
+	 * @param lowerLeftIsWall
+	 * @param lowerRightIsWall
+	 * @param leftIsWall
+	 * @param rightIsWall
+	 * @return
+	 */
+	private WallType getWallTypeBySurroundingFields(boolean upperIsWall, boolean upperLeftIsWall, boolean upperRightIsWall,
+			boolean lowerIsWall, boolean lowerLeftIsWall, boolean lowerRightIsWall, boolean leftIsWall, boolean rightIsWall) {
+		
+		// horizontal wall
+		if ( !upperIsWall && !lowerIsWall && leftIsWall && rightIsWall ) {
+			return WallType.HORIZONTAL;
 		}
 		
-		return WallType.FULL;
+		// horizontal and bottom
+		else if ( !upperIsWall && lowerIsWall && leftIsWall && rightIsWall ) {
+			return WallType.HORIZONTAL_AND_BOTTOM;
+		}
+		
+		// horizontal and top
+		else if ( upperIsWall && !lowerIsWall && leftIsWall && rightIsWall ) {		
+			return WallType.HORIZONTAL_AND_TOP;
+		}	
+		
+		// vertical wall
+		else if ( upperIsWall && lowerIsWall && !leftIsWall && !rightIsWall ) { 
+			return WallType.VERTICAL;
+		}
+		
+		// vertical and left
+		else if ( upperIsWall && lowerIsWall && leftIsWall && !rightIsWall ) { 
+			return WallType.VERTICAL_AND_LEFT;
+		}
+		
+		// vertical and right
+		else if ( upperIsWall && lowerIsWall && !leftIsWall && rightIsWall ) { 
+			return WallType.VERTICAL_AND_RIGHT;
+		}
+		
+		// lower left edge
+		else if ( !upperIsWall && lowerIsWall && leftIsWall && !rightIsWall ) { 
+			return WallType.EDGE_LOWER_LEFT;
+		}
+		
+		// lower right edge
+		else if ( !upperIsWall && lowerIsWall && !leftIsWall && rightIsWall ) { 
+			return WallType.EDGE_LOWER_RIGHT;
+		}
+		
+		// upper left edge
+		else if ( upperIsWall && !lowerIsWall && leftIsWall && !rightIsWall ) { 
+			return WallType.EDGE_UPPER_LEFT;
+		}
+		
+		// upper right edge
+		else if ( upperIsWall && !lowerIsWall && !leftIsWall && rightIsWall ) { 
+			return WallType.EDGE_UPPER_RIGHT;
+		}
+		
+		// cross
+		else if ( upperIsWall && lowerIsWall && leftIsWall && rightIsWall ) { 
+			return WallType.CROSS;
+		}
+
+		// if we know no better let it be a full wall!
+		return WallType.FULL;		
 	}
 	
 	/**
@@ -528,6 +562,7 @@ public final class Field {
 	
 	/**
 	 * Reveal the field. Each field can be revealed exactly once.
+	 * Surrounding wall fields will be revealed too.
 	 */
 	public void reveal() {
 		// nothing to do
@@ -537,7 +572,16 @@ public final class Field {
 		// reveal the field an fire event
 		this.revealed = true;
 		
-		this.map.fireOnFieldRevealed( this );		
+		this.map.fireOnFieldRevealed( this );
+		
+		// reveal surrounding wall fields
+		for (Field f : this.getSurroundingFields()) {
+			if ( f.isWall ) {
+				f.revealed = true;
+				
+				this.map.fireOnFieldRevealed( f );
+			}
+		}
 	}
 	
 	/**************************************************************************************

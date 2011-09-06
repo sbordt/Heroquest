@@ -12,7 +12,7 @@ public class DoorTest extends TestMap {
 	public static void main(String[] args) throws Exception {
 		TestMap0 test = new TestMap0();
 		
-		ClientApplication app = new ClientApplication( new TFile( test.resources.dropbox.dropboxFolderPath + "/script/map templates/doorTest.lua" ), test.resources.resourceFinder, test.settings, false );
+		ClientApplication app = new ClientApplication( new TFile( test.resources.dropbox.dropboxFolderPath + "/script/map templates/doorTest.lua" ), test.resources.resourceFinder, test.settings, true );
 		app.init();
 	
 		app.addTestHeroes(1);
