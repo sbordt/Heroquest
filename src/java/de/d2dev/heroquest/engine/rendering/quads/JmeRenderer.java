@@ -14,6 +14,7 @@ import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Texture;
 import com.jme3.math.Vector3f;
@@ -66,19 +67,42 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         	// Das Quad wird in seiner Größe erstellt
         	RenderQuad tempQuad = map.getQuads().get(i);
         	Quad quad = new Quad(tempQuad.getWidth(),tempQuad.getHeight());
+        	System.out.println("w. " + tempQuad.getWidth()+"h: "+tempQuad.getHeight());
+        	System.out.println("qw: "+quad.getWidth()+"qh: "+quad.getHeight());
             Geometry geom = new Geometry("Quad", quad);
             // Das Quad wird im Geometry bewegt
-            geom.move(tempQuad.getX(), transY(tempQuad.getY()), tempQuad.getZLayer());
+            geom.move(tempQuad.getX(), transY(tempQuad), tempQuad.getZLayer());
             // Rotation des Quads
-            switch (tempQuad.getTextureTurn()){
+           switch (tempQuad.getTextureTurn()){
             case TURN_LEFT_180_DEGREE:
-            	geom.rotate(0, 0, (float) Math.PI);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 0, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 1, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 0, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 1, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 0, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 1, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 0, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 1, 0f);
             break;
             case TURN_LEFT_270_DEGREE:
-            	geom.rotate(0, 0, (float) (1.5*Math.PI));
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 0, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 1, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 0, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 1, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 0, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 1, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 0, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 1, 0f);
             break;
             case TURN_LEFT_90_DEGREE:
-            	geom.rotate(0, 0, (float) (0.5*Math.PI));
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 0, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 1, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 0, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 1, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 0, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 1, 0f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 0, 1f);
+            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 1, 1f);       	
             break;
             }
             // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
@@ -165,7 +189,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
     	Quad jmeQuad = new Quad(quad.getWidth(),quad.getHeight());
         Geometry geom = new Geometry("Quad", jmeQuad);
         // Das Quad wird im Geometry bewegt
-        geom.move(quad.getX(), transY(quad.getY()), quad.getZLayer());
+        geom.move(quad.getX(), transY(quad), quad.getZLayer());
         // Rotation
         // Rotation des Quads
         switch (quad.getTextureTurn()){
@@ -199,7 +223,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 	}
 	@Override
 	public void onQuadMoved(RenderQuad quad) {
-		geometrics.get(quad).move(quad.getX(), transY(quad.getY()), quad.getZLayer());
+		geometrics.get(quad).move(quad.getX(), transY(quad), quad.getZLayer());
 	}
 	
 	@Override
@@ -244,8 +268,8 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 		
 	}	
 	
-	private float transY (float y){
-		return this.quadRenderModel.getHeight()-(y+1);
+	private float transY (final RenderQuad quad){
+		return (this.quadRenderModel.getHeight()-(quad.getY()+quad.getHeight()));
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////

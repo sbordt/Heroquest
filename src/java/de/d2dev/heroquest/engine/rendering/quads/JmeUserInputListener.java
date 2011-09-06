@@ -92,17 +92,6 @@ public class JmeUserInputListener implements AnalogListener, ActionListener {
             renderer.getCamera().setFrustum( -100, 1000, -renderer.getZoomLevel() * aspect, renderer.getZoomLevel() * aspect, renderer.getZoomLevel(), -renderer.getZoomLevel() );
         }
         else if (name.equals("dragMoveX")){
-        	System.out.println("hi drag");
-        	System.out.println("rmb: " + rightMouseButton);
-        	System.out.println("x: " + this.renderer.getInputManager().getCursorPosition().x);
-        	System.out.println("y: " + this.renderer.getInputManager().getCursorPosition().y);
-        	System.out.println("xstart: " + dragStartPos.x);
-        	System.out.println("ystart: " + dragStartPos.y);
-        	System.out.println("xres: " + (this.renderer.getInputManager().getCursorPosition().x - dragStartPos.x));
-        	System.out.println("yres: " + (this.renderer.getInputManager().getCursorPosition().y - dragStartPos.y));
-        	System.out.println("cam x: " + this.renderer.getCamera().getLocation().x);
-        	System.out.println("cam x: " + this.renderer.getCamera().getLocation().y);
-        	
         	float xDiff = this.renderer.getInputManager().getCursorPosition().x - dragStartPos.x;
         	float yDiff = this.renderer.getInputManager().getCursorPosition().y - dragStartPos.y;
         	
@@ -114,23 +103,11 @@ public class JmeUserInputListener implements AnalogListener, ActionListener {
 				this.dragStartPos.y = this.renderer.getInputManager().getCursorPosition().y;
         	}
         }
-        /*System.out.println("Höhe: " + (cam.getFrustumTop() - cam.getFrustumBottom()));
-        System.out.println("Breite: " + (cam.getFrustumRight() - cam.getFrustumLeft()));
-        System.out.println("X: " + cam.getLocation().x);
-        System.out.println("Y: " + cam.getLocation().y);
-        System.out.println("Z: " + cam.getLocation().z);
-        System.out.println("Linker Rand: " + (cam.getLocation().x - (cam.getFrustumRight() - cam.getFrustumLeft())/2));
-        System.out.println("rechter Rand: " + (cam.getLocation().x + (cam.getFrustumRight() - cam.getFrustumLeft())/2));
-        System.out.println("Unterer Rand: " + (renderer.getCamera().getLocation().y - (renderer.getCamera().getFrustumTop() - renderer.getCamera().getFrustumBottom())/2));
-        System.out.println("Oberer Rand: " + (renderer.getCamera().getLocation().y + (renderer.getCamera().getFrustumTop() - renderer.getCamera().getFrustumBottom())/2));
-        System.out.println("Cursor Position: " + inputManager.getCursorPosition());*/
       }
 
 	@Override
 	public void onAction(String name, boolean pressed, float tpf) {
 		if (name.equals("rightMouseButton")){
-			System.out.println("hi button");
-			System.out.println("rmb-key: " + rightMouseButton);
 			if (rightMouseButton == false){
 				this.dragStartPos.x = this.renderer.getInputManager().getCursorPosition().x;
 				this.dragStartPos.y = this.renderer.getInputManager().getCursorPosition().y;
