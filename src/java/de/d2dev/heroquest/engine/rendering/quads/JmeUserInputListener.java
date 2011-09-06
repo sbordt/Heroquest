@@ -3,6 +3,10 @@ package de.d2dev.heroquest.engine.rendering.quads;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.math.Vector2f;
+import com.jme3.niftygui.NiftyJmeDisplay;
+
+import de.d2dev.heroquest.engine.rendering.GUI.CharacterInfoController;
+import de.lessvoid.nifty.Nifty;
 
 public class JmeUserInputListener implements AnalogListener, ActionListener {
 	private JmeRenderer renderer = null;
@@ -132,6 +136,16 @@ public class JmeUserInputListener implements AnalogListener, ActionListener {
 				this.dragStartPos.y = this.renderer.getInputManager().getCursorPosition().y;
 			}
 			this.rightMouseButton = pressed;
+		}
+		else if (name.equals("characterInfo")){
+			System.out.println("Gui started");
+			NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(renderer.getAssetManager(), renderer.getInputManager(), renderer.getAudioRenderer(), renderer.getGuiViewPort());
+				/** Create a new NiftyGUI object */
+				Nifty nifty = niftyDisplay.getNifty();
+				/** Read your XML and initialize your custom ScreenController */
+				nifty.fromXml("gui/GUI.xml", "start", new CharacterInfoController());
+				// attach the Nifty display to the gui view port as a processor
+				renderer.getGuiViewPort().addProcessor(niftyDisplay);
 		}
 		
 	}

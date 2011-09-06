@@ -11,6 +11,8 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.*;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Texture;
@@ -62,15 +64,31 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         for (int i = 0; i < map.getQuads().size(); i++){
             
         	// Das Quad wird in seiner Größe erstellt
-        	Quad quad = new Quad(map.getQuads().get(i).getWidth(),map.getQuads().get(i).getHeight());
+        	RenderQuad tempQuad = map.getQuads().get(i);
+        	Quad quad = new Quad(tempQuad.getWidth(),tempQuad.getHeight());
             Geometry geom = new Geometry("Quad", quad);
             // Das Quad wird im Geometry bewegt
-            geom.move(map.getQuads().get(i).getX(), transY(map.getQuads().get(i).getY()), map.getQuads().get(i).getZLayer());
+            geom.move(tempQuad.getX(), transY(tempQuad.getY()), tempQuad.getZLayer());
+            // Rotation des Quads
+            switch (tempQuad.getTextureTurn()){
+            case TURN_LEFT_180_DEGREE:
+            	geom.rotate(0, 0, (float) Math.PI);
+            break;
+            case TURN_LEFT_270_DEGREE:
+            	geom.rotate(0, 0, (float) (1.5*Math.PI));
+            break;
+            case TURN_LEFT_90_DEGREE:
+            	geom.rotate(0, 0, (float) (0.5*Math.PI));
+            break;
+            }
             // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
             Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            Texture texture = assetManager.loadTexture( map.getQuads().get(i).getTexture().getName() );
+            System.out.println(tempQuad.getTexture().getName());
+            Texture texture = assetManager.loadTexture( tempQuad.getTexture().getName() );
             mat.setTexture("ColorMap", texture);
+            mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
             geom.setMaterial(mat);
+            geom.setQueueBucket(Bucket.Transparent);
             // Das Geometrie Object wird dem rootnode hinzugefügt
             this.rootNode.attachChild(geom);
             // Damit später auf die Quads zugefriffen werden kann werden diese mit dem zugehörigen
@@ -92,13 +110,14 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
        inputManager.addMapping("down", new KeyTrigger(KeyInput.KEY_DOWN));
        inputManager.addMapping("zoomOut", new KeyTrigger(KeyInput.KEY_O));
        inputManager.addMapping("zoomIn", new KeyTrigger(KeyInput.KEY_I));
+       inputManager.addMapping("characterInfo", new KeyTrigger(KeyInput.KEY_A));
        inputManager.addMapping("dragMoveX", new MouseAxisTrigger(MouseInput.AXIS_X, true));
        inputManager.addMapping("dragMoveX", new MouseAxisTrigger(MouseInput.AXIS_X, false));
        inputManager.addMapping("dragMoveY", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
        inputManager.addMapping("dragMoveY", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
        inputManager.addMapping("rightMouseButton", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
        
-       inputManager.addListener(userListener, new String[]{"left", "right", "up", "down", "zoomOut", "zoomIn", "dragMoveX", "dragMoveY", "rightMouseButton"});
+       inputManager.addListener(userListener, new String[]{"left", "right", "up", "down", "zoomOut", "zoomIn", "dragMoveX", "dragMoveY", "rightMouseButton", "characterInfo"});
     }
     
     
@@ -147,11 +166,26 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         Geometry geom = new Geometry("Quad", jmeQuad);
         // Das Quad wird im Geometry bewegt
         geom.move(quad.getX(), transY(quad.getY()), quad.getZLayer());
+        // Rotation
+        // Rotation des Quads
+        switch (quad.getTextureTurn()){
+        case TURN_LEFT_180_DEGREE:
+        	geom.rotate(0, 0, (float) Math.PI);
+        break;
+        case TURN_LEFT_270_DEGREE:
+        	geom.rotate(0, 0, (float) (1.5*Math.PI));
+        break;
+        case TURN_LEFT_90_DEGREE:
+        	geom.rotate(0, 0, (float) (0.5*Math.PI));
+        break;
+        }
         // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         Texture texture = assetManager.loadTexture( quad.getTexture().getName() );
         mat.setTexture("ColorMap", texture);
+        mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         geom.setMaterial(mat);
+        geom.setQueueBucket(Bucket.Transparent);
         // Das Geometrie Object wird dem rootnode hinzugefügt
         this.rootNode.attachChild(geom);
         // Damit später auf die Quads zugefriffen werden kann werden diese mit dem zugehörigen
