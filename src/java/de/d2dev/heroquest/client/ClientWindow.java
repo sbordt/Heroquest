@@ -15,8 +15,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.apache.log4j.Logger;
+
+import de.d2dev.fourseasons.swing.JTextAreaAppender;
 import de.d2dev.heroquest.editor.EditorResources;
 import de.d2dev.heroquest.editor.EditorSettings;
+import de.d2dev.heroquest.engine.game.classical.ClassicalGameContext;
 import de.d2dev.heroquest.engine.rendering.quads.Java2DRenderPanel;
 import de.d2dev.heroquest.engine.rendering.quads.JmeRenderer;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
@@ -50,6 +54,9 @@ public class ClientWindow extends javax.swing.JFrame {
         	this.jPanel1.setLayout(new BoxLayout(this.jPanel1, BoxLayout.PAGE_AXIS));
         	this.jPanel1.add(scrollPane);
         }	
+        
+        // log game to JTextArea
+        Logger.getLogger( ClassicalGameContext.GAME_LOGGER_NAME ).addAppender( new JTextAreaAppender( this.logTextArea ) );
         
         this.pack();
         this.repaint();

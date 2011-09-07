@@ -1,7 +1,7 @@
 package de.d2dev.heroquest.engine.game;
 
 import de.d2dev.fourseasons.files.FileUtil;
-import de.d2dev.fourseasons.util.Observed;
+import de.d2dev.fourseasons.util.Observable;
 import de.d2dev.fourseasons.util.ListenerUtil;
 import de.d2dev.heroquest.engine.game.Hero.HeroType;
 
@@ -20,7 +20,7 @@ import nu.xom.Elements;
  * @author Sebastian Bordt
  *
  */
-public final class Map implements Observed<MapListener> {
+public final class Map implements Observable<MapListener> {
 	
 	private static final String HERO_QUEST_MAP = "heroquestmap";
 	private static final String WIDTH = "width";
@@ -41,6 +41,8 @@ public final class Map implements Observed<MapListener> {
 	
 //	private List<MapObject> objects = new ArrayList<MapObject>();
 	private List<TextureOverlay> textureOverlays = new ArrayList<TextureOverlay>(); 
+	
+	private GameContext context;
 
 	/**
 	 * Construct a new empty map.
@@ -263,10 +265,19 @@ public final class Map implements Observed<MapListener> {
 	 * 
 	 **************************************************************************************/
     
+	public GameContext getContext() {
+		return context;
+	}
+
+	public void setContext(GameContext context) {
+		this.context = context;
+	}    
+    
 	@Override
 	public void addListener(MapListener l) {
 		this.listeners.addListener(l);
 	}
+
 
 	@Override
 	public void removeListener(MapListener l) {

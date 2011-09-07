@@ -2,17 +2,17 @@ package de.d2dev.heroquest.engine.game;
 
 import de.d2dev.fourseasons.gamestate.GameStateException;
 import de.d2dev.fourseasons.util.ListenerUtil;
-import de.d2dev.fourseasons.util.Observed;
+import de.d2dev.fourseasons.util.Observable;
 import de.d2dev.heroquest.engine.game.action.GameAction;
 import de.d2dev.heroquest.engine.game.action.MoveAction;
 
-public class GameContext implements Observed<GameListener> {
+public abstract class GameContext implements Observable<GameListener> {
 	
-	private ListenerUtil<GameListener> listeners = new ListenerUtil<GameListener>();
+	protected ListenerUtil<GameListener> listeners = new ListenerUtil<GameListener>();
 	
 	public final Map map;
 	
-	public GameContext(Map map) {
+	protected GameContext(Map map) {
 		super();
 		this.map = map;
 	}
@@ -26,14 +26,32 @@ public class GameContext implements Observed<GameListener> {
 		}
 	}
 	
+	/**************************************************************************************
+	 * 
+	 * 						           GAME METHODS
+	 * 
+	 **************************************************************************************/
 	
-	void fireOnMoveAction(MoveAction action) {
+	
+	public abstract void monsterAttackHero(Monster monster, Hero hero);
+	
+	public abstract void heroAttackMonster(Hero hero, Monster monster);
+	
+	
+
+	/**************************************************************************************
+	 * 
+	 * 										OTHER METHODS
+	 * 
+	 **************************************************************************************/
+	
+	protected void fireOnMoveAction(MoveAction action) {
 		for (GameListener l : listeners) {
 			l.onMoveAction( action );
 		}
 	}
 	
-	void fireOnMonsterDies(Monster monster) {
+	protected void fireOnMonsterDies(Monster monster) {
 		for (GameListener l : listeners) {
 			l.onMonsterDies( monster );
 		}

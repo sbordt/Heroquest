@@ -21,6 +21,7 @@ import de.d2dev.heroquest.engine.game.Hero.HeroType;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.Monster.MonsterType;
 import de.d2dev.heroquest.engine.game.action.*;
+import de.d2dev.heroquest.engine.game.classical.ClassicalGameContext;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.sound.JmeSoundPlayer;
@@ -28,11 +29,10 @@ import de.schlichtherle.truezip.file.TFile;
 
 import java.util.*;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 
 public class ClientApplication implements KeyListener, WindowListener {
 
@@ -44,7 +44,7 @@ public class ClientApplication implements KeyListener, WindowListener {
 	
     private ScriptEngine scriptEngine;    
     
-    private GameContext game;
+    private ClassicalGameContext game;
     private Map map;
     
     private ResourceLocator resourceFinder;
@@ -63,7 +63,7 @@ public class ClientApplication implements KeyListener, WindowListener {
     
     private Hero activeHero = null;
     
-    private List<Monster> monstersToGo;
+    private Monster activeMonster = null;
     private List<GameAction> actionsToPerform;
     
 	/**************************************************************************************
@@ -100,13 +100,16 @@ public class ClientApplication implements KeyListener, WindowListener {
     	
     	// log4j
     	BasicConfigurator.configure();
+    	Logger.getRootLogger().removeAllAppenders();
     	    	
     	// script engine setup
     	scriptEngine = ScriptEngine.createDefaultScriptEngine( this.resourceFinder, new EditorLuaScriptDecomposer() );
     }
     
     public void init() throws Exception {
-    	this.game = new GameContext( map );
+    	// game context - add to map
+    	this.game = new ClassicalGameContext( map );
+    	this.map.setContext( this.game );
     	
     	// sound player setup
     	this.soundPlayer = new JmeSoundPlayer( this.resources.assestManager );
@@ -205,21 +208,27 @@ public class ClientApplication implements KeyListener, WindowListener {
     public void startMonstersRound() {
     	this.heroesRound = false;
  
-    	// Get the maps monsters
-        this.monstersToGo = this.map.getMonsters();
+    	// notify the ai system
+    	this.aiSystem.startMonstersRound();
+    	
+    	// Get the first monster to act
+        this.activeMonster = this.aiSystem.getNextMonster();
         
-        if ( this.monstersToGo.isEmpty() ) {	// nothing to do
+        if ( this.activeMonster == null ) {	// nothing to do
         	this.endMonstersRound();
         	return;
         }
         
         // Let the first monster perform actions!
-        this.actionsToPerform = this.monstersToGo.get(0).getAIController().getActions();
+        this.actionsToPerform = this.activeMonster.getAIController().getActions();
         
         this.performMonsterActions();
     }
     
     public void endMonstersRound() {
+    	// notify the ai system
+    	this.aiSystem.endMonstersRound();
+    	
     	this.heroesRound = true;
     }
 
@@ -231,11 +240,11 @@ public class ClientApplication implements KeyListener, WindowListener {
         }    	
     	// the current monsters has all actions performed
     	else {
-        	this.monstersToGo.remove(0);
-        	
-        	// next monster perform actions!
-        	if ( !this.monstersToGo.isEmpty() ) {
-        		this.actionsToPerform = this.monstersToGo.get(0).getAIController().getActions();
+        	// Get the next monster perform actions!
+            this.activeMonster = this.aiSystem.getNextMonster();        	
+
+        	if ( this.activeMonster != null ) {
+        		this.actionsToPerform = this.activeMonster.getAIController().getActions();
         		
         		this.performMonsterActions();
         	} 
@@ -263,7 +272,7 @@ public class ClientApplication implements KeyListener, WindowListener {
         try {
             Thread.sleep(10);
         } catch (InterruptedException ex) {
-            Logger.getLogger(ClientApplication.class.getName()).log(Level.SEVERE, null, ex);
+        	ex.printStackTrace();
         }
 
         // what to do next?
@@ -392,7 +401,7 @@ public class ClientApplication implements KeyListener, WindowListener {
 				if ( actionField.hasUnit() && actionField.getUnit().isMonster() ) {
 					Monster monster = (Monster) actionField.getUnit();
 					
-					ClassicalGameUtil.heroAttackMonster( this.activeHero, monster );
+					this.game.execute( new AttackAction( this.activeHero, actionField.getUnit() ) );
 				}
 			}
 					

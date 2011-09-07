@@ -1,4 +1,4 @@
-package de.d2dev.heroquest.engine.game;
+package de.d2dev.heroquest.engine.game.classical;
 
 import java.util.Random;
 
@@ -6,14 +6,24 @@ import org.apache.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
+import de.d2dev.heroquest.engine.game.GameContext;
+import de.d2dev.heroquest.engine.game.Hero;
+import de.d2dev.heroquest.engine.game.Map;
+import de.d2dev.heroquest.engine.game.Monster;
+
 /**
  * This utility class provides static methods to run a classical 
  * HeroQuest game!
  * @author Sebastian Bordt
  *
  */
-public class ClassicalGameUtil {
+public class ClassicalGameContext extends GameContext {
 	
+	public ClassicalGameContext(Map map) {
+		super(map);
+		// TODO Auto-generated constructor stub
+	}
+
 	public enum HeroQuestDice {
 		ATTACK,
 		HERO_DEFENSE,
@@ -31,7 +41,7 @@ public class ClassicalGameUtil {
 	}
 	
 	public static HeroQuestDice rollHeroQuestDice() {
-		int result = ClassicalGameUtil.rollW6();
+		int result = ClassicalGameContext.rollW6();
 		
 		if ( result == 0 )	// 0 = monster defense
 			return HeroQuestDice.MONSTER_DEFENSE;
@@ -48,7 +58,7 @@ public class ClassicalGameUtil {
 		HeroQuestDice[] dices = new HeroQuestDice[ number ];
 		
 		for (int i=0; i<number; i++) {
-			dices[i] = ClassicalGameUtil.rollHeroQuestDice();
+			dices[i] = ClassicalGameContext.rollHeroQuestDice();
 		}
 		
 		return dices;
@@ -67,22 +77,22 @@ public class ClassicalGameUtil {
 	}
 	
 	public static int rollAttackDices(int number) {
-		return ClassicalGameUtil.getDiceAppearence(  ClassicalGameUtil.roolHeroQuestDices( number ), HeroQuestDice.ATTACK );
+		return ClassicalGameContext.getDiceAppearence(  ClassicalGameContext.roolHeroQuestDices( number ), HeroQuestDice.ATTACK );
 	}
 	
 	public static int rollHeroDefenceDices(int number) {
-		return ClassicalGameUtil.getDiceAppearence(  ClassicalGameUtil.roolHeroQuestDices( number ), HeroQuestDice.HERO_DEFENSE );
+		return ClassicalGameContext.getDiceAppearence(  ClassicalGameContext.roolHeroQuestDices( number ), HeroQuestDice.HERO_DEFENSE );
 	}
 	
 	public static int rollMonsterDefenceDices(int number) {
-		return ClassicalGameUtil.getDiceAppearence(  ClassicalGameUtil.roolHeroQuestDices( number ), HeroQuestDice.MONSTER_DEFENSE );
+		return ClassicalGameContext.getDiceAppearence(  ClassicalGameContext.roolHeroQuestDices( number ), HeroQuestDice.MONSTER_DEFENSE );
 	}
 	
-	public static void monsterAttackHero(Monster monster, Hero hero) {
-		Logger logger = Logger.getLogger( "game" );
+	public void monsterAttackHero(Monster monster, Hero hero) {
+		Logger logger = Logger.getLogger( GAME_LOGGER_NAME );
 		
-		int attack = ClassicalGameUtil.rollAttackDices( monster.getNumAttackDices() );
-		int defense = ClassicalGameUtil.rollHeroDefenceDices( hero.getNumDefenseDices() );
+		int attack = ClassicalGameContext.rollAttackDices( monster.getNumAttackDices() );
+		int defense = ClassicalGameContext.rollHeroDefenceDices( hero.getNumDefenseDices() );
 		
 		// no damage
 		if ( defense >= attack ) {
@@ -96,24 +106,24 @@ public class ClassicalGameUtil {
 		logger.info( monster.getName() + " attacked " + hero.getName() + " and dealt " + damage + " damage." );
 		
 		// hero survives
-		if ( hero.bodyForce > damage ) {
-			hero.bodyForce -= damage;
+		if ( hero.getBodyForce() > damage ) {
+			hero.setBodyForce( hero.getBodyForce() - damage );
 			return;
 		}
 		
 		// hero dies!
-		hero.bodyForce = 0;
+		hero.setBodyForce( 0 );
 		
 		logger.info( hero.getName() + " dies!" );
 		
 		hero.getMap().removeUnit( hero );
 	}
 	
-	public static void heroAttackMonster(Hero hero, Monster monster) {
-		Logger logger = Logger.getLogger( "game" );
+	public void heroAttackMonster(Hero hero, Monster monster) {
+		Logger logger = Logger.getLogger( GAME_LOGGER_NAME );
 		
-		int attack = ClassicalGameUtil.rollAttackDices( hero.getNumAttackDices() );
-		int defense = ClassicalGameUtil.rollMonsterDefenceDices( monster.getNumDefenseDices() );
+		int attack = ClassicalGameContext.rollAttackDices( hero.getNumAttackDices() );
+		int defense = ClassicalGameContext.rollMonsterDefenceDices( monster.getNumDefenseDices() );
 		
 		// no damage
 		if ( defense >= attack ) {
@@ -127,15 +137,17 @@ public class ClassicalGameUtil {
 		logger.info( hero.getName() + " attacked " + monster.getName() + " and dealt " + damage + " damage." );
 		
 		// monster survives (usually not the case anyway)
-		if ( monster.bodyForce > damage ) {
-			monster.bodyForce -= damage;
+		if ( monster.getBodyForce() > damage ) {
+			monster.setBodyForce( monster.getBodyForce() - damage );
 			return;
 		}
 		
-		// monster dies!
-		monster.bodyForce = 0;
+		// monster dies! - fire event
+		monster.setBodyForce( 0 );
 		
 		logger.info( monster.getName() + " dies!" );	
+		
+		this.fireOnMonsterDies( monster );
 		
 		monster.getMap().removeUnit( monster );
 	}

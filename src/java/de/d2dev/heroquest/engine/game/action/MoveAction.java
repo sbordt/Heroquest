@@ -20,7 +20,8 @@ public class MoveAction extends GameActionAdapter {
     Direction2D direction;
     
     public MoveAction(Unit unit, Direction2D direction) {
-		super(unit.getGameContext(), unit);
+		super(unit);
+		
 		this.direction = direction;
 	}
 

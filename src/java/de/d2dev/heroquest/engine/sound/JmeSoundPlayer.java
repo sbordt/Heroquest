@@ -22,7 +22,7 @@ public class JmeSoundPlayer implements GameListener {
 	private AudioNode stepSound;
 	private long lastStep = 0;
 	private long stepDelay = 200;
-	
+		
 	//private AudioNode backgroundMusic;
 	private AudioNode monsterKillSound;
 	
@@ -39,6 +39,9 @@ public class JmeSoundPlayer implements GameListener {
 		
 		stepSound = new AudioNode( this.assetManager, "step.wav" );
 		stepSound.setVolume( 0.1f );
+
+		monsterKillSound = new AudioNode( this.assetManager, "monster_kill.wav" );
+		monsterKillSound.setVolume( 0.1f );
 		
 		//backgroundMusic = new AudioNode( this.audioRenderer, this.assetManager, "music/HeroeQuest.ogg", true );
 		//backgroundMusic.setLooping(true);
