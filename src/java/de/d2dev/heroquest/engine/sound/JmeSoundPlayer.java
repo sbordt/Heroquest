@@ -3,12 +3,11 @@ package de.d2dev.heroquest.engine.sound;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.audio.AudioRenderer;
+import com.jme3.audio.plugins.OGGLoader;
 import com.jme3.audio.plugins.WAVLoader;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeSystem;
 
-import de.d2dev.fourseasons.resource.JmeAssetLocatorAdapter;
-import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.heroquest.engine.game.GameListener;
 import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Monster;
@@ -24,21 +23,27 @@ public class JmeSoundPlayer implements GameListener {
 	private long lastStep = 0;
 	private long stepDelay = 200;
 	
+	//private AudioNode backgroundMusic;
 	private AudioNode monsterKillSound;
 	
 	
-	public JmeSoundPlayer(ResourceLocator resourceFinder) {
-		assetManager = JmeSystem.newAssetManager();
+	//@SuppressWarnings("deprecation")	// need to call deprecated to make ogg working
+	public JmeSoundPlayer(AssetManager assetManager) {
+		this.assetManager = assetManager;
+		
 		assetManager.registerLoader( WAVLoader.class, "wav" ); 
-		
-		assetManager.registerLocator( "audioLocator", JmeAssetLocatorAdapter.class );
-		JmeAssetLocatorAdapter.locators.put( "audioLocator", resourceFinder );
-		
-		
+		assetManager.registerLoader( OGGLoader.class, "ogg" ); 
+	
 		audioRenderer = JmeSystem.newAudioRenderer( new AppSettings(true) );
 		audioRenderer.initialize();
 		
-		stepSound = new AudioNode( assetManager, "step.wav" );
+		stepSound = new AudioNode( this.assetManager, "step.wav" );
+		stepSound.setVolume( 0.1f );
+		
+		//backgroundMusic = new AudioNode( this.audioRenderer, this.assetManager, "music/HeroeQuest.ogg", true );
+		//backgroundMusic.setLooping(true);
+		//backgroundMusic.setVolume( 0.5f );
+		//this.audioRenderer.playSource( this.backgroundMusic );
 	}
 
 	@Override

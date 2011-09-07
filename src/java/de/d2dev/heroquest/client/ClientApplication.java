@@ -10,23 +10,17 @@ import java.io.IOException;
 
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.script.ScriptEngine;
+import de.d2dev.heroquest.editor.EditorResources;
 import de.d2dev.heroquest.editor.EditorSettings;
 import de.d2dev.heroquest.editor.script.EditorLuaScriptDecomposer;
 import de.d2dev.heroquest.editor.script.LuaMapCreatorFunction;
 import de.d2dev.heroquest.engine.ai.AISystem;
 import de.d2dev.heroquest.engine.files.HqMapFile;
-import de.d2dev.heroquest.engine.game.ClassicalGameUtil;
-import de.d2dev.heroquest.engine.game.Direction2D;
-import de.d2dev.heroquest.engine.game.Field;
-import de.d2dev.heroquest.engine.game.GameContext;
-import de.d2dev.heroquest.engine.game.Hero;
+import de.d2dev.heroquest.engine.game.*;
 import de.d2dev.heroquest.engine.game.Hero.HeroType;
 import de.d2dev.heroquest.engine.game.Map;
-import de.d2dev.heroquest.engine.game.Monster;
 import de.d2dev.heroquest.engine.game.Monster.MonsterType;
-import de.d2dev.heroquest.engine.game.UnitFactory;
-import de.d2dev.heroquest.engine.game.action.GameAction;
-import de.d2dev.heroquest.engine.game.action.MoveAction;
+import de.d2dev.heroquest.engine.game.action.*;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.sound.JmeSoundPlayer;
@@ -44,6 +38,7 @@ public class ClientApplication implements KeyListener, WindowListener {
 
 //    private String settingsPath = "";
 	private EditorSettings settings;
+	private EditorResources resources;
 	
     private boolean fogOfWar;
 	
@@ -53,6 +48,7 @@ public class ClientApplication implements KeyListener, WindowListener {
     private Map map;
     
     private ResourceLocator resourceFinder;
+    
     private Renderer renderer;
     private QuadRenderModel renderTarget;
     private ClientWindow window;
@@ -76,8 +72,9 @@ public class ClientApplication implements KeyListener, WindowListener {
 	 * 
 	 **************************************************************************************/    
 
-    public ClientApplication(TFile mapCreatorScript, ResourceLocator resourceFinder, EditorSettings settings, boolean fogOfWar) throws Exception {
-    	this.initResourceFinder(resourceFinder);
+    public ClientApplication(TFile mapCreatorScript, EditorResources resources, EditorSettings settings, boolean fogOfWar) throws Exception {
+    	this.resources = resources;
+    	this.initResourceFinder( this.resources.resourceFinder );
     	
     	this.fogOfWar = fogOfWar;
     	
@@ -112,7 +109,7 @@ public class ClientApplication implements KeyListener, WindowListener {
     	this.game = new GameContext( map );
     	
     	// sound player setup
-    	this.soundPlayer = new JmeSoundPlayer( this.resourceFinder );
+    	this.soundPlayer = new JmeSoundPlayer( this.resources.assestManager );
     	this.game.addListener( soundPlayer );
     	
         this.aiSystem = new AISystem(map);
@@ -172,7 +169,7 @@ public class ClientApplication implements KeyListener, WindowListener {
         this.map.addListener(renderer);
         this.renderer.render();
 
-        this.window = new ClientWindow(this.settings, this.renderer.getRederTarget(), this.resourceFinder);
+        this.window = new ClientWindow( this.resources, this.settings, this.renderer.getRederTarget() );
         this.window.setTitle("HeroQuest");
         this.window.setVisible(true);
 
