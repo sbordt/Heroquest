@@ -39,7 +39,9 @@ public class EditorResources {
     	// assets folder 'assets'
     	this.assetsFolder = new TFile( this.publicDataStoragePath + "/assets" ); 
     	
-    	this.assestManager.registerLocator( this.assetsFolder.getAbsolutePath(), TFileLocator.class );
+    	if ( this.assetsFolder.exists() ) {
+    		this.assestManager.registerLocator( this.assetsFolder.getAbsolutePath(), TFileLocator.class );
+    	}
     	
     	// textures folder 'textures'
     	this.textureFolder = new TFile( this.publicDataStoragePath + "/textures" );
