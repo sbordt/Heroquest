@@ -8,9 +8,9 @@ public abstract class GameActionAdapter implements GameAction {
 	protected GameContext context;
 	protected Unit unit;
 
-	public GameActionAdapter(GameContext context, Unit unit) {
+	public GameActionAdapter(Unit unit) {
 		super();
-		this.context = context;
+		this.context = unit.getGameContext();
 		this.unit = unit;
 	}
 

@@ -35,6 +35,10 @@ public class ActionBuilder {
 		}
 	}
 	
+	public void addAttack(Unit toAttack) {
+		this.actions.add( new AttackAction( unit, toAttack ) );
+	}
+	
 	public List<GameAction> getActions() {
 		return this.actions;
 	}

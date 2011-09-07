@@ -10,23 +10,18 @@ import java.io.IOException;
 
 import de.d2dev.fourseasons.resource.ResourceLocator;
 import de.d2dev.fourseasons.script.ScriptEngine;
+import de.d2dev.heroquest.editor.EditorResources;
 import de.d2dev.heroquest.editor.EditorSettings;
 import de.d2dev.heroquest.editor.script.EditorLuaScriptDecomposer;
 import de.d2dev.heroquest.editor.script.LuaMapCreatorFunction;
 import de.d2dev.heroquest.engine.ai.AISystem;
 import de.d2dev.heroquest.engine.files.HqMapFile;
-import de.d2dev.heroquest.engine.game.ClassicalGameUtil;
-import de.d2dev.heroquest.engine.game.Direction2D;
-import de.d2dev.heroquest.engine.game.Field;
-import de.d2dev.heroquest.engine.game.GameContext;
-import de.d2dev.heroquest.engine.game.Hero;
+import de.d2dev.heroquest.engine.game.*;
 import de.d2dev.heroquest.engine.game.Hero.HeroType;
 import de.d2dev.heroquest.engine.game.Map;
-import de.d2dev.heroquest.engine.game.Monster;
 import de.d2dev.heroquest.engine.game.Monster.MonsterType;
-import de.d2dev.heroquest.engine.game.UnitFactory;
-import de.d2dev.heroquest.engine.game.action.GameAction;
-import de.d2dev.heroquest.engine.game.action.MoveAction;
+import de.d2dev.heroquest.engine.game.action.*;
+import de.d2dev.heroquest.engine.game.classical.ClassicalGameContext;
 import de.d2dev.heroquest.engine.rendering.Renderer;
 import de.d2dev.heroquest.engine.rendering.quads.QuadRenderModel;
 import de.d2dev.heroquest.engine.sound.JmeSoundPlayer;
@@ -34,25 +29,26 @@ import de.schlichtherle.truezip.file.TFile;
 
 import java.util.*;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 
 public class ClientApplication implements KeyListener, WindowListener {
 
 //    private String settingsPath = "";
 	private EditorSettings settings;
+	private EditorResources resources;
 	
     private boolean fogOfWar;
 	
     private ScriptEngine scriptEngine;    
     
-    private GameContext game;
+    private ClassicalGameContext game;
     private Map map;
     
     private ResourceLocator resourceFinder;
+    
     private Renderer renderer;
     private QuadRenderModel renderTarget;
     private ClientWindow window;
@@ -67,7 +63,7 @@ public class ClientApplication implements KeyListener, WindowListener {
     
     private Hero activeHero = null;
     
-    private List<Monster> monstersToGo;
+    private Monster activeMonster = null;
     private List<GameAction> actionsToPerform;
     
 	/**************************************************************************************
@@ -76,8 +72,9 @@ public class ClientApplication implements KeyListener, WindowListener {
 	 * 
 	 **************************************************************************************/    
 
-    public ClientApplication(TFile mapCreatorScript, ResourceLocator resourceFinder, EditorSettings settings, boolean fogOfWar) throws Exception {
-    	this.initResourceFinder(resourceFinder);
+    public ClientApplication(TFile mapCreatorScript, EditorResources resources, EditorSettings settings, boolean fogOfWar) throws Exception {
+    	this.resources = resources;
+    	this.initResourceFinder( this.resources.resourceFinder );
     	
     	this.fogOfWar = fogOfWar;
     	
@@ -103,16 +100,19 @@ public class ClientApplication implements KeyListener, WindowListener {
     	
     	// log4j
     	BasicConfigurator.configure();
+    	Logger.getRootLogger().removeAllAppenders();
     	    	
     	// script engine setup
     	scriptEngine = ScriptEngine.createDefaultScriptEngine( this.resourceFinder, new EditorLuaScriptDecomposer() );
     }
     
     public void init() throws Exception {
-    	this.game = new GameContext( map );
+    	// game context - add to map
+    	this.game = new ClassicalGameContext( map );
+    	this.map.setContext( this.game );
     	
     	// sound player setup
-    	this.soundPlayer = new JmeSoundPlayer( this.resourceFinder );
+    	this.soundPlayer = new JmeSoundPlayer( this.resources.assestManager );
     	this.game.addListener( soundPlayer );
     	
         this.aiSystem = new AISystem(map);
@@ -172,7 +172,7 @@ public class ClientApplication implements KeyListener, WindowListener {
         this.map.addListener(renderer);
         this.renderer.render();
 
-        this.window = new ClientWindow(this.settings, this.renderer.getRederTarget(), this.resourceFinder);
+        this.window = new ClientWindow( this.resources, this.settings, this.renderer.getRederTarget() );
         this.window.setTitle("HeroQuest");
         this.window.setVisible(true);
 
@@ -208,21 +208,27 @@ public class ClientApplication implements KeyListener, WindowListener {
     public void startMonstersRound() {
     	this.heroesRound = false;
  
-    	// Get the maps monsters
-        this.monstersToGo = this.map.getMonsters();
+    	// notify the ai system
+    	this.aiSystem.startMonstersRound();
+    	
+    	// Get the first monster to act
+        this.activeMonster = this.aiSystem.getNextMonster();
         
-        if ( this.monstersToGo.isEmpty() ) {	// nothing to do
+        if ( this.activeMonster == null ) {	// nothing to do
         	this.endMonstersRound();
         	return;
         }
         
         // Let the first monster perform actions!
-        this.actionsToPerform = this.monstersToGo.get(0).getAIController().getActions();
+        this.actionsToPerform = this.activeMonster.getAIController().getActions();
         
         this.performMonsterActions();
     }
     
     public void endMonstersRound() {
+    	// notify the ai system
+    	this.aiSystem.endMonstersRound();
+    	
     	this.heroesRound = true;
     }
 
@@ -234,11 +240,11 @@ public class ClientApplication implements KeyListener, WindowListener {
         }    	
     	// the current monsters has all actions performed
     	else {
-        	this.monstersToGo.remove(0);
-        	
-        	// next monster perform actions!
-        	if ( !this.monstersToGo.isEmpty() ) {
-        		this.actionsToPerform = this.monstersToGo.get(0).getAIController().getActions();
+        	// Get the next monster perform actions!
+            this.activeMonster = this.aiSystem.getNextMonster();        	
+
+        	if ( this.activeMonster != null ) {
+        		this.actionsToPerform = this.activeMonster.getAIController().getActions();
         		
         		this.performMonsterActions();
         	} 
@@ -266,7 +272,7 @@ public class ClientApplication implements KeyListener, WindowListener {
         try {
             Thread.sleep(10);
         } catch (InterruptedException ex) {
-            Logger.getLogger(ClientApplication.class.getName()).log(Level.SEVERE, null, ex);
+        	ex.printStackTrace();
         }
 
         // what to do next?
@@ -288,50 +294,51 @@ public class ClientApplication implements KeyListener, WindowListener {
 	 **************************************************************************************/
     
     public void handleHeroesRoundKeyEvent(KeyEvent e) {
-    	// no active hero => no heroes
+    	
+		/*
+		 * Select heroes
+		 */
+		if (e.getKeyChar() == '1') { // select barbarian
+			Hero barbarian = this.map.getHero( HeroType.BARBARIAN );
+			
+			if ( barbarian != null ) {
+				this.activeHero = barbarian;
+			}
+		} 
+		
+		else if (e.getKeyChar() == '2') { // select dwarf
+			Hero dwarf = this.map.getHero( HeroType.DWARF );
+			
+			if ( dwarf != null ) {
+				this.activeHero = dwarf;
+			}
+		} 
+		
+		else if (e.getKeyChar() == '3') { // select alb
+			Hero alb = this.map.getHero( HeroType.ALB );
+			
+			if ( alb != null ) {
+				this.activeHero = alb;
+			}
+		} 
+		
+		else if (e.getKeyChar() == '4') { // select wizard
+			Hero wizard = this.map.getHero( HeroType.WIZARD );
+			
+			if ( wizard != null ) {
+				this.activeHero = wizard;
+			}
+		}
+    		
+    	// no active hero => no actions!
     	if ( this.activeHero == null )
     		return;
     	
 		try {
 			/*
-			 * Select heroes
-			 */
-			if (e.getKeyChar() == '1') { // select barbarian
-				Hero barbarian = this.map.getHero( HeroType.BARBARIAN );
-				
-				if ( barbarian != null ) {
-					this.activeHero = barbarian;
-				}
-			} 
-			
-			else if (e.getKeyChar() == '2') { // select dwarf
-				Hero dwarf = this.map.getHero( HeroType.DWARF );
-				
-				if ( dwarf != null ) {
-					this.activeHero = dwarf;
-				}
-			} 
-			
-			else if (e.getKeyChar() == '3') { // select alb
-				Hero alb = this.map.getHero( HeroType.ALB );
-				
-				if ( alb != null ) {
-					this.activeHero = alb;
-				}
-			} 
-			
-			else if (e.getKeyChar() == '4') { // select wizard
-				Hero wizard = this.map.getHero( HeroType.WIZARD );
-				
-				if ( wizard != null ) {
-					this.activeHero = wizard;
-				}
-			} 
-			
-			/*
 			 * Move selected hero
 			 */
-			else if (e.getKeyChar() == 's') { // walk down
+			if (e.getKeyChar() == 's') { // walk down
 
 				if (this.activeHero.canMoveDown()) {
 					this.game.execute( new MoveAction( this.activeHero, Direction2D.DOWN ) );
@@ -393,9 +400,8 @@ public class ClientApplication implements KeyListener, WindowListener {
 				
 				// attack monsters! (yea)
 				if ( actionField.hasUnit() && actionField.getUnit().isMonster() ) {
-					Monster monster = (Monster) actionField.getUnit();
 					
-					ClassicalGameUtil.heroAttackMonster( this.activeHero, monster );
+					this.game.execute( new AttackAction( this.activeHero, actionField.getUnit() ) );
 				}
 			}
 					

@@ -369,11 +369,11 @@ public class Renderer implements MapListener {
 			if ( field.getUpperField().isWall() ) {
 				quad = new RenderQuad( field.getX(), field.getY() - 0.5f, 1.0f, 2f, DOORS, vertOpenTex ); 
 				
-				arc_quad = new RenderQuad( field.getX(), field.getY(), 1, 1, DOOR_ARCS, vertOpenArcTex ); 
+				arc_quad = new RenderQuad( field.getX(), field.getY() - 0.5f, 1.0f, 2f, DOOR_ARCS, vertOpenArcTex ); 
 			} else {
 				quad = new RenderQuad( field.getX() -0.5f, field.getY(), 2, 1, DOORS, horOpenTex ); 
 				
-				arc_quad = new RenderQuad( field.getX(), field.getY(), 1, 1, DOOR_ARCS, horOpenArcTex ); 
+				arc_quad = new RenderQuad( field.getX() -0.5f, field.getY(), 2, 1, DOOR_ARCS, horOpenArcTex ); 
 			}	
 		} 
 		// closed

@@ -8,7 +8,7 @@ public class Demo0 {
 	public static void main(String[] args) throws Exception {
 		TestMap map = new TestMap();
 		
-		ClientApplication app = new ClientApplication( new TFile( map.resources.dropbox.dropboxFolderPath + "/script/map templates/demo0.lua" ), map.resources.resourceFinder, map.settings, false );
+		ClientApplication app = new ClientApplication( new TFile( map.resources.dropbox.dropboxFolderPath + "/script/map templates/demo0.lua" ), map.resources, map.settings, false );
 		app.init();
 		
 		//app.addTestMonsters(3);

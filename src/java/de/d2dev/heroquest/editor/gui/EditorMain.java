@@ -199,6 +199,7 @@ public class EditorMain extends javax.swing.JFrame {
     		this.jmeRenderWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     		JPanel panel = new JPanel();
     		
+    		// hier benutzen: this.editor.resources.assestManager
     		this.jmeRenderer = new JmeRenderer (this.editor.renderer.getRederTarget(), this.editor.resources.resourceFinder);
     		
     		JmeRenderer jmeRenderer = this.jmeRenderer;

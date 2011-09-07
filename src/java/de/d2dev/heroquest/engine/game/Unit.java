@@ -46,8 +46,6 @@ public abstract class Unit {
 	/*
 	 * Running Game Variables
 	 */
-	protected GameContext gameContext;
-
 	protected int remainingMoves = 0;
 	
 	/*
@@ -263,11 +261,7 @@ public abstract class Unit {
 	 **************************************************************************************/
 
 	public GameContext getGameContext() {
-		return gameContext;
-	}
-
-	public void setGameContext(GameContext gameContext) {
-		this.gameContext = gameContext;
+		return map.getContext();
 	}
 	
 	public int getRemainingMoves() {
@@ -288,18 +282,33 @@ public abstract class Unit {
 		return bodyForce;
 	}
 
+	public void setBodyForce(int bodyForce) {
+		this.bodyForce = bodyForce;
+	}
+
 	public int getIntelligence() {
 		return intelligence;
+	}
+
+	public void setIntelligence(int intelligence) {
+		this.intelligence = intelligence;
 	}
 
 	public int getNumAttackDices() {
 		return numAttackDices;
 	}
 
+	public void setNumAttackDices(int numAttackDices) {
+		this.numAttackDices = numAttackDices;
+	}
+
 	public int getNumDefenseDices() {
 		return numDefenseDices;
 	}
-	
+
+	public void setNumDefenseDices(int numDefenseDices) {
+		this.numDefenseDices = numDefenseDices;
+	}	
 	
 	/**************************************************************************************
 	 * 
