@@ -294,50 +294,51 @@ public class ClientApplication implements KeyListener, WindowListener {
 	 **************************************************************************************/
     
     public void handleHeroesRoundKeyEvent(KeyEvent e) {
-    	// no active hero => no heroes
+    	
+		/*
+		 * Select heroes
+		 */
+		if (e.getKeyChar() == '1') { // select barbarian
+			Hero barbarian = this.map.getHero( HeroType.BARBARIAN );
+			
+			if ( barbarian != null ) {
+				this.activeHero = barbarian;
+			}
+		} 
+		
+		else if (e.getKeyChar() == '2') { // select dwarf
+			Hero dwarf = this.map.getHero( HeroType.DWARF );
+			
+			if ( dwarf != null ) {
+				this.activeHero = dwarf;
+			}
+		} 
+		
+		else if (e.getKeyChar() == '3') { // select alb
+			Hero alb = this.map.getHero( HeroType.ALB );
+			
+			if ( alb != null ) {
+				this.activeHero = alb;
+			}
+		} 
+		
+		else if (e.getKeyChar() == '4') { // select wizard
+			Hero wizard = this.map.getHero( HeroType.WIZARD );
+			
+			if ( wizard != null ) {
+				this.activeHero = wizard;
+			}
+		}
+    		
+    	// no active hero => no actions!
     	if ( this.activeHero == null )
     		return;
     	
 		try {
 			/*
-			 * Select heroes
-			 */
-			if (e.getKeyChar() == '1') { // select barbarian
-				Hero barbarian = this.map.getHero( HeroType.BARBARIAN );
-				
-				if ( barbarian != null ) {
-					this.activeHero = barbarian;
-				}
-			} 
-			
-			else if (e.getKeyChar() == '2') { // select dwarf
-				Hero dwarf = this.map.getHero( HeroType.DWARF );
-				
-				if ( dwarf != null ) {
-					this.activeHero = dwarf;
-				}
-			} 
-			
-			else if (e.getKeyChar() == '3') { // select alb
-				Hero alb = this.map.getHero( HeroType.ALB );
-				
-				if ( alb != null ) {
-					this.activeHero = alb;
-				}
-			} 
-			
-			else if (e.getKeyChar() == '4') { // select wizard
-				Hero wizard = this.map.getHero( HeroType.WIZARD );
-				
-				if ( wizard != null ) {
-					this.activeHero = wizard;
-				}
-			} 
-			
-			/*
 			 * Move selected hero
 			 */
-			else if (e.getKeyChar() == 's') { // walk down
+			if (e.getKeyChar() == 's') { // walk down
 
 				if (this.activeHero.canMoveDown()) {
 					this.game.execute( new MoveAction( this.activeHero, Direction2D.DOWN ) );
@@ -399,7 +400,6 @@ public class ClientApplication implements KeyListener, WindowListener {
 				
 				// attack monsters! (yea)
 				if ( actionField.hasUnit() && actionField.getUnit().isMonster() ) {
-					Monster monster = (Monster) actionField.getUnit();
 					
 					this.game.execute( new AttackAction( this.activeHero, actionField.getUnit() ) );
 				}

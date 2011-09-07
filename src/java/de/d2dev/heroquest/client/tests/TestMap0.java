@@ -16,7 +16,7 @@ public class TestMap0 extends TestMap {
 		app.init();
 		
 		app.addTestMonsters(3);
-		app.addTestHeroes(1);
+		app.addTestHeroes(2);
 		
 		app.run();
 	}
