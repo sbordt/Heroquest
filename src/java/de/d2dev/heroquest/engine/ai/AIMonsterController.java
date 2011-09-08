@@ -4,9 +4,9 @@
  */
 package de.d2dev.heroquest.engine.ai;
 
-import de.d2dev.fourseasons.resource.types.TextureResource;
 import de.d2dev.heroquest.engine.game.Direction2D;
 import de.d2dev.heroquest.engine.game.Field;
+import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.Unit;
 import de.d2dev.heroquest.engine.game.action.ActionBuilder;
@@ -59,7 +59,7 @@ public class AIMonsterController implements AIController {
      */
     private void findWay() {
         targets.clear();
-        List<Unit> heroes = map.getHeroes();
+        List<Hero> heroes = map.getHeroes();
         System.out.println("Heroes on map: "+heroes.size());
         while (!heroes.isEmpty()) {
             //Starting with first heroe

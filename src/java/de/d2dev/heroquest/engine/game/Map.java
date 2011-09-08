@@ -34,9 +34,9 @@ public final class Map implements Observable<MapListener> {
 	
 	private Field[][] fields;
 
-//	private List<Unit> units = new Vector<Unit>();
-//	private List<Unit> heroes = new Vector<Unit>();
-//	private List<Unit> monsters = new Vector<Unit>();
+//	private List<Unit> units = new ArrayList<Unit>();
+//	private List<Unit> heroes = new ArrayList<Unit>();
+//	private List<Unit> monsters = new ArrayList<Unit>();
 	private List<Room> rooms = new ArrayList<Room>();
 	
 //	private List<MapObject> objects = new ArrayList<MapObject>();
@@ -179,7 +179,7 @@ public final class Map implements Observable<MapListener> {
 	 */
 	public List<Unit> getUnits() {
         // TODO more efficient
-    	Vector<Unit> units = new Vector<Unit>();
+    	ArrayList<Unit> units = new ArrayList<Unit>();
     	
     	for (Field[] fields : this.fields) {
 			for(Field field : fields) {
@@ -196,14 +196,14 @@ public final class Map implements Observable<MapListener> {
 	 * Get all heroes.
 	 * @return
 	 */
-    public List<Unit> getHeroes() {
+    public List<Hero> getHeroes() {
         // TODO more efficient
-    	Vector<Unit> heroes = new Vector<Unit>();
+    	ArrayList<Hero> heroes = new ArrayList<Hero>();
     	
     	for (Field[] fields : this.fields) {
 			for(Field field : fields) {
 				if ( field.hasUnit() && field.getUnit().isHero()) {
-					heroes.add( field.getUnit() );
+					heroes.add( (Hero) field.getUnit() );
 				}
 			}
 		}
@@ -217,11 +217,11 @@ public final class Map implements Observable<MapListener> {
      * @return {@code null} in case there is none.
      */
     public Hero getHero(HeroType type) {
-    	List<Unit> heroes = this.getHeroes();
+    	List<Hero> heroes = this.getHeroes();
     	
-    	for (Unit hero : heroes) {
-    		if ( ((Hero) hero).getHeroType() == type ){
-    			return (Hero) hero;
+    	for (Hero hero : heroes) {
+    		if ( hero.getHeroType() == type ){
+    			return hero;
     		}
     	}
     	
@@ -235,12 +235,12 @@ public final class Map implements Observable<MapListener> {
      */
     public List<Monster> getMonsters() {
         // TODO better
-    	Vector<Monster> monsters = new Vector<Monster>();
+    	ArrayList<Monster> monsters = new ArrayList<Monster>();
     	
     	for (Field[] fields : this.fields) {
 			for(Field field : fields) {
 				if ( field.hasUnit() && field.getUnit().isMonster() ) {
-					monsters.add( (Monster)field.getUnit() );
+					monsters.add( (Monster) field.getUnit() );
 				}
 			}
 		}
