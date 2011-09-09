@@ -46,10 +46,10 @@ public final class Field {
 	public enum WallType {
 		FULL,
 		
-		DOCKING_LEFT,
-		DOCKING_RIGHT,
-		DOCKING_UPPER,
-		DOCKING_LOWER,
+		DOCKING_LEFT,	// not used yet
+		DOCKING_RIGHT,  // not used yet
+		DOCKING_UPPER,  // not used yet
+		DOCKING_LOWER,  // not used yet
 		
 		HORIZONTAL,
 		HORIZONTAL_AND_BOTTOM,
@@ -120,6 +120,12 @@ public final class Field {
 	 * the field.
 	 */
 	private Resource texture;
+	
+	/**
+	 * List of {@link MapObject}s that lie on the field. To be modified
+	 * by the {@link Map}.
+	 */
+	List<MapObject> objects = new ArrayList<MapObject>();
 	
 	public Field(Map map, int x, int y) {
 		this.map = map;
@@ -514,6 +520,13 @@ public final class Field {
 		// walls block fields - but OPEN door let u pass!
 		if ( this.isWall ) {
 			if ( !this.isDoor() || this.door.isClosed() ) {
+				return true;
+			}
+		}
+		
+		// does any map object block the field?
+		for (MapObject object : this.objects) {
+			if ( object.blocksField( this.x, this.y ) ) {
 				return true;
 			}
 		}

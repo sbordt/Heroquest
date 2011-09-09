@@ -1,6 +1,7 @@
 package de.d2dev.heroquest.engine.game;
 
 import de.d2dev.fourseasons.files.FileUtil;
+import de.d2dev.fourseasons.gamestate.GameStateException;
 import de.d2dev.fourseasons.util.Observable;
 import de.d2dev.fourseasons.util.ListenerUtil;
 import de.d2dev.heroquest.engine.game.Hero.HeroType;
@@ -39,10 +40,19 @@ public final class Map implements Observable<MapListener> {
 //	private List<Unit> monsters = new ArrayList<Unit>();
 	private List<Room> rooms = new ArrayList<Room>();
 	
-//	private List<MapObject> objects = new ArrayList<MapObject>();
+	private List<MapObject> objects = new ArrayList<MapObject>();
+	
 	private List<TextureOverlay> textureOverlays = new ArrayList<TextureOverlay>(); 
 	
+	
+	
 	private GameContext context;
+	
+	/**************************************************************************************
+	 * 
+	 * 										CONSTRUCTORS
+	 * 
+	 **************************************************************************************/
 
 	/**
 	 * Construct a new empty map.
@@ -146,6 +156,30 @@ public final class Map implements Observable<MapListener> {
 		return room;
 	}
 	
+	public void addMapObject(MapObject object) throws GameStateException {
+		// does this object fit on the map anyway?
+		Preconditions.checkState( this.fieldExists( object.getX() + object.getWidth(), object.getY() + object.getHeight() ), "Can't place " + object.toString() + " cause it is to big for this map." );
+		
+		// check if we can place that object on the map! - fieldwise
+		for (int x=object.getX(); x<object.getX() + object.getWidth(); x++ ){
+			for ( int y=object.getY(); y<object.getY() + object.getHeight(); y++) {
+				Field field = this.getField( x, y );
+				
+				// objects that block fields can't be placed if the field is already blocked!
+				Preconditions.checkState( !field.isBlocked() || !object.blocksField(x, y), "Can't place " + object.toString() + " cause the field " + x + "/" + y + " is already blocked." );
+			}
+		}
+		
+		// Place the object on the map!
+		for (int x=object.getX(); x<object.getX() + object.getWidth(); x++ ){
+			for ( int y=object.getY(); y<object.getY() + object.getHeight(); y++) {
+				this.getField( x, y ).objects.add( object );
+			}
+		}		
+		
+		this.objects.add( object );
+	}	
+	
 	/**
 	 * Add a new texture overlay to the map.
 	 * @return The newly created texture overlay.
@@ -163,6 +197,14 @@ public final class Map implements Observable<MapListener> {
 	 */
 	public List<Room> getRooms() {
 		return Collections.unmodifiableList( rooms );	
+	}
+	
+	/**
+	 * Get all map objects.
+	 * @return
+	 */
+	public List<MapObject> getObjects() {
+		return Collections.unmodifiableList( objects );	
 	}
 	
 	/**
@@ -258,6 +300,13 @@ public final class Map implements Observable<MapListener> {
     	
     	this.fireOnUnitLeavesField( field );
     }
+    
+	/**************************************************************************************
+	 * 
+	 * 							      	GAME STATE - INTERNAL
+	 * 
+	 **************************************************************************************/
+    
     
 	/**************************************************************************************
 	 * 

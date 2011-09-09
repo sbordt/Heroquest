@@ -4,7 +4,7 @@ import de.d2dev.fourseasons.resource.Resource;
 import de.d2dev.fourseasons.resource.types.TextureResource;
 import de.d2dev.heroquest.engine.rendering.quads.RenderQuad.TextureTurn;
 
-public class TextureOverlay extends MapObject {
+public class TextureOverlay /*extends MapObject*/ {
 	
 	private float x;
 	private float y;
