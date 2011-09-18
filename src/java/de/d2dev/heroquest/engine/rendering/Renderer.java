@@ -14,6 +14,7 @@ import de.d2dev.heroquest.engine.game.Field.WallType;
 import de.d2dev.heroquest.engine.game.Hero;
 import de.d2dev.heroquest.engine.game.Map;
 import de.d2dev.heroquest.engine.game.MapListener;
+import de.d2dev.heroquest.engine.game.MapObject;
 import de.d2dev.heroquest.engine.game.Monster;
 import de.d2dev.heroquest.engine.game.Room;
 import de.d2dev.heroquest.engine.game.TextureOverlay;
@@ -35,11 +36,15 @@ public class Renderer implements MapListener {
 	 */
 	private static int GROUND = 0;
 	private static int OVERLAYS = 1;
-	private static int WALLS = 2;
-	private static int DOORS = 3;
+	private static int OBJECTS = 2;
+	private static int WALLS = 3;
+	private static int DOORS = 4;
+	
 	private static int UNITS = 100;
+	
 	private static int DOOR_ARCS = 200;
-	private static int FOG_OF_WAR = 1000;
+	
+	private static int FOG_OF_WAR = 900;
 	
 	/*
 	 * Render options and their default values
@@ -69,6 +74,8 @@ public class Renderer implements MapListener {
 	
 	private HashMap<Field, RenderQuad> fogOfWarQuads = new HashMap<Field, RenderQuad>();
 	private Resource fogTexture = TextureResource.createTextureResource("fog of war/fog.png");
+	
+	private HashMap<MapObject, RenderQuad> objectQuads = new HashMap<MapObject, RenderQuad>();
 	
 	/*
 	 * Textures
@@ -152,6 +159,9 @@ public class Renderer implements MapListener {
 		
 		// units
 		this.renderUnits();
+		
+		// map objects
+		this.renderMapObjects();
 	}
 	
 
@@ -284,6 +294,27 @@ public class Renderer implements MapListener {
 
 		this.walls.put( field, new RenderQuad( field.getX(), field.getY(), 1.0f, 1.0f, WALLS,  wallTexture, turn ) );
 		this.renderTarget.addQuad( this.walls.get( field ) );
+	}
+	
+	private void renderMapObjects() {
+		// remove all currently rendered objects
+		for ( RenderQuad quad : this.objectQuads.values() ) {
+			this.renderTarget.removeQuad( quad );
+		}
+		
+		this.objectQuads.clear();
+		
+		// render map objects
+		for ( MapObject o : this.map.getObjects() ) {
+			this.renderMapObject(o);
+		}
+	}
+	
+	private void renderMapObject(MapObject object) {
+		RenderQuad quad = new RenderQuad( object.getX(), object.getY(), object.getWidth(), object.getHeight(), OBJECTS,  object.getTexture() );
+		
+		this.renderTarget.addQuad( quad );
+		this.objectQuads.put( object, quad );
 	}
 	
 	private void renderTextureOverlay(TextureOverlay overlay) {

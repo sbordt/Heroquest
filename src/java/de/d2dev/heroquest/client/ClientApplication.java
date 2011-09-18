@@ -115,7 +115,19 @@ public class ClientApplication implements KeyListener, WindowListener {
     	this.soundPlayer = new JmeSoundPlayer( this.resources.assestManager );
     	this.game.addListener( soundPlayer );
     	
+    	// initialize the ai system - add all existing monsters 
         this.aiSystem = new AISystem(map);
+        
+        for (Monster m : map.getMonsters()) {
+        	if ( m.getAIController() == null ) {
+        		m.setAiController( this.aiSystem.creatAIController( m ) );
+        	}
+        }
+        
+        // select some hero if there is one on the map
+        if ( !this.map.getHeroes().isEmpty() ) {
+        	this.activeHero = this.map.getHeroes().get( 0 );
+        }
 
     	this.unitFactory = new UnitFactory();
     }
@@ -330,7 +342,14 @@ public class ClientApplication implements KeyListener, WindowListener {
 			}
 		}
     		
-    	// no active hero => no actions!
+		/*
+		 * Start monsters round!
+		 */			
+		else if ( this.heroesRound && e.getKeyChar() == 'm') { // MONSTER!!!
+			this.startMonstersRound();
+		}
+		
+    	// no active hero => no hero actions!
     	if ( this.activeHero == null )
     		return;
     	
@@ -405,12 +424,6 @@ public class ClientApplication implements KeyListener, WindowListener {
 				}
 			}
 					
-			/*
-			 * Start monsters round!
-			 */			
-			else if (e.getKeyChar() == 'm') { // MONSTER!!!
-				this.startMonstersRound();
-			}
 		} catch (GameStateException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -462,8 +475,6 @@ public class ClientApplication implements KeyListener, WindowListener {
 		// TODO Auto-generated method stub
 		
 	}
-
-
 
 	@Override
 	public void windowDeactivated(WindowEvent arg0) {
