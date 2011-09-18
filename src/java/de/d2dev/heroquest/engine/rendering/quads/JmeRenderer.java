@@ -17,6 +17,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Texture;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 
 import de.d2dev.fourseasons.resource.JmeAssetLocatorAdapter;
@@ -48,6 +49,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         super();
         
         this.quadRenderModel = model;
+        this.quadRenderModel.addListener(this);
         this.resourceLocator = locator;
         userListener = new JmeUserInputListener (this);
     }
@@ -56,68 +58,16 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
      * 
      */
      
-    private void createMap (QuadRenderModel map){
-       
+    private void createMap (){
+    	
+    	this.getRenderer().setBackgroundColor(ColorRGBA.Pink);
     	// Wenn eine neue Map erstellt wird soll sie zentriert werden
-    	cam.setLocation(cam.getLocation().add(new Vector3f(map.getWidth()/2, map.getHeight()/2, 0)));
+    	cam.setLocation(cam.getLocation().add(new Vector3f(this.quadRenderModel.getWidth()/2, this.quadRenderModel.getHeight()/2, 991)));
+    	System.out.println("camera: "+cam.getLocation());
     	// Für jedes Quad des QuadRenderModels wird ein Quad erstellt mit der Textur versehen
     	// und zum rootNode hinzugefügt
-        for (int i = 0; i < map.getQuads().size(); i++){
-            
-        	// Das Quad wird in seiner Größe erstellt
-        	RenderQuad tempQuad = map.getQuads().get(i);
-        	Quad quad = new Quad(tempQuad.getWidth(),tempQuad.getHeight());
-        	System.out.println("w. " + tempQuad.getWidth()+"h: "+tempQuad.getHeight());
-        	System.out.println("qw: "+quad.getWidth()+"qh: "+quad.getHeight());
-            Geometry geom = new Geometry("Quad", quad);
-            // Das Quad wird im Geometry bewegt
-            geom.move(tempQuad.getX(), transY(tempQuad), tempQuad.getZLayer());
-            // Rotation des Quads
-           switch (tempQuad.getTextureTurn()){
-            case TURN_LEFT_180_DEGREE:
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 0, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 1, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 0, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 1, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 0, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 1, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 0, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 1, 0f);
-            break;
-            case TURN_LEFT_270_DEGREE:
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 0, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 1, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 0, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 1, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 0, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 1, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 0, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 1, 0f);
-            break;
-            case TURN_LEFT_90_DEGREE:
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 0, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 1, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 0, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 1, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 0, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 1, 0f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 0, 1f);
-            	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 1, 1f);       	
-            break;
-            }
-            // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
-            Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            System.out.println(tempQuad.getTexture().getName());
-            Texture texture = assetManager.loadTexture( tempQuad.getTexture().getName() );
-            mat.setTexture("ColorMap", texture);
-            mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-            geom.setMaterial(mat);
-            geom.setQueueBucket(Bucket.Transparent);
-            // Das Geometrie Object wird dem rootnode hinzugefügt
-            this.rootNode.attachChild(geom);
-            // Damit später auf die Quads zugefriffen werden kann werden diese mit dem zugehörigen
-            // RenderQuad als Schlüssel gespeichert 
-            geometrics.put(map.getQuads().get(i), geom);
+        for (int i = 0; i < this.quadRenderModel.getQuads().size(); i++){           
+        	addQuadToScene(this.quadRenderModel.getQuads().get(i));
         }
     }
     
@@ -128,13 +78,14 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
     
     private void initKeys(){
        flyCam.setEnabled(paused);
-       inputManager.addMapping("right", new KeyTrigger(KeyInput.KEY_RIGHT));
-       inputManager.addMapping("left", new KeyTrigger(KeyInput.KEY_LEFT));
-       inputManager.addMapping("up", new KeyTrigger(KeyInput.KEY_UP));
-       inputManager.addMapping("down", new KeyTrigger(KeyInput.KEY_DOWN));
+       this.
+       //inputManager.addMapping("right", new KeyTrigger(KeyInput.KEY_RIGHT));
+       //inputManager.addMapping("left", new KeyTrigger(KeyInput.KEY_LEFT));
+       //inputManager.addMapping("up", new KeyTrigger(KeyInput.KEY_UP));
+       //inputManager.addMapping("down", new KeyTrigger(KeyInput.KEY_DOWN));
        inputManager.addMapping("zoomOut", new KeyTrigger(KeyInput.KEY_O));
        inputManager.addMapping("zoomIn", new KeyTrigger(KeyInput.KEY_I));
-       inputManager.addMapping("characterInfo", new KeyTrigger(KeyInput.KEY_A));
+       inputManager.addMapping("characterInfo", new KeyTrigger(KeyInput.KEY_C));
        inputManager.addMapping("dragMoveX", new MouseAxisTrigger(MouseInput.AXIS_X, true));
        inputManager.addMapping("dragMoveX", new MouseAxisTrigger(MouseInput.AXIS_X, false));
        inputManager.addMapping("dragMoveY", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
@@ -154,7 +105,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         cam.setParallelProjection(true);
         // und die Clipping ebenen müssen an das display angepasst werde
         float aspect = (float) cam.getWidth() / cam.getHeight();
-        cam.setFrustum( -100, 1000, -zoomLevel * aspect, zoomLevel * aspect, zoomLevel, -zoomLevel );
+        cam.setFrustum( -100, 1100, -zoomLevel * aspect, zoomLevel * aspect, zoomLevel, -zoomLevel );
         cam.update();
     }   
     
@@ -166,17 +117,17 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
     public void simpleInitApp() {
     	JmeAssetLocatorAdapter.locators.put("argh", this.resourceLocator );	// ugly hack
     	this.assetManager.registerLocator( "argh", new JmeAssetLocatorAdapter().getClass() );
-    	
     	initKeys();
         setCamToParallelProjektion (); 
-        createMap(this.quadRenderModel);
+        createMap();
     }
     
 	@Override
 	public void setRenderModel(QuadRenderModel m) {
 		this.quadRenderModel = m;
+		this.quadRenderModel.addListener(this);
 		rootNode.detachAllChildren();
-		this.createMap(m);
+		this.createMap();
 	}
 	@Override
 	public QuadRenderModel getRenderModel() {
@@ -184,40 +135,18 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 	}
 	@Override
 	public void onAddQuad(RenderQuad quad) {
-		this.quadRenderModel.addQuad(quad);
-		// Das Quad wird in seiner Größe erstellt
-    	Quad jmeQuad = new Quad(quad.getWidth(),quad.getHeight());
-        Geometry geom = new Geometry("Quad", jmeQuad);
-        // Das Quad wird im Geometry bewegt
-        geom.move(quad.getX(), transY(quad), quad.getZLayer());
-        // Rotation
-        // Rotation des Quads
-        switch (quad.getTextureTurn()){
-        case TURN_LEFT_180_DEGREE:
-        	geom.rotate(0, 0, (float) Math.PI);
-        break;
-        case TURN_LEFT_270_DEGREE:
-        	geom.rotate(0, 0, (float) (1.5*Math.PI));
-        break;
-        case TURN_LEFT_90_DEGREE:
-        	geom.rotate(0, 0, (float) (0.5*Math.PI));
-        break;
-        }
-        // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        Texture texture = assetManager.loadTexture( quad.getTexture().getName() );
-        mat.setTexture("ColorMap", texture);
-        mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-        geom.setMaterial(mat);
-        geom.setQueueBucket(Bucket.Transparent);
-        // Das Geometrie Object wird dem rootnode hinzugefügt
-        this.rootNode.attachChild(geom);
-        // Damit später auf die Quads zugefriffen werden kann werden diese mit dem zugehörigen
-        // RenderQuad als Schlüssel gespeichert 
-        geometrics.put(quad, geom);
+		System.out.println("hallo add");
+		addQuadToScene(quad);
 	}
 	@Override
 	public void onRemoveQuad(RenderQuad quad) {
+		System.out.println("hallo");
+		rootNode.detachChild(geometrics.get(quad));
+		geometrics.remove(quad);
+	}
+	
+	public void removeQuad(RenderQuad quad) {
+		System.out.println("hallo");
 		rootNode.detachChild(geometrics.get(quad));
 		geometrics.remove(quad);
 	}
@@ -254,13 +183,70 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 			if (obererBildrand + y > quadRenderModel.getHeight())
 				tempVec.y = quadRenderModel.getHeight() - obererBildrand ;
 			
-			// rechter Bildrand darf die Map nicht verlassen
+			// unterer Bildrand darf die Map nicht verlassen
 			float untererBildrand = (cam.getLocation().y - (cam.getFrustumTop() - cam.getFrustumBottom())/2);
 			if (untererBildrand + y < 0)
 				tempVec.y = 0 - untererBildrand ;
 		}
 		// Die Eigentliche Bewegung der Kamera um den ev. angepassten Vector
 		cam.setLocation(cam.getLocation().add(tempVec));
+	}
+	
+	private Geometry addQuadToScene (RenderQuad quad){
+		// Das Quad wird in seiner Größe erstellt
+    	Quad quadMesh = new Quad(quad.getWidth(),quad.getHeight());
+    	System.out.println("w. " + quad.getWidth()+"h: "+quad.getHeight()+"z: "+quad.getZLayer());
+    	System.out.println("qw: "+quad.getWidth()+"qh: "+quad.getHeight());
+        Geometry geom = new Geometry("Quad", quadMesh);
+        // Das Quad wird im Geometry bewegt
+        geom.move(quad.getX(), transY(quad), quad.getZLayer());
+        // Rotation des Quads
+        switch (quad.getTextureTurn()){
+        case TURN_LEFT_180_DEGREE:
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 0, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 1, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 0, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 1, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 0, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 1, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 0, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 1, 0f);
+        break;
+        case TURN_LEFT_270_DEGREE:
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 0, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 1, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 0, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 1, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 0, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 1, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 0, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 1, 0f);
+        break;
+        case TURN_LEFT_90_DEGREE:
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 0, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(0, 1, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 0, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(1, 1, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 0, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(2, 1, 0f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 0, 1f);
+        	geom.getMesh().getBuffer(VertexBuffer.Type.TexCoord).setElementComponent(3, 1, 1f);       	
+        break;
+        }
+        // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
+        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        System.out.println(quad.getTexture().getName());
+        Texture texture = assetManager.loadTexture( quad.getTexture().getName() );
+        mat.setTexture("ColorMap", texture);
+        mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+        geom.setMaterial(mat);
+        geom.setQueueBucket(Bucket.Transparent);
+        // Das Geometrie Object wird dem rootnode hinzugefügt
+        this.rootNode.attachChild(geom);
+        // Damit später auf die Quads zugefriffen werden kann werden diese mit dem zugehörigen
+        // RenderQuad als Schlüssel gespeichert 
+        geometrics.put(quad, geom);
+		return geom;
 	}
 	
 	@Override
