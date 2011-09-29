@@ -7,6 +7,7 @@ package de.d2dev.heroquest.engine.rendering.quads;
 import java.util.HashMap;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.*;
@@ -42,15 +43,17 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
     // Listener
     JmeUserInputListener userListener;
     
+    // Asset Manager 
+    private AssetManager hqAssetManager;
     
-    ResourceLocator resourceLocator;
+ 
     
-    public JmeRenderer (QuadRenderModel model, ResourceLocator locator) {
+    public JmeRenderer (QuadRenderModel model, AssetManager assetManager) {
         super();
         
         this.quadRenderModel = model;
         this.quadRenderModel.addListener(this);
-        this.resourceLocator = locator;
+        //hqAssetManager = assetManager;
         userListener = new JmeUserInputListener (this);
     }
     /** 
@@ -115,8 +118,6 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
      */
     @Override
     public void simpleInitApp() {
-    	JmeAssetLocatorAdapter.locators.put("argh", this.resourceLocator );	// ugly hack
-    	this.assetManager.registerLocator( "argh", new JmeAssetLocatorAdapter().getClass() );
     	initKeys();
         setCamToParallelProjektion (); 
         createMap();
@@ -195,8 +196,6 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 	private Geometry addQuadToScene (RenderQuad quad){
 		// Das Quad wird in seiner Größe erstellt
     	Quad quadMesh = new Quad(quad.getWidth(),quad.getHeight());
-    	System.out.println("w. " + quad.getWidth()+"h: "+quad.getHeight()+"z: "+quad.getZLayer());
-    	System.out.println("qw: "+quad.getWidth()+"qh: "+quad.getHeight());
         Geometry geom = new Geometry("Quad", quadMesh);
         // Das Quad wird im Geometry bewegt
         geom.move(quad.getX(), transY(quad), quad.getZLayer());
@@ -236,7 +235,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         // Ein Material mit der zum Quad gehörenden Textur wird erzeugt und dem Geometry hinzugefügt
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         System.out.println(quad.getTexture().getName());
-        Texture texture = assetManager.loadTexture( quad.getTexture().getName() );
+        Texture texture = hqAssetManager.loadTexture( quad.getTexture().getName() );
         mat.setTexture("ColorMap", texture);
         mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         geom.setMaterial(mat);
@@ -285,5 +284,17 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
 	}
 	public void setQuadRenderModel(QuadRenderModel quadRenderModel) {
 		this.quadRenderModel = quadRenderModel;
+	}
+	/**
+	 * @return the hqAssetManager
+	 */
+	public AssetManager getHqAssetManager() {
+		return hqAssetManager;
+	}
+	/**
+	 * @param hqAssetManager the hqAssetManager to set
+	 */
+	public void setHqAssetManager(AssetManager hqAssetManager) {
+		this.hqAssetManager = hqAssetManager;
 	}
 }

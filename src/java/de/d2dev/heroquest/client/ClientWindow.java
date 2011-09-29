@@ -45,8 +45,7 @@ public class ClientWindow extends javax.swing.JFrame {
         initComponents();
         
         if ( settings.useJmeRenderer() ) {
-        	// hier benutzen: resources.assestManager
-    		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing<JmeRenderer> ( this.jPanel1, new JmeRenderer ( m, resources.resourceFinder ) ) );        	
+    		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing<JmeRenderer> ( this.jPanel1, new JmeRenderer ( m, resources.assestManager ) ) );        	
         } else {
         	JScrollPane scrollPane = new JScrollPane();
         	scrollPane.setViewportView( new Java2DRenderPanel(m, resources.resourceFinder) );

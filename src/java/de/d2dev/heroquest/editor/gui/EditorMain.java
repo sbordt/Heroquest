@@ -198,9 +198,8 @@ public class EditorMain extends javax.swing.JFrame {
     		this.jmeRenderWindow = new JFrame ("JME-Renderer");
     		this.jmeRenderWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     		JPanel panel = new JPanel();
-    		
-    		// hier benutzen: this.editor.resources.assestManager
-    		this.jmeRenderer = new JmeRenderer (this.editor.renderer.getRederTarget(), this.editor.resources.resourceFinder);
+    	
+    		this.jmeRenderer = new JmeRenderer (this.editor.renderer.getRederTarget(), this.editor.resources.assestManager);
     		
     		JmeRenderer jmeRenderer = this.jmeRenderer;
     		java.awt.EventQueue.invokeLater(new RunJmeCanvasInSwing<JmeRenderer> (panel, jmeRenderer));

@@ -164,7 +164,7 @@ public class JmeUserInputListener implements AnalogListener, ActionListener {
 			renderer.getRootNode().detachChildNamed("Statistics View");
 			renderer.getRootNode().detachChildNamed("Frames per second");
 			System.out.println("Gui started");
-			NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(renderer.getAssetManager(), renderer.getInputManager(), renderer.getAudioRenderer(), renderer.getGuiViewPort());
+			NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(renderer.getHqAssetManager(), renderer.getInputManager(), renderer.getAudioRenderer(), renderer.getGuiViewPort());
 				/** Create a new NiftyGUI object */
 				Nifty nifty = niftyDisplay.getNifty();
 				/** Read your XML and initialize your custom ScreenController */

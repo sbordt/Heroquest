@@ -16,7 +16,7 @@ public class Main {
 	
     public static void main(String[] args) {
         QuadRenderModel map = new TestMap ();
-        JmeRenderer stupidRenderer = new JmeRenderer(map, new DummyResourceLocator() );
+        JmeRenderer stupidRenderer = new JmeRenderer(map);
         stupidRenderer.start();
     }
 }
