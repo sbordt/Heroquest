@@ -53,7 +53,7 @@ public class JmeRenderer extends SimpleApplication implements QuadRenderer, Quad
         
         this.quadRenderModel = model;
         this.quadRenderModel.addListener(this);
-        //hqAssetManager = assetManager;
+        hqAssetManager = assetManager;
         userListener = new JmeUserInputListener (this);
     }
     /** 
